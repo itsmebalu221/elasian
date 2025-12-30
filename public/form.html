@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration — Student Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #141416;
+      --bg-secondary: #1a1a1d;
+      --bg-elevated: #202024;
+      --silver: #a8a9ad;
+      --silver-muted: #6b6c70;
+      --silver-bright: #c4c5c9;
+      --text-primary: #e8e8e9;
+      --text-secondary: #94949a;
+      --text-muted: #5a5a60;
+      --border: rgba(168, 169, 173, 0.12);
+      --glass: rgba(255, 255, 255, 0.02);
+      --glass-border: rgba(168, 169, 173, 0.08);
+      --success: #7a9e7a;
+      --error: #c47a7a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-weight: 400;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      letter-spacing: -0.01em;
+      overflow-x: hidden;
+    }
+
+    .page {
+      min-height: 100vh;
+      width: 100%;
+      padding: 2rem 2rem 4rem;
+    }
+
+    .container {
+      max-width: 720px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    /* Header Bar */
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 3rem;
+    }
+
+    .user-block {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      object-fit: cover;
+    }
+
+    .user-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .user-email {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--success);
+    }
+
+    .status-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+    }
+
+    .logout-link {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .logout-link:hover {
+      color: var(--text-secondary);
+    }
+
+    /* Page Title */
+    .page-header {
+      margin-bottom: 3rem;
+    }
+
+    .page-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      font-size: 0.875rem;
+      font-weight: 300;
+      color: var(--text-secondary);
+    }
+
+    /* Form Sections */
+    .form-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .section-label {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--silver-muted);
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Form Fields */
+    .field {
+      margin-bottom: 1.5rem;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 540px) {
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    .field-label .required {
+      color: var(--silver-muted);
+      margin-left: 0.25rem;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .field-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .field-input:focus {
+      outline: none;
+      border-color: var(--silver-muted);
+      background: var(--bg-elevated);
+    }
+
+    .field-input.error {
+      border-color: rgba(196, 122, 122, 0.5);
+    }
+
+    .field-error {
+      font-size: 0.6875rem;
+      color: var(--error);
+      margin-top: 0.375rem;
+    }
+
+    select.field-input {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6c70' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+      cursor: pointer;
+    }
+
+    textarea.field-input {
+      resize: vertical;
+      min-height: 100px;
+      line-height: 1.6;
+    }
+
+    /* Messages */
+    .message {
+      padding: 1rem 1.25rem;
+      margin-bottom: 2rem;
+      font-size: 0.8125rem;
+      line-height: 1.6;
+    }
+
+    .message-success {
+      background: rgba(122, 158, 122, 0.08);
+      border-left: 2px solid var(--success);
+      color: var(--success);
+    }
+
+    .message-error {
+      background: rgba(196, 122, 122, 0.06);
+      border-left: 2px solid var(--error);
+      color: var(--error);
+    }
+
+    /* Submit Button */
+    .form-footer {
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      margin-top: 1rem;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 1rem 1.5rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: border-color 0.3s ease, background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      border-color: var(--silver-muted);
+      background: rgba(168, 169, 173, 0.04);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-spinner {
+      width: 1rem;
+      height: 1rem;
+      border: 1.5px solid var(--border);
+      border-top-color: var(--silver);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Loading State */
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      gap: 1.5rem;
+    }
+
+    .loading-spinner {
+      width: 2rem;
+      height: 2rem;
+      border: 2px solid var(--border);
+      border-top-color: var(--silver);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .loading-text {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="container">
+      <!-- Loading State -->
+      <div id="loading" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading</p>
+      </div>
+
+      <!-- Main Content -->
+      <div id="main-content" style="display: none;">
+        <!-- Header Bar -->
+        <header class="header-bar">
+          <div class="user-block">
+            <img id="user-avatar" class="user-avatar" src="" alt="">
+            <div class="user-meta">
+              <span class="user-name" id="user-name"></span>
+              <span class="user-email" id="user-email"></span>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 2rem;">
+            <div class="status-badge">Verified</div>
+            <a href="/auth/logout" class="logout-link">Sign out</a>
+          </div>
+        </header>
+
+        <!-- Page Header -->
+        <div class="page-header">
+          <h1 class="page-title">Student Registration</h1>
+          <p class="page-subtitle">Complete your registration details below</p>
+        </div>
+
+        <!-- Messages -->
+        <div id="success-message" class="message message-success" style="display: none;">
+          Registration submitted successfully.
+        </div>
+        <div id="error-message" class="message message-error" style="display: none;"></div>
+
+        <!-- Form -->
+        <form id="student-form">
+          <!-- Personal Information -->
+          <div class="form-section">
+            <div class="section-label">Personal Information</div>
+            
+            <div class="field">
+              <label class="field-label" for="full_name">
+                Full Name <span class="required">*</span>
+              </label>
+              <input type="text" id="full_name" name="full_name" class="field-input" placeholder="Enter your full name" required>
+              <div class="field-error" id="full_name-error"></div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label class="field-label" for="roll_number">
+                  Roll Number <span class="required">*</span>
+                </label>
+                <input type="text" id="roll_number" name="roll_number" class="field-input" placeholder="e.g., 21A31A0501" required>
+                <div class="field-error" id="roll_number-error"></div>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="mobile">
+                  Mobile Number <span class="required">*</span>
+                </label>
+                <input type="tel" id="mobile" name="mobile" class="field-input" placeholder="10-digit number" required>
+                <div class="field-error" id="mobile-error"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Academic Information -->
+          <div class="form-section">
+            <div class="section-label">Academic Information</div>
+
+            <div class="field-row">
+              <div class="field">
+                <label class="field-label" for="branch">
+                  Branch <span class="required">*</span>
+                </label>
+                <select id="branch" name="branch" class="field-input" required>
+                  <option value="">Select branch</option>
+                  <option value="CSE">Computer Science (CSE)</option>
+                  <option value="ECE">Electronics & Communication (ECE)</option>
+                  <option value="EEE">Electrical & Electronics (EEE)</option>
+                  <option value="MECH">Mechanical Engineering</option>
+                  <option value="CIVIL">Civil Engineering</option>
+                  <option value="IT">Information Technology (IT)</option>
+                  <option value="AIDS">AI & Data Science (AIDS)</option>
+                  <option value="AIML">AI & Machine Learning (AIML)</option>
+                  <option value="CSM">CSE (AI & ML)</option>
+                  <option value="CSD">CSE (Data Science)</option>
+                </select>
+                <div class="field-error" id="branch-error"></div>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="year_of_study">
+                  Year <span class="required">*</span>
+                </label>
+                <select id="year_of_study" name="year_of_study" class="field-input" required>
+                  <option value="">Select year</option>
+                  <option value="1">First Year</option>
+                  <option value="2">Second Year</option>
+                  <option value="3">Third Year</option>
+                  <option value="4">Fourth Year</option>
+                </select>
+                <div class="field-error" id="year_of_study-error"></div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="section">Section</label>
+              <input type="text" id="section" name="section" class="field-input" placeholder="e.g., A, B, C">
+              <div class="field-error" id="section-error"></div>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div class="form-footer">
+            <button type="submit" class="btn" id="submit-btn">
+              <span id="btn-text">Submit Registration</span>
+              <div class="btn-spinner" id="spinner"></div>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/auth/status');
+        const data = await response.json();
+
+        if (!data.isAuthenticated) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        document.getElementById('user-avatar').src = data.user.picture || 'https://via.placeholder.com/40';
+        document.getElementById('user-name').textContent = data.user.name;
+        document.getElementById('user-email').textContent = data.user.email;
+        document.getElementById('full_name').value = data.user.name || '';
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+
+        await loadExistingForm();
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        window.location.href = '/login.html';
+      }
+    }
+
+    async function loadExistingForm() {
+      try {
+        const response = await fetch('/api/student/form');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            const form = data.data;
+            document.getElementById('full_name').value = form.full_name || '';
+            document.getElementById('roll_number').value = form.roll_number || '';
+            document.getElementById('mobile').value = form.mobile || '';
+            document.getElementById('branch').value = form.branch || '';
+            document.getElementById('year_of_study').value = form.year_of_study || '';
+            document.getElementById('section').value = form.section || '';
+            document.getElementById('btn-text').textContent = 'Update Registration';
+          }
+        }
+      } catch (error) {
+        console.log('No existing form found');
+      }
+    }
+
+    document.getElementById('student-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      document.querySelectorAll('.field-error').forEach(el => el.textContent = '');
+      document.querySelectorAll('.field-input').forEach(el => el.classList.remove('error'));
+      document.getElementById('error-message').style.display = 'none';
+      document.getElementById('success-message').style.display = 'none';
+
+      const submitBtn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+      const spinner = document.getElementById('spinner');
+      
+      submitBtn.disabled = true;
+      btnText.textContent = 'Submitting';
+      spinner.style.display = 'block';
+
+      const formData = {
+        full_name: document.getElementById('full_name').value.trim(),
+        roll_number: document.getElementById('roll_number').value.trim(),
+        mobile: document.getElementById('mobile').value.trim(),
+        branch: document.getElementById('branch').value,
+        year_of_study: parseInt(document.getElementById('year_of_study').value),
+        section: document.getElementById('section').value.trim() || undefined
+      };
+
+      try {
+        const response = await fetch('/api/student/form', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (data.errors) {
+            data.errors.forEach(err => {
+              const field = err.field;
+              const errorEl = document.getElementById(`${field}-error`);
+              const inputEl = document.getElementById(field);
+              if (errorEl) errorEl.textContent = err.message;
+              if (inputEl) inputEl.classList.add('error');
+            });
+          } else {
+            document.getElementById('error-message').textContent = data.error || 'An error occurred';
+            document.getElementById('error-message').style.display = 'block';
+          }
+        } else {
+          document.getElementById('success-message').style.display = 'block';
+          btnText.textContent = 'Update Registration';
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          
+          // Redirect to dashboard after short delay
+          setTimeout(() => {
+            window.location.href = '/dashboard.html';
+          }, 1500);
+        }
+      } catch (error) {
+        document.getElementById('error-message').textContent = 'Network error. Please try again.';
+        document.getElementById('error-message').style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        spinner.style.display = 'none';
+        if (btnText.textContent === 'Submitting') {
+          btnText.textContent = 'Submit Registration';
+        }
+      }
+    });
+
+    checkAuth();
+  </script>
+</body>
+</html>

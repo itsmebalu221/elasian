@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portal — HITAM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #141416;
+      --bg-secondary: #1a1a1d;
+      --bg-elevated: #202024;
+      --silver: #a8a9ad;
+      --silver-muted: #6b6c70;
+      --silver-bright: #c4c5c9;
+      --text-primary: #e8e8e9;
+      --text-secondary: #94949a;
+      --text-muted: #5a5a60;
+      --border: rgba(168, 169, 173, 0.12);
+      --glass: rgba(255, 255, 255, 0.02);
+      --glass-border: rgba(168, 169, 173, 0.08);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-weight: 400;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      letter-spacing: -0.01em;
+    }
+
+    .page {
+      min-height: 100vh;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .serif {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+    }
+
+    .title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 2.25rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-size: 0.875rem;
+      font-weight: 300;
+      color: var(--text-secondary);
+      letter-spacing: 0.02em;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .institution {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--silver-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .divider {
+      width: 1px;
+      height: 2rem;
+      background: linear-gradient(to bottom, transparent, var(--silver-muted), transparent);
+      margin: 1.5rem auto;
+    }
+
+    .card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      padding: 2.5rem 2rem;
+    }
+
+    .info-box {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 0;
+      margin-bottom: 2rem;
+    }
+
+    .info-label {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--silver-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .info-text {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .domain-tag {
+      display: inline-block;
+      font-family: 'SF Mono', 'Monaco', monospace;
+      font-size: 0.75rem;
+      color: var(--silver);
+      background: rgba(168, 169, 173, 0.08);
+      padding: 0.25rem 0.625rem;
+      margin-top: 0.75rem;
+      letter-spacing: 0.02em;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 0.9375rem 1.5rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: border-color 0.3s ease, background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      border-color: var(--silver-muted);
+      background: rgba(168, 169, 173, 0.04);
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-icon {
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: 4px;
+      object-fit: contain;
+    }
+
+    .btn-spinner {
+      width: 1rem;
+      height: 1rem;
+      border: 1.5px solid var(--border);
+      border-top-color: var(--silver);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      font-size: 0.8125rem;
+      color: #c47a7a;
+      background: rgba(196, 122, 122, 0.06);
+      border-left: 2px solid rgba(196, 122, 122, 0.4);
+      padding: 0.875rem 1rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 3rem;
+    }
+
+    .footer-text {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      letter-spacing: 0.01em;
+      line-height: 1.8;
+    }
+
+    .footer-divider {
+      width: 3rem;
+      height: 1px;
+      background: var(--border);
+      margin: 1.5rem auto;
+    }
+
+    @media (max-width: 480px) {
+      .title {
+        font-size: 1.875rem;
+      }
+      .card {
+        padding: 2rem 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="container">
+      <header class="header">
+        <p class="institution">Hyderabad Institute of Technology and Management</p>
+        <div class="divider"></div>
+        <h1 class="title">Student Portal</h1>
+        <p class="subtitle">Registration & Verification System</p>
+      </header>
+
+      <div class="card">
+        <div class="info-box">
+          <p class="info-label">Authentication Required</p>
+          <p class="info-text">
+            Sign in with your institutional email address to access the student registration portal.
+          </p>
+          <span class="domain-tag">@hitam.org</span>
+        </div>
+
+        <div id="error-container"></div>
+
+        <button id="google-signin-btn" class="btn" onclick="signInWithGoogle()">
+          <img class="btn-icon" src="/assets/Hitam-logo-greenbg.png" alt="HITAM">
+          <span id="btn-text">Continue with HITAM ID</span>
+          <div class="btn-spinner" id="spinner"></div>
+        </button>
+      </div>
+
+      <footer class="footer">
+        <div class="footer-divider"></div>
+        <p class="footer-text">
+          By continuing, you acknowledge and accept<br>
+          the institution's terms of service.
+        </p>
+      </footer>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCJOKZsFVoV77wXVhi9Q71-2EDP4jdtLFc",
+      authDomain: "elasian.firebaseapp.com",
+      projectId: "elasian",
+      storageBucket: "elasian.firebasestorage.app",
+      messagingSenderId: "451777569898",
+      appId: "1:451777569898:web:ab09271ea3cf1e581bd613",
+      measurementId: "G-C2Q901DRJJ"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    if (error) showError(error);
+
+    checkAuthStatus();
+
+    async function checkAuthStatus() {
+      try {
+        const response = await fetch('/api/auth/status');
+        const data = await response.json();
+        if (data.isAuthenticated) {
+          window.location.href = data.user.hasSubmittedForm ? '/dashboard.html' : '/form.html';
+        }
+      } catch (err) {
+        console.error('Auth check failed:', err);
+      }
+    }
+
+    function showError(message) {
+      document.getElementById('error-container').innerHTML = 
+        `<div class="error-message">${message}</div>`;
+    }
+
+    function setLoading(loading) {
+      const btn = document.getElementById('google-signin-btn');
+      const btnText = document.getElementById('btn-text');
+      const spinner = document.getElementById('spinner');
+
+      btn.disabled = loading;
+      btnText.textContent = loading ? 'Authenticating' : 'Continue with HITAM ID';
+      spinner.style.display = loading ? 'block' : 'none';
+    }
+
+    async function signInWithGoogle() {
+      setLoading(true);
+      document.getElementById('error-container').innerHTML = '';
+
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+        
+        const result = await firebase.auth().signInWithPopup(provider);
+        const user = result.user;
+
+        if (!user.email.toLowerCase().endsWith('@hitam.org')) {
+          await firebase.auth().signOut();
+          showError('Access restricted to @hitam.org email addresses.');
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch('/api/auth/firebase-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user: {
+              uid: user.uid,
+              email: user.email,
+              displayName: user.displayName,
+              photoURL: user.photoURL
+            }
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          window.location.href = data.hasSubmittedForm ? '/dashboard.html' : '/form.html';
+        } else {
+          await firebase.auth().signOut();
+          showError(data.error || 'Authentication failed.');
+          setLoading(false);
+        }
+      } catch (error) {
+        if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+          showError(error.message || 'Authentication failed.');
+        }
+        setLoading(false);
+      }
+    }
+  </script>
+</body>
+</html>

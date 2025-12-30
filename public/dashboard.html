@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Student Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #141416;
+      --bg-secondary: #1a1a1d;
+      --bg-elevated: #202024;
+      --silver: #a8a9ad;
+      --silver-muted: #6b6c70;
+      --silver-bright: #c4c5c9;
+      --text-primary: #e8e8e9;
+      --text-secondary: #94949a;
+      --text-muted: #5a5a60;
+      --border: rgba(168, 169, 173, 0.12);
+      --glass: rgba(255, 255, 255, 0.02);
+      --glass-border: rgba(168, 169, 173, 0.08);
+      --success: #7a9e7a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      font-weight: 400;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      letter-spacing: -0.01em;
+      overflow-x: hidden;
+    }
+
+    .page {
+      min-height: 100vh;
+      width: 100%;
+      padding: 2rem 2rem 4rem;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    /* Header Bar */
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 3rem;
+    }
+
+    .user-block {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      object-fit: cover;
+    }
+
+    .user-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .user-email {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--success);
+    }
+
+    .status-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+    }
+
+    .logout-link {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .logout-link:hover {
+      color: var(--text-secondary);
+    }
+
+    /* Success Header */
+    .success-header {
+      text-align: center;
+      padding: 3rem 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 3rem;
+    }
+
+    .success-icon {
+      width: 4rem;
+      height: 4rem;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      color: var(--success);
+      font-size: 1.5rem;
+    }
+
+    .success-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .success-subtitle {
+      font-size: 0.875rem;
+      font-weight: 300;
+      color: var(--text-secondary);
+    }
+
+    /* Data Sections */
+    .data-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .section-label {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--silver-muted);
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+    }
+
+    .data-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+
+    @media (max-width: 480px) {
+      .data-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .data-item {
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-grid .data-item:nth-child(odd) {
+      padding-right: 1.5rem;
+    }
+
+    .data-grid .data-item:nth-child(even) {
+      padding-left: 1.5rem;
+      border-left: 1px solid var(--border);
+    }
+
+    @media (max-width: 480px) {
+      .data-grid .data-item:nth-child(odd),
+      .data-grid .data-item:nth-child(even) {
+        padding: 1rem 0;
+        border-left: none;
+      }
+    }
+
+    .data-label {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.375rem;
+    }
+
+    .data-value {
+      font-size: 0.9375rem;
+      color: var(--text-primary);
+    }
+
+    .data-value.empty {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* Full Width Data Item */
+    .data-item-full {
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Actions */
+    .actions {
+      padding-top: 2rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.875rem 1.5rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color 0.3s ease, background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      border-color: var(--silver-muted);
+      background: rgba(168, 169, 173, 0.04);
+    }
+
+    /* Timestamp */
+    .timestamp {
+      text-align: center;
+      padding-top: 2rem;
+      margin-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .timestamp-text {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    /* Loading State */
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      gap: 1.5rem;
+    }
+
+    .loading-spinner {
+      width: 2rem;
+      height: 2rem;
+      border: 2px solid var(--border);
+      border-top-color: var(--silver);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    /* QR Code Section */
+    .qr-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem 2rem;
+      margin-bottom: 2.5rem;
+      background: linear-gradient(135deg, rgba(168, 169, 173, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+      border: 1px solid transparent;
+      border-radius: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .qr-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 1rem;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(168, 169, 173, 0.4), rgba(168, 169, 173, 0.1), rgba(196, 197, 201, 0.3));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+
+    .qr-section::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        45deg,
+        transparent 40%,
+        rgba(168, 169, 173, 0.08) 45%,
+        rgba(196, 197, 201, 0.12) 50%,
+        rgba(168, 169, 173, 0.08) 55%,
+        transparent 60%
+      );
+      animation: shimmer 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%) rotate(0deg); }
+      100% { transform: translateX(100%) rotate(0deg); }
+    }
+
+    .qr-card {
+      position: relative;
+      z-index: 1;
+      padding: 1.5rem;
+      background: linear-gradient(145deg, #ffffff, #f8f8f8);
+      border-radius: 0.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.25),
+        0 0 40px rgba(168, 169, 173, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(168, 169, 173, 0.2);
+    }
+
+    .qr-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 0.75rem;
+      padding: 1px;
+      background: linear-gradient(145deg, rgba(196, 197, 201, 0.6), rgba(168, 169, 173, 0.2), rgba(196, 197, 201, 0.4));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .qr-card img {
+      display: block;
+      width: 160px;
+      height: 160px;
+      border-radius: 0.25rem;
+    }
+
+    .reg-id-display {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      padding: 1rem 2rem;
+      background: rgba(168, 169, 173, 0.05);
+      border: 1px solid rgba(168, 169, 173, 0.15);
+      border-radius: 0.5rem;
+    }
+
+    .reg-id-label {
+      font-size: 0.625rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .reg-id-value {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--silver-bright), var(--silver), var(--silver-bright));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 30px rgba(168, 169, 173, 0.3);
+    }
+
+    .qr-hint {
+      position: relative;
+      z-index: 1;
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="container">
+      <!-- Loading State -->
+      <div id="loading" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading</p>
+      </div>
+
+      <!-- Main Content -->
+      <div id="main-content" style="display: none;">
+        <!-- Header Bar -->
+        <header class="header-bar">
+          <div class="user-block">
+            <img id="user-avatar" class="user-avatar" src="" alt="">
+            <div class="user-meta">
+              <span class="user-name" id="user-name"></span>
+              <span class="user-email" id="user-email"></span>
+            </div>
+          </div>
+          <div class="header-actions">
+            <div class="status-badge">Verified</div>
+            <a href="/auth/logout" class="logout-link">Sign out</a>
+          </div>
+        </header>
+
+        <!-- Success Header -->
+        <div class="success-header">
+          <div class="success-icon">✓</div>
+          <h1 class="success-title">Registration Complete</h1>
+          <p class="success-subtitle">Your student registration has been recorded</p>
+        </div>
+
+        <!-- QR Code Section -->
+        <div class="qr-section">
+          <div class="qr-card">
+            <img id="qr-code" src="" alt="QR Code">
+          </div>
+          <div class="reg-id-display">
+            <span class="reg-id-label">Registration ID</span>
+            <span class="reg-id-value" id="display-reg-id">—</span>
+          </div>
+          <p class="qr-hint">Scan this QR code for verification</p>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="data-section">
+          <div class="section-label">Personal Information</div>
+          <div class="data-grid">
+            <div class="data-item">
+              <div class="data-label">Full Name</div>
+              <div class="data-value" id="display-name">—</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">Roll Number</div>
+              <div class="data-value" id="display-roll">—</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">Mobile</div>
+              <div class="data-value" id="display-mobile">—</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">Email</div>
+              <div class="data-value" id="display-email">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Academic Information -->
+        <div class="data-section">
+          <div class="section-label">Academic Information</div>
+          <div class="data-grid">
+            <div class="data-item">
+              <div class="data-label">Branch</div>
+              <div class="data-value" id="display-branch">—</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">Year</div>
+              <div class="data-value" id="display-year">—</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">Section</div>
+              <div class="data-value" id="display-section">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+          <a href="/form.html" class="btn">Edit Details</a>
+        </div>
+
+        <!-- Timestamp -->
+        <div class="timestamp">
+          <p class="timestamp-text" id="submission-date"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const yearLabels = {
+      1: 'First Year',
+      2: 'Second Year',
+      3: 'Third Year',
+      4: 'Fourth Year'
+    };
+
+    function generateQRCode(registrationId) {
+      const qrImg = document.getElementById('qr-code');
+      // Using QR Server API - free and reliable
+      qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(registrationId)}&bgcolor=ffffff&color=141416`;
+    }
+
+    async function loadDashboard() {
+      try {
+        const response = await fetch('/api/auth/status');
+        const data = await response.json();
+
+        if (!data.isAuthenticated) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        document.getElementById('user-avatar').src = data.user.picture || 'https://via.placeholder.com/40';
+        document.getElementById('user-name').textContent = data.user.name;
+        document.getElementById('user-email').textContent = data.user.email;
+        document.getElementById('display-email').textContent = data.user.email;
+
+        if (!data.user.hasSubmittedForm) {
+          window.location.href = '/form.html';
+          return;
+        }
+
+        const formResponse = await fetch('/api/student/form');
+        const formData = await formResponse.json();
+
+        if (formData.success && formData.data) {
+          const form = formData.data;
+          
+          // Display Registration ID and generate QR
+          const regId = form.registration_id || 'N/A';
+          document.getElementById('display-reg-id').textContent = regId;
+          if (form.registration_id) {
+            generateQRCode(form.registration_id);
+          }
+
+          document.getElementById('display-name').textContent = form.full_name || '—';
+          document.getElementById('display-roll').textContent = form.roll_number || '—';
+          document.getElementById('display-mobile').textContent = form.mobile || '—';
+          document.getElementById('display-branch').textContent = form.branch || '—';
+          document.getElementById('display-year').textContent = yearLabels[form.year_of_study] || '—';
+          document.getElementById('display-section').textContent = form.section || '—';
+
+          // Handle empty optional fields
+          if (!form.section) {
+            document.getElementById('display-section').classList.add('empty');
+            document.getElementById('display-section').textContent = 'Not specified';
+          }
+
+          if (form.created_at) {
+            const date = new Date(form.created_at);
+            document.getElementById('submission-date').textContent = 
+              `Submitted ${date.toLocaleDateString('en-GB', { 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric'
+              })}`;
+          }
+        }
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+        window.location.href = '/login.html';
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>
