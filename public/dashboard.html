@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — Student Portal</title>
+  <title>Dashboard — elasian</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -22,6 +22,7 @@
       --glass: rgba(255, 255, 255, 0.02);
       --glass-border: rgba(168, 169, 173, 0.08);
       --success: #7a9e7a;
+      --page-margin: 3rem;
     }
 
     * {
@@ -51,17 +52,215 @@
       overflow-x: hidden;
     }
 
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem var(--page-margin);
+      background: rgba(20, 20, 22, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .brand-text {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      color: var(--text-primary);
+      text-transform: lowercase;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-text span {
+      display: inline-block;
+      animation: wave 2.5s ease-in-out infinite;
+    }
+
+    .brand-text span:nth-child(1) { animation-delay: 0s; }
+    .brand-text span:nth-child(2) { animation-delay: 0.1s; }
+    .brand-text span:nth-child(3) { animation-delay: 0.2s; }
+    .brand-text span:nth-child(4) { animation-delay: 0.3s; }
+    .brand-text span:nth-child(5) { animation-delay: 0.4s; }
+    .brand-text span:nth-child(6) { animation-delay: 0.5s; }
+    .brand-text span:nth-child(7) { animation-delay: 0.6s; }
+
+    @keyframes wave {
+      0%, 100% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      25% {
+        transform: translateY(-3px);
+        opacity: 0.8;
+      }
+      50% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .navbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-link {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      transition: color 0.2s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--text-secondary);
+    }
+
+    /* Mobile Menu Toggle */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      width: 32px;
+      height: 32px;
+      padding: 6px;
+      background: none;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+
+    .menu-toggle:hover {
+      border-color: var(--silver-muted);
+    }
+
+    .menu-toggle span {
+      width: 100%;
+      height: 1.5px;
+      background: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+
+    .menu-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(4px, 4px);
+    }
+
+    .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(4px, -4px);
+    }
+
+    @media (max-width: 576px) {
+      .navbar {
+        padding: 0.875rem 1.25rem;
+      }
+
+      .brand-text {
+        font-size: 1.25rem;
+      }
+
+      .menu-toggle {
+        display: flex;
+      }
+
+      .navbar-actions {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+        background: rgba(20, 20, 22, 0.98);
+        backdrop-filter: blur(10px);
+        flex-direction: column;
+        padding: 0;
+        gap: 0;
+        border-bottom: 1px solid var(--border);
+        transform: translateY(-100%);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .navbar-actions.open {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .nav-link {
+        display: block;
+        padding: 1rem 1.25rem;
+        width: 100%;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.8125rem;
+      }
+
+      .nav-link:last-child {
+        border-bottom: none;
+      }
+    }
+
+    /* Page Layout */
     .page {
       min-height: 100vh;
       width: 100%;
-      padding: 2rem 2rem 4rem;
+      padding: 5rem var(--page-margin) var(--page-margin);
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 992px) {
+      :root {
+        --page-margin: 2rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      :root {
+        --page-margin: 1.5rem;
+      }
+      .page {
+        border-left: none;
+        border-right: none;
+        padding-top: 4.5rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      :root {
+        --page-margin: 1rem;
+      }
+      .page {
+        padding-top: 4rem;
+      }
     }
 
     .container {
       max-width: 800px;
       width: 100%;
       margin: 0 auto;
-      padding: 0 1rem;
     }
 
     /* Header Bar */
@@ -71,7 +270,15 @@
       justify-content: space-between;
       padding: 1.5rem 0;
       border-bottom: 1px solid var(--border);
-      margin-bottom: 3rem;
+      margin-bottom: 0;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      .header-bar {
+        padding: 1.25rem 0;
+      }
     }
 
     .user-block {
@@ -80,34 +287,74 @@
       gap: 1rem;
     }
 
+    @media (max-width: 480px) {
+      .user-block {
+        gap: 0.75rem;
+      }
+    }
+
     .user-avatar {
       width: 2.5rem;
       height: 2.5rem;
       border-radius: 50%;
       border: 1px solid var(--border);
       object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 480px) {
+      .user-avatar {
+        width: 2.25rem;
+        height: 2.25rem;
+      }
     }
 
     .user-meta {
       display: flex;
       flex-direction: column;
+      min-width: 0;
     }
 
     .user-name {
       font-size: 0.875rem;
       font-weight: 500;
       color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .user-email {
       font-size: 0.75rem;
       color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+
+    @media (max-width: 480px) {
+      .user-name {
+        font-size: 0.8125rem;
+      }
+
+      .user-email {
+        font-size: 0.6875rem;
+        max-width: 150px;
+      }
     }
 
     .header-actions {
       display: flex;
       align-items: center;
       gap: 2rem;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 480px) {
+      .header-actions {
+        gap: 1rem;
+      }
     }
 
     .status-badge {
@@ -121,12 +368,20 @@
       color: var(--success);
     }
 
+    @media (max-width: 400px) {
+      .status-badge {
+        font-size: 0.625rem;
+        letter-spacing: 0.05em;
+      }
+    }
+
     .status-badge::before {
       content: '';
       width: 6px;
       height: 6px;
       background: var(--success);
       border-radius: 50%;
+      flex-shrink: 0;
     }
 
     .logout-link {
@@ -142,43 +397,191 @@
 
     /* Success Header */
     .success-header {
-      text-align: center;
-      padding: 3rem 0;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem 0;
       border-bottom: 1px solid var(--border);
-      margin-bottom: 3rem;
+      margin-bottom: 2.5rem;
+    }
+
+    @media (max-width: 576px) {
+      .success-header {
+        padding: 1.25rem 0;
+        margin-bottom: 2rem;
+        gap: 0.75rem;
+      }
     }
 
     .success-icon {
-      width: 4rem;
-      height: 4rem;
+      width: 2.5rem;
+      height: 2.5rem;
       border: 1px solid var(--border);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 1.5rem;
       color: var(--success);
-      font-size: 1.5rem;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 480px) {
+      .success-icon {
+        width: 2.25rem;
+        height: 2.25rem;
+        font-size: 0.875rem;
+      }
+    }
+
+    .success-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+      min-width: 0;
     }
 
     .success-title {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.75rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
       font-weight: 500;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.01em;
       color: var(--text-primary);
-      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 480px) {
+      .success-title {
+        font-size: 0.9375rem;
+      }
     }
 
     .success-subtitle {
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       font-weight: 300;
-      color: var(--text-secondary);
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 480px) {
+      .success-subtitle {
+        font-size: 0.6875rem;
+      }
+    }
+
+    /* Payment Banner */
+    .payment-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid;
+    }
+
+    .payment-banner.pending {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .payment-banner.paid {
+      background: rgba(34, 197, 94, 0.08);
+      border-color: rgba(34, 197, 94, 0.3);
+    }
+
+    .payment-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .payment-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .payment-banner.pending .payment-icon {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+    }
+
+    .payment-banner.paid .payment-icon {
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
+    }
+
+    .payment-icon svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .payment-text h3 {
+      font-size: 0.9375rem;
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+
+    .payment-banner.pending .payment-text h3 {
+      color: #f59e0b;
+    }
+
+    .payment-banner.paid .payment-text h3 {
+      color: #22c55e;
+    }
+
+    .payment-text p {
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    .btn-pay-now {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #6b8cce 0%, #5a7bc0 100%);
+      border: none;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-pay-now:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(107, 140, 206, 0.3);
+    }
+
+    @media (max-width: 576px) {
+      .payment-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .btn-pay-now {
+        width: 100%;
+        justify-content: center;
+      }
     }
 
     /* Data Sections */
     .data-section {
       margin-bottom: 2.5rem;
+    }
+
+    @media (max-width: 576px) {
+      .data-section {
+        margin-bottom: 2rem;
+      }
     }
 
     .section-label {
@@ -192,13 +595,21 @@
       margin-bottom: 1.25rem;
     }
 
+    @media (max-width: 480px) {
+      .section-label {
+        font-size: 0.625rem;
+        padding-bottom: 0.875rem;
+        margin-bottom: 1rem;
+      }
+    }
+
     .data-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0;
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 576px) {
       .data-grid {
         grid-template-columns: 1fr;
       }
@@ -207,6 +618,12 @@
     .data-item {
       padding: 1rem 0;
       border-bottom: 1px solid var(--border);
+    }
+
+    @media (max-width: 480px) {
+      .data-item {
+        padding: 0.875rem 0;
+      }
     }
 
     .data-grid .data-item:nth-child(odd) {
@@ -218,10 +635,10 @@
       border-left: 1px solid var(--border);
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 576px) {
       .data-grid .data-item:nth-child(odd),
       .data-grid .data-item:nth-child(even) {
-        padding: 1rem 0;
+        padding: 0.875rem 0;
         border-left: none;
       }
     }
@@ -235,9 +652,23 @@
       margin-bottom: 0.375rem;
     }
 
+    @media (max-width: 480px) {
+      .data-label {
+        font-size: 0.625rem;
+        margin-bottom: 0.25rem;
+      }
+    }
+
     .data-value {
       font-size: 0.9375rem;
       color: var(--text-primary);
+      word-break: break-word;
+    }
+
+    @media (max-width: 480px) {
+      .data-value {
+        font-size: 0.875rem;
+      }
     }
 
     .data-value.empty {
@@ -256,10 +687,19 @@
       padding-top: 2rem;
       display: flex;
       gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 480px) {
+      .actions {
+        flex-direction: column;
+        padding-top: 1.5rem;
+      }
     }
 
     .btn {
       flex: 1;
+      min-width: 140px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -277,6 +717,13 @@
       transition: border-color 0.3s ease, background-color 0.3s ease;
     }
 
+    @media (max-width: 480px) {
+      .btn {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.75rem;
+      }
+    }
+
     .btn:hover {
       border-color: var(--silver-muted);
       background: rgba(168, 169, 173, 0.04);
@@ -290,10 +737,22 @@
       border-top: 1px solid var(--border);
     }
 
+    @media (max-width: 576px) {
+      .timestamp {
+        padding-top: 1.5rem;
+      }
+    }
+
     .timestamp-text {
       font-size: 0.6875rem;
       color: var(--text-muted);
       letter-spacing: 0.02em;
+    }
+
+    @media (max-width: 480px) {
+      .timestamp-text {
+        font-size: 0.625rem;
+      }
     }
 
     /* Loading State */
@@ -304,6 +763,14 @@
       justify-content: center;
       min-height: 60vh;
       gap: 1.5rem;
+      padding: 2rem;
+    }
+
+    @media (max-width: 576px) {
+      .loading-state {
+        min-height: 50vh;
+        gap: 1rem;
+      }
     }
 
     .loading-spinner {
@@ -327,133 +794,697 @@
     /* QR Code Section */
     .qr-section {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 3rem 2rem;
+      align-items: stretch;
       margin-bottom: 2.5rem;
-      background: linear-gradient(135deg, rgba(168, 169, 173, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
-      border: 1px solid transparent;
-      border-radius: 1rem;
-      position: relative;
-      overflow: hidden;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
     }
 
-    .qr-section::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: 1rem;
-      padding: 1px;
-      background: linear-gradient(135deg, rgba(168, 169, 173, 0.4), rgba(168, 169, 173, 0.1), rgba(196, 197, 201, 0.3));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
+    @media (max-width: 600px) {
+      .qr-section {
+        flex-direction: column;
+      }
     }
 
-    .qr-section::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(
-        45deg,
-        transparent 40%,
-        rgba(168, 169, 173, 0.08) 45%,
-        rgba(196, 197, 201, 0.12) 50%,
-        rgba(168, 169, 173, 0.08) 55%,
-        transparent 60%
-      );
-      animation: shimmer 3s ease-in-out infinite;
-      pointer-events: none;
+    .qr-left {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
     }
 
-    @keyframes shimmer {
-      0% { transform: translateX(-100%) rotate(0deg); }
-      100% { transform: translateX(100%) rotate(0deg); }
+    @media (max-width: 600px) {
+      .qr-left {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 1.25rem;
+      }
     }
 
     .qr-card {
-      position: relative;
-      z-index: 1;
-      padding: 1.5rem;
-      background: linear-gradient(145deg, #ffffff, #f8f8f8);
-      border-radius: 0.75rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 
-        0 4px 20px rgba(0, 0, 0, 0.25),
-        0 0 40px rgba(168, 169, 173, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
-      border: 1px solid rgba(168, 169, 173, 0.2);
-    }
-
-    .qr-card::before {
-      content: '';
-      position: absolute;
-      inset: -1px;
-      border-radius: 0.75rem;
-      padding: 1px;
-      background: linear-gradient(145deg, rgba(196, 197, 201, 0.6), rgba(168, 169, 173, 0.2), rgba(196, 197, 201, 0.4));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      pointer-events: none;
+      padding: 0.5rem;
+      background: #ffffff;
     }
 
     .qr-card img {
       display: block;
-      width: 160px;
-      height: 160px;
-      border-radius: 0.25rem;
+      width: 120px;
+      height: 120px;
     }
 
-    .reg-id-display {
-      position: relative;
-      z-index: 1;
+    @media (max-width: 400px) {
+      .qr-card img {
+        width: 100px;
+        height: 100px;
+      }
+    }
+
+    .qr-right {
+      flex: 1;
       display: flex;
       flex-direction: column;
+      padding: 1.5rem;
+      min-width: 0;
+    }
+
+    @media (max-width: 600px) {
+      .qr-right {
+        padding: 1.25rem;
+      }
+    }
+
+    .reg-id-row {
+      display: flex;
       align-items: center;
-      gap: 0.5rem;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
       margin-bottom: 1rem;
-      padding: 1rem 2rem;
-      background: rgba(168, 169, 173, 0.05);
-      border: 1px solid rgba(168, 169, 173, 0.15);
-      border-radius: 0.5rem;
+    }
+
+    .reg-id-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      min-width: 0;
     }
 
     .reg-id-label {
       font-size: 0.625rem;
-      font-weight: 600;
-      letter-spacing: 0.15em;
+      font-weight: 500;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--text-muted);
     }
 
     .reg-id-value {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: 1.75rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 1.125rem;
       font-weight: 600;
-      background: linear-gradient(135deg, var(--silver-bright), var(--silver), var(--silver-bright));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: 0.08em;
-      text-shadow: 0 0 30px rgba(168, 169, 173, 0.3);
+      color: var(--text-primary);
+      letter-spacing: 0.05em;
+      word-break: break-all;
     }
 
-    .qr-hint {
-      position: relative;
-      z-index: 1;
+    @media (max-width: 480px) {
+      .reg-id-value {
+        font-size: 1rem;
+      }
+    }
+
+    .btn-download {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.375rem;
+      padding: 0.5rem 0.875rem;
+      background: linear-gradient(135deg, #6b8cce 0%, #5a7bc0 100%);
+      border: none;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn-download:hover {
+      background: linear-gradient(135deg, #7a9bdd 0%, #6b8cce 100%);
+      transform: translateY(-1px);
+    }
+
+    .btn-download svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    @media (max-width: 400px) {
+      .reg-id-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+      
+      .btn-download {
+        width: 100%;
+      }
+    }
+
+    .qr-info {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .qr-info {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .qr-info {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .qr-info {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+      }
+    }
+
+    .qr-info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+      min-width: 0;
+    }
+
+    .qr-info-label {
+      font-size: 0.625rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .qr-info-value {
+      font-size: 0.8125rem;
+      color: var(--text-primary);
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 480px) {
+      .qr-info-value {
+        font-size: 0.75rem;
+      }
+    }
+
+    .qr-instructions {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 0.625rem 0.75rem;
+      background: rgba(107, 140, 206, 0.08);
+      border-left: 2px solid #6b8cce;
+      margin-top: auto;
+    }
+
+    .qr-instructions-icon {
+      font-size: 0.875rem;
+      flex-shrink: 0;
+    }
+
+    .qr-instructions-text {
+      font-size: 0.6875rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* Events Section Styles */
+    .events-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .day-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .day-badge {
+      font-size: 0.625rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #6b8cce;
+      padding: 0.25rem 0.75rem;
+      background: rgba(107, 140, 206, 0.1);
+      border: 1px solid rgba(107, 140, 206, 0.2);
+      border-radius: 2rem;
+      flex-shrink: 0;
+    }
+
+    .day-title {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .event-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .event-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: border-color 0.2s ease;
+    }
+
+    @media (max-width: 480px) {
+      .event-item {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.875rem;
+      }
+    }
+
+    .event-item:hover {
+      border-color: var(--silver-muted);
+    }
+
+    .event-time {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: #6b8cce;
+      min-width: 110px;
+      padding-top: 0.125rem;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 480px) {
+      .event-time {
+        min-width: auto;
+        padding-top: 0;
+        font-size: 0.625rem;
+        padding: 0.25rem 0.5rem;
+        background: rgba(107, 140, 206, 0.08);
+        border-radius: 3px;
+        display: inline-block;
+      }
+    }
+
+    .event-details {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .event-name {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    @media (max-width: 480px) {
+      .event-name {
+        font-size: 0.8125rem;
+      }
+    }
+
+    .event-venue {
       font-size: 0.6875rem;
       color: var(--text-muted);
-      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 480px) {
+      .event-venue {
+        font-size: 0.625rem;
+      }
+    }
+
+    .no-events {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+      background: var(--bg-secondary);
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+    }
+
+    @media (max-width: 480px) {
+      .no-events {
+        padding: 1.5rem;
+        font-size: 0.75rem;
+      }
+    }
+
+    .events-summary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      background: rgba(107, 140, 206, 0.08);
+      border: 1px solid rgba(107, 140, 206, 0.15);
+      border-radius: 6px;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 480px) {
+      .events-summary {
+        padding: 0.625rem 0.5rem;
+      }
+    }
+
+    .events-summary-text {
+      font-size: 0.75rem;
+      color: #6b8cce;
+      text-align: center;
+    }
+
+    @media (max-width: 480px) {
+      .events-summary-text {
+        font-size: 0.6875rem;
+      }
+    }
+
+    .events-summary-count {
+      font-weight: 600;
+    }
+
+    /* ==================== PRINT STYLES ==================== */
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      html, body {
+        background: #fff !important;
+        color: #000 !important;
+        font-size: 12pt;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: auto;
+      }
+
+      /* Hide everything except print pass */
+      .navbar,
+      .page,
+      #loading {
+        display: none !important;
+      }
+
+      /* Show print pass */
+      .print-pass {
+        display: block !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: #fff !important;
+      }
+
+      .print-pass-inner {
+        width: 100%;
+        max-width: 210mm;
+        padding: 12mm 15mm;
+      }
+
+      .pass-day-badge {
+        background: #000 !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+
+    /* Print Pass Layout (hidden on screen) */
+    .print-pass {
+      display: none;
+    }
+
+    .print-pass-inner {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      padding: 15mm;
+      background: #fff;
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: #000;
+      box-sizing: border-box;
+    }
+
+    .pass-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 8mm;
+      border-bottom: 2px solid #000;
+      margin-bottom: 8mm;
+    }
+
+    .pass-brand {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 28pt;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: lowercase;
+    }
+
+    .pass-title {
+      text-align: right;
+    }
+
+    .pass-title h1 {
+      font-size: 16pt;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin: 0;
+    }
+
+    .pass-title p {
+      font-size: 9pt;
+      color: #555;
+      margin-top: 2mm;
+    }
+
+    .pass-main {
+      display: flex;
+      gap: 10mm;
+      margin-bottom: 10mm;
+    }
+
+    .pass-qr-section {
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    .pass-qr-box {
+      width: 45mm;
+      height: 45mm;
+      padding: 3mm;
+      border: 1px solid #000;
+      background: #fff;
+    }
+
+    .pass-qr-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .pass-reg-id {
+      margin-top: 3mm;
+      font-size: 8pt;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+    }
+
+    .pass-details {
+      flex: 1;
+    }
+
+    .pass-student-name {
+      font-size: 18pt;
+      font-weight: 600;
+      margin-bottom: 4mm;
+      padding-bottom: 3mm;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .pass-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3mm 8mm;
+    }
+
+    .pass-info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 1mm;
+    }
+
+    .pass-info-label {
+      font-size: 7pt;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #666;
+    }
+
+    .pass-info-value {
+      font-size: 10pt;
+      font-weight: 500;
+    }
+
+    .pass-schedule {
+      margin-top: 8mm;
+    }
+
+    .pass-schedule-title {
+      font-size: 11pt;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      padding-bottom: 3mm;
+      border-bottom: 2px solid #000;
+      margin-bottom: 5mm;
+    }
+
+    .pass-day {
+      margin-bottom: 6mm;
+    }
+
+    .pass-day-header {
+      display: flex;
+      align-items: center;
+      gap: 3mm;
+      margin-bottom: 3mm;
+    }
+
+    .pass-day-badge {
+      font-size: 8pt;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 1.5mm 4mm;
+      background: #000;
+      color: #fff !important;
+    }
+
+    .pass-day-date {
+      font-size: 9pt;
+      color: #555;
+    }
+
+    .pass-events-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9pt;
+    }
+
+    .pass-events-table th {
+      text-align: left;
+      font-size: 7pt;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2mm;
+      border-bottom: 1px solid #000;
+      color: #555;
+    }
+
+    .pass-events-table td {
+      padding: 2.5mm 2mm;
+      border-bottom: 1px solid #ddd;
+      vertical-align: top;
+    }
+
+    .pass-events-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .pass-event-time {
+      font-weight: 500;
+      white-space: nowrap;
+      width: 35mm;
+    }
+
+    .pass-event-name {
+      font-weight: 500;
+    }
+
+    .pass-event-venue {
+      font-size: 8pt;
+      color: #666;
+    }
+
+    .pass-footer {
+      margin-top: auto;
+      padding-top: 8mm;
+      border-top: 1px solid #ccc;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 8pt;
+      color: #666;
+    }
+
+    .pass-footer-note {
+      max-width: 60%;
+      line-height: 1.4;
+    }
+
+    .pass-footer-meta {
+      text-align: right;
+    }
+
+    .pass-no-events {
+      padding: 5mm;
+      text-align: center;
+      font-size: 10pt;
+      color: #666;
+      font-style: italic;
+      border: 1px dashed #ccc;
     }
   </style>
 </head>
 <body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/" class="navbar-brand">
+      <span class="brand-text">
+        <span>e</span><span>l</span><span>a</span><span>s</span><span>i</span><span>a</span><span>n</span>
+      </span>
+    </a>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="navbar-actions" id="navbar-actions">
+      <a href="/auth/logout" class="nav-link">Sign out</a>
+    </div>
+  </nav>
+
   <div class="page">
     <div class="container">
       <!-- Loading State -->
@@ -475,27 +1506,75 @@
           </div>
           <div class="header-actions">
             <div class="status-badge">Verified</div>
-            <a href="/auth/logout" class="logout-link">Sign out</a>
           </div>
         </header>
 
         <!-- Success Header -->
         <div class="success-header">
           <div class="success-icon">✓</div>
-          <h1 class="success-title">Registration Complete</h1>
-          <p class="success-subtitle">Your student registration has been recorded</p>
+          <div class="success-content">
+            <h1 class="success-title">Registration Complete</h1>
+            <p class="success-subtitle">Your registration has been recorded</p>
+          </div>
+        </div>
+
+        <!-- Payment Banner -->
+        <div id="payment-banner" class="payment-banner pending" style="display: none;">
+          <div class="payment-info">
+            <div class="payment-icon" id="payment-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div class="payment-text">
+              <h3 id="payment-title">Payment Pending</h3>
+              <p id="payment-subtitle">Complete payment of ₹500 to download your event pass</p>
+            </div>
+          </div>
+          <a href="/payment.html" class="btn-pay-now" id="btn-pay-now">
+            Pay ₹500 Now
+          </a>
         </div>
 
         <!-- QR Code Section -->
         <div class="qr-section">
-          <div class="qr-card">
-            <img id="qr-code" src="" alt="QR Code">
+          <div class="qr-left">
+            <div class="qr-card">
+              <img id="qr-code" src="" alt="QR Code">
+            </div>
           </div>
-          <div class="reg-id-display">
-            <span class="reg-id-label">Registration ID</span>
-            <span class="reg-id-value" id="display-reg-id">—</span>
+          <div class="qr-right">
+            <div class="reg-id-row">
+              <div class="reg-id-block">
+                <span class="reg-id-label">Registration ID</span>
+                <span class="reg-id-value" id="display-reg-id">—</span>
+              </div>
+              <button class="btn-download" id="download-pass-btn" onclick="printPass()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download Pass
+              </button>
+            </div>
+            <div class="qr-info">
+              <div class="qr-info-item">
+                <span class="qr-info-label">Name</span>
+                <span class="qr-info-value" id="qr-display-name">—</span>
+              </div>
+              <div class="qr-info-item">
+                <span class="qr-info-label">Roll No</span>
+                <span class="qr-info-value" id="qr-display-roll">—</span>
+              </div>
+              <div class="qr-info-item">
+                <span class="qr-info-label">Branch</span>
+                <span class="qr-info-value" id="qr-display-branch">—</span>
+              </div>
+            </div>
+            <div class="qr-instructions">
+              <span class="qr-instructions-icon">ℹ️</span>
+              <span class="qr-instructions-text">Show this QR code at the entrance for verification</span>
+            </div>
           </div>
-          <p class="qr-hint">Scan this QR code for verification</p>
         </div>
 
         <!-- Personal Information -->
@@ -540,9 +1619,12 @@
           </div>
         </div>
 
-        <!-- Actions -->
-        <div class="actions">
-          <a href="/form.html" class="btn">Edit Details</a>
+        <!-- Registered Events -->
+        <div class="data-section events-section">
+          <div class="section-label">Registered Events</div>
+          <div id="events-container">
+            <!-- Events will be populated by JavaScript -->
+          </div>
         </div>
 
         <!-- Timestamp -->
@@ -553,7 +1635,92 @@
     </div>
   </div>
 
+  <!-- Print Pass Template (Hidden on screen, shown when printing) -->
+  <div class="print-pass" id="print-pass">
+    <div class="print-pass-inner">
+      <div class="pass-header">
+        <div class="pass-brand">elasian</div>
+        <div class="pass-title">
+          <h1>Event Pass</h1>
+          <p>Technical Symposium 2025</p>
+        </div>
+      </div>
+
+      <div class="pass-main">
+        <div class="pass-qr-section">
+          <div class="pass-qr-box">
+            <img id="print-qr-code" src="" alt="QR Code">
+          </div>
+          <div class="pass-reg-id" id="print-reg-id">—</div>
+        </div>
+
+        <div class="pass-details">
+          <div class="pass-student-name" id="print-name">—</div>
+          <div class="pass-info-grid">
+            <div class="pass-info-item">
+              <span class="pass-info-label">Roll Number</span>
+              <span class="pass-info-value" id="print-roll">—</span>
+            </div>
+            <div class="pass-info-item">
+              <span class="pass-info-label">Branch</span>
+              <span class="pass-info-value" id="print-branch">—</span>
+            </div>
+            <div class="pass-info-item">
+              <span class="pass-info-label">Year</span>
+              <span class="pass-info-value" id="print-year">—</span>
+            </div>
+            <div class="pass-info-item">
+              <span class="pass-info-label">Section</span>
+              <span class="pass-info-value" id="print-section">—</span>
+            </div>
+            <div class="pass-info-item">
+              <span class="pass-info-label">Mobile</span>
+              <span class="pass-info-value" id="print-mobile">—</span>
+            </div>
+            <div class="pass-info-item">
+              <span class="pass-info-label">Email</span>
+              <span class="pass-info-value" id="print-email">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pass-schedule">
+        <div class="pass-schedule-title">Event Schedule</div>
+        <div id="print-schedule">
+          <!-- Schedule will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <div class="pass-footer">
+        <div class="pass-footer-note">
+          Please carry this pass and a valid ID proof for entry. Report to the venue 10 minutes before the scheduled time.
+        </div>
+        <div class="pass-footer-meta">
+          <div>Generated: <span id="print-date">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // Mobile menu toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const navbarActions = document.getElementById('navbar-actions');
+
+    menuToggle.addEventListener('click', () => {
+      menuToggle.classList.toggle('active');
+      navbarActions.classList.toggle('open');
+    });
+
+    // Close menu when clicking a nav link
+    navbarActions.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        menuToggle.classList.remove('active');
+        navbarActions.classList.remove('open');
+      });
+    });
+
     const yearLabels = {
       1: 'First Year',
       2: 'Second Year',
@@ -561,10 +1728,204 @@
       4: 'Fourth Year'
     };
 
+    // Event Configuration
+    const EVENT_CONFIG = {
+      timeSlots: {
+        slot1: '10:00 AM - 12:00 PM',
+        slot2: '1:00 PM - 3:00 PM',
+        slot3: '3:00 PM - 5:00 PM'
+      },
+      events: {
+        day1: {
+          slot1: [
+            { id: 'D1S1E1', name: 'Technical Quiz', venue: 'Seminar Hall A' },
+            { id: 'D1S1E2', name: 'Coding Challenge', venue: 'Computer Lab 1' },
+            { id: 'D1S1E3', name: 'Paper Presentation', venue: 'Conference Room' },
+            { id: 'D1S1E4', name: 'Poster Exhibition', venue: 'Main Lobby' }
+          ],
+          slot2: [
+            { id: 'D1S2E1', name: 'Hackathon Round 1', venue: 'Computer Lab 1 & 2' },
+            { id: 'D1S2E2', name: 'Web Development', venue: 'Computer Lab 3' },
+            { id: 'D1S2E3', name: 'Debugging Contest', venue: 'Computer Lab 4' },
+            { id: 'D1S2E4', name: 'Tech Talk', venue: 'Auditorium' }
+          ],
+          slot3: [
+            { id: 'D1S3E1', name: 'Gaming Tournament', venue: 'Gaming Arena' },
+            { id: 'D1S3E2', name: 'UI/UX Design', venue: 'Design Lab' },
+            { id: 'D1S3E3', name: 'Database Challenge', venue: 'Computer Lab 2' },
+            { id: 'D1S3E4', name: 'Networking Workshop', venue: 'Network Lab' }
+          ]
+        },
+        day2: {
+          slot1: [
+            { id: 'D2S1E1', name: 'AI/ML Workshop', venue: 'AI Lab' },
+            { id: 'D2S1E2', name: 'Mobile App Dev', venue: 'Computer Lab 1' },
+            { id: 'D2S1E3', name: 'Cybersecurity CTF', venue: 'Security Lab' },
+            { id: 'D2S1E4', name: 'Group Discussion', venue: 'Seminar Hall B' }
+          ],
+          slot2: [
+            { id: 'D2S2E1', name: 'Hackathon Final', venue: 'Computer Lab 1 & 2' },
+            { id: 'D2S2E2', name: 'Cloud Computing', venue: 'Cloud Lab' },
+            { id: 'D2S2E3', name: 'IoT Workshop', venue: 'IoT Lab' },
+            { id: 'D2S2E4', name: 'Tech Debate', venue: 'Auditorium' }
+          ],
+          slot3: [
+            { id: 'D2S3E1', name: 'Project Showcase', venue: 'Main Hall' },
+            { id: 'D2S3E2', name: 'Blockchain Basics', venue: 'Computer Lab 3' },
+            { id: 'D2S3E3', name: 'DevOps Workshop', venue: 'DevOps Lab' },
+            { id: 'D2S3E4', name: 'Prize Distribution', venue: 'Auditorium' }
+          ]
+        }
+      }
+    };
+
+    function getEventById(eventId) {
+      for (const day of ['day1', 'day2']) {
+        for (const slot of ['slot1', 'slot2', 'slot3']) {
+          const event = EVENT_CONFIG.events[day][slot].find(e => e.id === eventId);
+          if (event) {
+            return { ...event, day, slot, time: EVENT_CONFIG.timeSlots[slot] };
+          }
+        }
+      }
+      return null;
+    }
+
+    function displayEvents(formData) {
+      const container = document.getElementById('events-container');
+      const eventFields = ['day1_slot1', 'day1_slot2', 'day1_slot3', 'day2_slot1', 'day2_slot2', 'day2_slot3'];
+      
+      const day1Events = [];
+      const day2Events = [];
+
+      eventFields.forEach(field => {
+        if (formData[field]) {
+          const event = getEventById(formData[field]);
+          if (event) {
+            if (event.day === 'day1') {
+              day1Events.push(event);
+            } else {
+              day2Events.push(event);
+            }
+          }
+        }
+      });
+
+      const totalEvents = day1Events.length + day2Events.length;
+
+      if (totalEvents === 0) {
+        container.innerHTML = '<div class="no-events">No events registered yet</div>';
+        return;
+      }
+
+      let html = '';
+
+      if (day1Events.length > 0) {
+        html += `
+          <div class="day-header">
+            <span class="day-badge">Day 1</span>
+          </div>
+          <div class="event-list">
+            ${day1Events.map(event => `
+              <div class="event-item">
+                <span class="event-time">${event.time}</span>
+                <div class="event-details">
+                  <div class="event-name">${event.name}</div>
+                  <div class="event-venue">${event.venue}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      if (day2Events.length > 0) {
+        html += `
+          <div class="day-header">
+            <span class="day-badge">Day 2</span>
+          </div>
+          <div class="event-list">
+            ${day2Events.map(event => `
+              <div class="event-item">
+                <span class="event-time">${event.time}</span>
+                <div class="event-details">
+                  <div class="event-name">${event.name}</div>
+                  <div class="event-venue">${event.venue}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      html += `
+        <div class="events-summary">
+          <span class="events-summary-text">Total <span class="events-summary-count">${totalEvents}</span> event${totalEvents > 1 ? 's' : ''} registered</span>
+        </div>
+      `;
+
+      container.innerHTML = html;
+    }
+
     function generateQRCode(registrationId) {
       const qrImg = document.getElementById('qr-code');
       // Using QR Server API - free and reliable
       qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(registrationId)}&bgcolor=ffffff&color=141416`;
+    }
+
+    async function checkPaymentStatus(formId) {
+      try {
+        const response = await fetch(`/api/payment/status?formId=${formId}`);
+        const data = await response.json();
+        
+        const paymentBanner = document.getElementById('payment-banner');
+        const downloadBtn = document.getElementById('download-pass-btn');
+        
+        if (data.isPaid) {
+          // User has paid - show success banner and enable download
+          paymentBanner.classList.remove('pending');
+          paymentBanner.classList.add('paid');
+          paymentBanner.innerHTML = `
+            <div class="payment-icon">✓</div>
+            <div class="payment-text">
+              <div class="payment-title">Payment Complete</div>
+              <div class="payment-subtitle">Your event pass is confirmed</div>
+            </div>
+          `;
+          
+          // Enable download button
+          if (downloadBtn) {
+            downloadBtn.style.opacity = '1';
+            downloadBtn.style.pointerEvents = 'auto';
+            downloadBtn.title = 'Download your event pass';
+          }
+        } else {
+          // User hasn't paid - show pending banner
+          paymentBanner.classList.add('pending');
+          paymentBanner.classList.remove('paid');
+          paymentBanner.innerHTML = `
+            <div class="payment-icon">₹</div>
+            <div class="payment-text">
+              <div class="payment-title">Payment Required</div>
+              <div class="payment-subtitle">Complete payment to download your event pass</div>
+            </div>
+            <a href="/payment.html" class="btn-pay-now">Pay ₹500</a>
+          `;
+          
+          // Disable download button
+          if (downloadBtn) {
+            downloadBtn.style.opacity = '0.5';
+            downloadBtn.style.pointerEvents = 'none';
+            downloadBtn.title = 'Complete payment to download pass';
+          }
+        }
+        
+        paymentBanner.style.display = 'flex';
+      } catch (error) {
+        console.error('Error checking payment status:', error);
+        // Hide banner on error
+        document.getElementById('payment-banner').style.display = 'none';
+      }
     }
 
     async function loadDashboard() {
@@ -593,6 +1954,9 @@
         if (formData.success && formData.data) {
           const form = formData.data;
           
+          // Check payment status
+          await checkPaymentStatus(form.id);
+          
           // Display Registration ID and generate QR
           const regId = form.registration_id || 'N/A';
           document.getElementById('display-reg-id').textContent = regId;
@@ -607,11 +1971,22 @@
           document.getElementById('display-year').textContent = yearLabels[form.year_of_study] || '—';
           document.getElementById('display-section').textContent = form.section || '—';
 
+          // Populate QR section info
+          document.getElementById('qr-display-name').textContent = form.full_name || '—';
+          document.getElementById('qr-display-roll').textContent = form.roll_number || '—';
+          document.getElementById('qr-display-branch').textContent = form.branch || '—';
+
           // Handle empty optional fields
           if (!form.section) {
             document.getElementById('display-section').classList.add('empty');
             document.getElementById('display-section').textContent = 'Not specified';
           }
+
+          // Display registered events
+          displayEvents(form);
+
+          // Populate print pass data
+          populatePrintPass(form);
 
           if (form.created_at) {
             const date = new Date(form.created_at);
@@ -631,6 +2006,123 @@
         console.error('Error loading dashboard:', error);
         window.location.href = '/login.html';
       }
+    }
+
+    function populatePrintPass(form) {
+      // QR Code
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(form.registration_id)}&bgcolor=ffffff&color=000000`;
+      document.getElementById('print-qr-code').src = qrUrl;
+      
+      // Basic Info
+      document.getElementById('print-reg-id').textContent = form.registration_id || '—';
+      document.getElementById('print-name').textContent = form.full_name || '—';
+      document.getElementById('print-roll').textContent = form.roll_number || '—';
+      document.getElementById('print-branch').textContent = form.branch || '—';
+      document.getElementById('print-year').textContent = yearLabels[form.year_of_study] || '—';
+      document.getElementById('print-section').textContent = form.section || 'N/A';
+      document.getElementById('print-mobile').textContent = form.mobile || '—';
+      document.getElementById('print-email').textContent = document.getElementById('display-email').textContent || '—';
+      
+      // Current date
+      document.getElementById('print-date').textContent = new Date().toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+
+      // Build schedule
+      const eventFields = ['day1_slot1', 'day1_slot2', 'day1_slot3', 'day2_slot1', 'day2_slot2', 'day2_slot3'];
+      const day1Events = [];
+      const day2Events = [];
+
+      eventFields.forEach(field => {
+        if (form[field]) {
+          const event = getEventById(form[field]);
+          if (event) {
+            if (event.day === 'day1') {
+              day1Events.push(event);
+            } else {
+              day2Events.push(event);
+            }
+          }
+        }
+      });
+
+      // Sort by slot
+      const slotOrder = { slot1: 1, slot2: 2, slot3: 3 };
+      day1Events.sort((a, b) => slotOrder[a.slot] - slotOrder[b.slot]);
+      day2Events.sort((a, b) => slotOrder[a.slot] - slotOrder[b.slot]);
+
+      const scheduleContainer = document.getElementById('print-schedule');
+      let scheduleHtml = '';
+
+      if (day1Events.length === 0 && day2Events.length === 0) {
+        scheduleHtml = '<div class="pass-no-events">No events registered</div>';
+      } else {
+        if (day1Events.length > 0) {
+          scheduleHtml += `
+            <div class="pass-day">
+              <div class="pass-day-header">
+                <span class="pass-day-badge">Day 1</span>
+                <span class="pass-day-date">January 15, 2025</span>
+              </div>
+              <table class="pass-events-table">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Event</th>
+                    <th>Venue</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${day1Events.map(event => `
+                    <tr>
+                      <td class="pass-event-time">${event.time}</td>
+                      <td class="pass-event-name">${event.name}</td>
+                      <td class="pass-event-venue">${event.venue}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          `;
+        }
+
+        if (day2Events.length > 0) {
+          scheduleHtml += `
+            <div class="pass-day">
+              <div class="pass-day-header">
+                <span class="pass-day-badge">Day 2</span>
+                <span class="pass-day-date">January 16, 2025</span>
+              </div>
+              <table class="pass-events-table">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Event</th>
+                    <th>Venue</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${day2Events.map(event => `
+                    <tr>
+                      <td class="pass-event-time">${event.time}</td>
+                      <td class="pass-event-name">${event.name}</td>
+                      <td class="pass-event-venue">${event.venue}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          `;
+        }
+      }
+
+      scheduleContainer.innerHTML = scheduleHtml;
+    }
+
+    function printPass() {
+      window.print();
     }
 
     loadDashboard();

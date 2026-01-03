@@ -288,9 +288,12 @@
 
     firebase.initializeApp(firebaseConfig);
 
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 1500;
+
     const urlParams = new URLSearchParams(window.location.search);
     const error = urlParams.get('error');
-    if (error) showError(error);
+    if (error) showError(decodeURIComponent(error));
 
     checkAuthStatus();
 
@@ -302,7 +305,8 @@
           window.location.href = data.user.hasSubmittedForm ? '/dashboard.html' : '/form.html';
         }
       } catch (err) {
-        console.error('Auth check failed:', err);
+        console.warn('Auth check failed:', err);
+        // Don't show error - user can still try to login
       }
     }
 
@@ -311,34 +315,26 @@
         `<div class="error-message">${message}</div>`;
     }
 
-    function setLoading(loading) {
+    function clearError() {
+      document.getElementById('error-container').innerHTML = '';
+    }
+
+    function setLoading(loading, text = null) {
       const btn = document.getElementById('google-signin-btn');
       const btnText = document.getElementById('btn-text');
       const spinner = document.getElementById('spinner');
 
       btn.disabled = loading;
-      btnText.textContent = loading ? 'Authenticating' : 'Continue with HITAM ID';
+      btnText.textContent = text || (loading ? 'Authenticating...' : 'Continue with HITAM ID');
       spinner.style.display = loading ? 'block' : 'none';
     }
 
-    async function signInWithGoogle() {
-      setLoading(true);
-      document.getElementById('error-container').innerHTML = '';
+    async function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
+    async function sendLoginToServer(user, attempt = 1) {
       try {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
-        
-        const result = await firebase.auth().signInWithPopup(provider);
-        const user = result.user;
-
-        if (!user.email.toLowerCase().endsWith('@hitam.org')) {
-          await firebase.auth().signOut();
-          showError('Access restricted to @hitam.org email addresses.');
-          setLoading(false);
-          return;
-        }
-
         const response = await fetch('/api/auth/firebase-login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -355,19 +351,109 @@
         const data = await response.json();
 
         if (data.success) {
-          window.location.href = data.hasSubmittedForm ? '/dashboard.html' : '/form.html';
+          return { success: true, data };
         } else {
-          await firebase.auth().signOut();
-          showError(data.error || 'Authentication failed.');
-          setLoading(false);
+          return { success: false, error: data.error || 'Authentication failed' };
         }
       } catch (error) {
-        if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
-          showError(error.message || 'Authentication failed.');
+        console.error(`Server login attempt ${attempt} failed:`, error);
+        
+        if (attempt < MAX_RETRIES) {
+          setLoading(true, `Retrying... (${attempt}/${MAX_RETRIES})`);
+          await sleep(RETRY_DELAY);
+          return sendLoginToServer(user, attempt + 1);
         }
+        
+        return { success: false, error: 'Connection failed. Please check your internet and try again.' };
+      }
+    }
+
+    async function signInWithGoogle() {
+      setLoading(true);
+      clearError();
+
+      let user = null;
+
+      try {
+        // Step 1: Firebase Authentication
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ 
+          prompt: 'select_account',
+          hd: 'hitam.org' // Hint for Google to show only hitam.org accounts
+        });
+        
+        const result = await firebase.auth().signInWithPopup(provider);
+        user = result.user;
+
+        // Validate email domain
+        if (!user.email || !user.email.toLowerCase().endsWith('@hitam.org')) {
+          await firebase.auth().signOut();
+          showError('Access restricted to @hitam.org email addresses only.');
+          setLoading(false);
+          return;
+        }
+
+        setLoading(true, 'Setting up session...');
+
+        // Step 2: Server Authentication with retry
+        const serverResult = await sendLoginToServer(user);
+
+        if (serverResult.success) {
+          // Success - redirect
+          const hasForm = serverResult.data.hasSubmittedForm;
+          window.location.href = hasForm ? '/dashboard.html' : '/form.html';
+        } else {
+          // Server auth failed
+          await firebase.auth().signOut();
+          showError(serverResult.error);
+          setLoading(false);
+        }
+
+      } catch (error) {
+        console.error('Login error:', error);
+        
+        // Sign out from Firebase if we got that far
+        try {
+          await firebase.auth().signOut();
+        } catch (e) { /* ignore */ }
+
+        // Handle specific Firebase errors
+        if (error.code === 'auth/popup-closed-by-user') {
+          // User closed popup - not an error, just reset
+          setLoading(false);
+          return;
+        }
+        
+        if (error.code === 'auth/cancelled-popup-request') {
+          // Multiple popup requests - ignore
+          setLoading(false);
+          return;
+        }
+
+        if (error.code === 'auth/network-request-failed') {
+          showError('Network error. Please check your internet connection and try again.');
+        } else if (error.code === 'auth/popup-blocked') {
+          showError('Popup was blocked. Please allow popups for this site and try again.');
+        } else if (error.code === 'auth/internal-error') {
+          showError('Authentication service error. Please try again in a moment.');
+        } else if (error.code === 'auth/user-disabled') {
+          showError('This account has been disabled. Please contact support.');
+        } else if (error.message) {
+          showError(error.message);
+        } else {
+          showError('An unexpected error occurred. Please try again.');
+        }
+        
         setLoading(false);
       }
     }
+
+    // Handle page visibility - re-check auth when user returns to tab
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        checkAuthStatus();
+      }
+    });
   </script>
 </body>
 </html>

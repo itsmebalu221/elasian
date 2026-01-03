@@ -15,7 +15,13 @@ export async function submitStudentForm(studentId, formData) {
     roll_number,
     mobile,
     year_of_study,
-    section
+    section,
+    day1_slot1,
+    day1_slot2,
+    day1_slot3,
+    day2_slot1,
+    day2_slot2,
+    day2_slot3
   } = formData;
 
   try {
@@ -30,9 +36,14 @@ export async function submitStudentForm(studentId, formData) {
       await pool.query(
         `UPDATE student_forms SET 
           full_name = ?, branch = ?, roll_number = ?, mobile = ?, 
-          year_of_study = ?, section = ?
+          year_of_study = ?, section = ?,
+          day1_slot1 = ?, day1_slot2 = ?, day1_slot3 = ?,
+          day2_slot1 = ?, day2_slot2 = ?, day2_slot3 = ?
         WHERE student_id = ?`,
-        [full_name, branch, roll_number, mobile, year_of_study, section || null, studentId]
+        [full_name, branch, roll_number, mobile, year_of_study, section || null,
+         day1_slot1 || null, day1_slot2 || null, day1_slot3 || null,
+         day2_slot1 || null, day2_slot2 || null, day2_slot3 || null,
+         studentId]
       );
 
       return {
@@ -49,9 +60,12 @@ export async function submitStudentForm(studentId, formData) {
     // Insert new form with registration ID
     const [result] = await pool.query(
       `INSERT INTO student_forms 
-        (student_id, registration_id, full_name, branch, roll_number, mobile, year_of_study, section) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [studentId, registrationId, full_name, branch, roll_number, mobile, year_of_study, section || null]
+        (student_id, registration_id, full_name, branch, roll_number, mobile, year_of_study, section,
+         day1_slot1, day1_slot2, day1_slot3, day2_slot1, day2_slot2, day2_slot3) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [studentId, registrationId, full_name, branch, roll_number, mobile, year_of_study, section || null,
+       day1_slot1 || null, day1_slot2 || null, day1_slot3 || null,
+       day2_slot1 || null, day2_slot2 || null, day2_slot3 || null]
     );
 
     return {

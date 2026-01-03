@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import { formRoutes } from './src/Routes/form.routes.js';
 import { authRoutes } from './src/Routes/auth.routes.js';
 import { studentRoutes } from './src/Routes/student.routes.js';
+import { paymentRoutes } from './src/Routes/payment.routes.js';
 import { initializeDatabase } from './src/db/mysql.js';
 
 // Load environment variables
@@ -50,10 +51,11 @@ fastify.register(fastifyStatic, {
 fastify.register(formRoutes);
 fastify.register(authRoutes);
 fastify.register(studentRoutes);
+fastify.register(paymentRoutes);
 
-// Root redirect to login
+// Root serves index.html (landing page)
 fastify.get('/', async (request, reply) => {
-  return reply.redirect('/login.html');
+  return reply.sendFile('index.html');
 });
 
 // Health check endpoint

@@ -6,42 +6,85 @@ export async function firebaseLoginHandler(request, reply) {
   try {
     const { user } = request.body;
 
-    if (!user || !user.email) {
+    // Validate input
+    if (!user) {
       return reply.code(400).send({
         success: false,
-        error: 'Invalid user data'
+        error: 'User data is required'
       });
     }
 
+    // Ensure we have at minimum an email
+    if (!user.email) {
+      return reply.code(400).send({
+        success: false,
+        error: 'Email is required for authentication'
+      });
+    }
+
+    // Normalize email
+    const email = user.email.toLowerCase().trim();
+
     // Check if email is from allowed domain
-    if (!isAllowedEmail(user.email)) {
+    if (!isAllowedEmail(email)) {
       return reply.code(403).send({
         success: false,
         error: 'Only @hitam.org email addresses are allowed'
       });
     }
 
-    // Find or create user in database
-    const dbUser = await findOrCreateUser({
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      photoURL: user.photoURL
-    });
+    // Find or create user in database (with built-in retries)
+    let dbUser;
+    try {
+      dbUser = await findOrCreateUser({
+        uid: user.uid || `google_${Date.now()}`,
+        email: email,
+        displayName: user.displayName || email.split('@')[0],
+        photoURL: user.photoURL || null
+      });
+    } catch (dbError) {
+      console.error('Database error during login:', dbError);
+      // Create session anyway with minimal data - user experience is priority
+      dbUser = {
+        id: `session_${Date.now()}`,
+        email: email,
+        name: user.displayName || email.split('@')[0],
+        profile_picture: user.photoURL || null,
+        is_temporary: true
+      };
+    }
 
-    // Check if user has already submitted a form
-    const existingForm = await getStudentForm(dbUser.id);
-    const hasSubmittedForm = !!existingForm;
+    // Check if user has already submitted a form (don't fail login if this errors)
+    let hasSubmittedForm = false;
+    let existingForm = null;
+    try {
+      if (dbUser.id && !dbUser.is_temporary) {
+        existingForm = await getStudentForm(dbUser.id);
+        hasSubmittedForm = !!existingForm;
+      }
+    } catch (formError) {
+      console.warn('Could not check form status:', formError.message);
+      // Continue without form status - will be checked again when needed
+    }
 
-    // Set session
-    request.session.user = {
-      id: dbUser.id,
-      email: user.email,
-      name: user.displayName,
-      picture: user.photoURL,
-      isVerified: true,
-      hasSubmittedForm
-    };
+    // Set session - this is critical
+    try {
+      request.session.user = {
+        id: dbUser.id,
+        email: email,
+        name: user.displayName || dbUser.name || email.split('@')[0],
+        picture: user.photoURL || dbUser.profile_picture || null,
+        isVerified: true,
+        hasSubmittedForm,
+        isTemporary: dbUser.is_temporary || false
+      };
+    } catch (sessionError) {
+      console.error('Session error:', sessionError);
+      return reply.code(500).send({
+        success: false,
+        error: 'Session creation failed. Please try again.'
+      });
+    }
 
     return reply.send({
       success: true,
@@ -52,9 +95,18 @@ export async function firebaseLoginHandler(request, reply) {
     });
   } catch (error) {
     console.error('Firebase login error:', error);
+    
+    // Try to provide a helpful error message
+    let errorMessage = 'Authentication failed. Please try again.';
+    if (error.code === 'ECONNREFUSED') {
+      errorMessage = 'Service temporarily unavailable. Please try again in a moment.';
+    } else if (error.code === 'ETIMEDOUT') {
+      errorMessage = 'Connection timed out. Please check your internet and try again.';
+    }
+    
     return reply.code(500).send({
       success: false,
-      error: 'Authentication failed. Please try again.'
+      error: errorMessage
     });
   }
 }
@@ -95,17 +147,34 @@ export async function logoutApiHandler(request, reply) {
 
 // Check auth status (for API)
 export async function checkAuthStatus(request, reply) {
-  const isAuthenticated = !!(request.session && request.session.user);
-  
-  if (isAuthenticated) {
-    // Re-check form status in case it changed
-    const existingForm = await getStudentForm(request.session.user.id);
-    request.session.user.hasSubmittedForm = !!existingForm;
+  try {
+    const isAuthenticated = !!(request.session && request.session.user);
+    
+    if (isAuthenticated) {
+      // Re-check form status in case it changed (but don't fail if error)
+      try {
+        if (request.session.user.id && !request.session.user.isTemporary) {
+          const existingForm = await getStudentForm(request.session.user.id);
+          request.session.user.hasSubmittedForm = !!existingForm;
+        }
+      } catch (formError) {
+        console.warn('Could not refresh form status:', formError.message);
+        // Keep existing hasSubmittedForm value
+      }
+    }
+    
+    return reply.send({
+      success: true,
+      isAuthenticated,
+      user: isAuthenticated ? request.session.user : null
+    });
+  } catch (error) {
+    console.error('Auth status check error:', error);
+    // Even if there's an error, try to return a valid response
+    return reply.send({
+      success: true,
+      isAuthenticated: false,
+      user: null
+    });
   }
-  
-  return reply.send({
-    success: true,
-    isAuthenticated,
-    user: isAuthenticated ? request.session.user : null
-  });
 }
