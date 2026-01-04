@@ -6,12 +6,12 @@ import { PAYMENT_AMOUNT } from '../config/cashfree.js';
 export async function createOrder(request, reply) {
   try {
     // Check if user is authenticated
-    if (!request.session?.user?.id) {
+    if (!request.user?.id) {
       return reply.status(401).send({ error: 'Unauthorized' });
     }
 
     const { formId, customerPhone } = request.body;
-    const user = request.session.user;
+    const user = request.user;
 
     // Validate input
     const validated = createOrderSchema.parse({
@@ -102,7 +102,7 @@ export async function handleWebhook(request, reply) {
 // Get payment status for current user's form
 export async function getPaymentStatus(request, reply) {
   try {
-    if (!request.session?.user?.id) {
+    if (!request.user?.id) {
       return reply.status(401).send({ error: 'Unauthorized' });
     }
 

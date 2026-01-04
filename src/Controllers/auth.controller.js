@@ -1,7 +1,8 @@
 import { isAllowedEmail, findOrCreateUser } from '../config/firebase.js';
 import { getStudentForm } from '../Services/student.service.js';
+import { signToken, getCookieName, getCookieOptions, sanitizeUserPayload } from '../utils/jwt.js';
 
-// Handle Firebase login - verify token and create session
+// Handle Firebase login - verify token and issue auth cookie
 export async function firebaseLoginHandler(request, reply) {
   try {
     const { user } = request.body;
@@ -67,42 +68,29 @@ export async function firebaseLoginHandler(request, reply) {
       // Continue without form status - will be checked again when needed
     }
 
-    // Set session - this is critical
-    try {
-      request.session.user = {
-        id: dbUser.id,
-        email: email,
-        name: user.displayName || dbUser.name || email.split('@')[0],
-        picture: user.photoURL || dbUser.profile_picture || null,
-        isVerified: true,
-        hasSubmittedForm,
-        isTemporary: dbUser.is_temporary || false
-      };
-      
-      // Save session explicitly
-      await new Promise((resolve, reject) => {
-        request.session.save((err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
-      
-      console.log('✅ Session created for:', email, 'hasForm:', hasSubmittedForm);
-    } catch (sessionError) {
-      console.error('Session error:', sessionError);
-      return reply.code(500).send({
-        success: false,
-        error: 'Session creation failed. Please try again.'
-      });
-    }
-
-    return reply.send({
-      success: true,
-      message: 'Login successful',
-      user: request.session.user,
+    const authUser = {
+      id: dbUser.id,
+      email,
+      name: user.displayName || dbUser.name || email.split('@')[0],
+      picture: user.photoURL || dbUser.profile_picture || null,
+      isVerified: true,
       hasSubmittedForm,
-      formData: existingForm
-    });
+      isTemporary: dbUser.is_temporary || false
+    };
+
+    const token = signToken(authUser);
+
+    console.log('✅ Auth token issued for:', email, 'hasForm:', hasSubmittedForm);
+
+    return reply
+      .setCookie(getCookieName(), token, getCookieOptions())
+      .send({
+        success: true,
+        message: 'Login successful',
+        user: authUser,
+        hasSubmittedForm,
+        formData: existingForm
+      });
   } catch (error) {
     console.error('Firebase login error:', error);
     
@@ -121,9 +109,9 @@ export async function firebaseLoginHandler(request, reply) {
   }
 }
 
-// Get current user session
+// Get current user
 export async function getCurrentUser(request, reply) {
-  if (!request.session || !request.session.user) {
+  if (!request.user) {
     return reply.code(401).send({
       success: false,
       error: 'Not authenticated'
@@ -132,23 +120,20 @@ export async function getCurrentUser(request, reply) {
 
   return reply.send({
     success: true,
-    user: request.session.user
+    user: sanitizeUserPayload(request.user)
   });
 }
 
 // Logout handler
 export async function logoutHandler(request, reply) {
-  if (request.session) {
-    await request.session.destroy();
-  }
-  return reply.redirect('/login.html');
+  reply
+    .clearCookie(getCookieName(), getCookieOptions())
+    .redirect('/login.html');
 }
 
 // Logout API handler
 export async function logoutApiHandler(request, reply) {
-  if (request.session) {
-    await request.session.destroy();
-  }
+  reply.clearCookie(getCookieName(), getCookieOptions());
   return reply.send({
     success: true,
     message: 'Logged out successfully'
@@ -158,16 +143,33 @@ export async function logoutApiHandler(request, reply) {
 // Check auth status (for API)
 export async function checkAuthStatus(request, reply) {
   try {
-    const isAuthenticated = !!(request.session && request.session.user);
-    
-    console.log('🔍 Auth check - Session exists:', !!request.session, 'User exists:', !!request.session?.user);
-    
+    const isAuthenticated = !!request.user;
+
+    console.log('🔍 Auth check - user present:', isAuthenticated);
+
+    let authUser = sanitizeUserPayload(request.user);
+
     if (isAuthenticated) {
       // Re-check form status in case it changed (but don't fail if error)
       try {
-        if (request.session.user.id && !request.session.user.isTemporary) {
-          const existingForm = await getStudentForm(request.session.user.id);
-          request.session.user.hasSubmittedForm = !!existingForm;
+        if (authUser.id && !authUser.isTemporary) {
+          const existingForm = await getStudentForm(authUser.id);
+          const hasSubmittedForm = !!existingForm;
+
+          if (hasSubmittedForm !== authUser.hasSubmittedForm) {
+            authUser = {
+              ...authUser,
+              hasSubmittedForm
+            };
+
+            const token = signToken(authUser);
+            reply.setCookie(getCookieName(), token, getCookieOptions());
+          } else {
+            authUser = {
+              ...authUser,
+              hasSubmittedForm
+            };
+          }
         }
       } catch (formError) {
         console.warn('Could not refresh form status:', formError.message);
@@ -178,7 +180,7 @@ export async function checkAuthStatus(request, reply) {
     return reply.send({
       success: true,
       isAuthenticated,
-      user: isAuthenticated ? request.session.user : null
+      user: isAuthenticated ? authUser : null
     });
   } catch (error) {
     console.error('Auth status check error:', error);

@@ -1,5 +1,4 @@
 import Fastify from 'fastify';
-import fastifySession from '@fastify/session';
 import fastifyCookie from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
 import dotenv from 'dotenv';
@@ -9,6 +8,7 @@ import { authRoutes } from '../src/Routes/auth.routes.js';
 import { studentRoutes } from '../src/Routes/student.routes.js';
 import { paymentRoutes } from '../src/Routes/payment.routes.js';
 import { initializeDatabase } from '../src/db/mysql.js';
+import { verifyToken, getCookieName, getCookieOptions } from '../src/utils/jwt.js';
 
 dotenv.config();
 
@@ -23,19 +23,24 @@ await fastify.register(fastifyCors, {
 // Register cookie plugin
 await fastify.register(fastifyCookie);
 
-// Register session plugin with production-ready settings
-await fastify.register(fastifySession, {
-  secret: process.env.SESSION_SECRET || 'a-very-long-secret-key-that-should-be-changed-in-production',
-  cookieName: 'sessionId',
-  cookie: {
-    secure: true,
-    httpOnly: true,
-    sameSite: 'none',  // Required for cross-site cookies
-    path: '/',
-    maxAge: 24 * 60 * 60 * 1000
-  },
-  saveUninitialized: false,
-  rolling: true  // Refresh session on each request
+// Decorate request with user property populated from JWT cookie
+fastify.decorateRequest('user', null);
+
+fastify.addHook('preHandler', async (request, reply) => {
+  const token = request.cookies?.[getCookieName()];
+
+  if (!token) {
+    request.user = null;
+    return;
+  }
+
+  try {
+    request.user = verifyToken(token);
+  } catch (error) {
+    console.warn('Invalid auth token:', error.message);
+    request.user = null;
+    reply.clearCookie(getCookieName(), getCookieOptions());
+  }
 });
 
 // Register routes

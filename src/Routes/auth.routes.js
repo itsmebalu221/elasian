@@ -1,7 +1,7 @@
 import { firebaseLoginHandler, getCurrentUser, logoutHandler, logoutApiHandler, checkAuthStatus } from '../Controllers/auth.controller.js';
 
 export async function authRoutes(fastify) {
-  // Firebase login - verify and create session
+  // Firebase login - verify and issue auth cookie
   fastify.post('/api/auth/firebase-login', firebaseLoginHandler);
 
   // Get current user
