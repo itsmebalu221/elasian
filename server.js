@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import fastifyStatic from '@fastify/static';
 import fastifySession from '@fastify/session';
 import fastifyCookie from '@fastify/cookie';
+import fastifyCors from '@fastify/cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -20,6 +21,12 @@ const __dirname = path.dirname(__filename);
 
 const fastify = Fastify({ logger: true });
 
+// Register CORS
+fastify.register(fastifyCors, {
+  origin: true,
+  credentials: true
+});
+
 // Register cookie plugin (required for sessions)
 fastify.register(fastifyCookie);
 
@@ -27,8 +34,9 @@ fastify.register(fastifyCookie);
 fastify.register(fastifySession, {
   secret: process.env.SESSION_SECRET || 'a-very-long-secret-key-that-should-be-changed-in-production',
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production' || !!process.env.VERCEL,
     httpOnly: true,
+    sameSite: 'lax',
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   },
   saveUninitialized: false
@@ -63,20 +71,41 @@ fastify.get('/health', async () => {
   return { status: 'ok', timestamp: new Date().toISOString() };
 });
 
-// Start server
-const start = async () => {
-  try {
-    // Initialize database tables
-    await initializeDatabase();
-    
-    const port = process.env.PORT || 3000;
-    await fastify.listen({ port, host: '0.0.0.0' });
-    console.log(`🚀 Server running at http://localhost:${port}`);
-    console.log(`📝 Login page: http://localhost:${port}/login.html`);
-  } catch (err) {
-    fastify.log.error(err);
-    process.exit(1);
-  }
-};
+// Database initialization flag
+let dbInitialized = false;
 
-start();
+// Initialize database once
+async function ensureDbReady() {
+  if (!dbInitialized) {
+    try {
+      await initializeDatabase();
+      dbInitialized = true;
+    } catch (err) {
+      console.error('DB init error:', err);
+    }
+  }
+}
+
+// Export for Vercel serverless
+export default async function handler(req, res) {
+  await ensureDbReady();
+  await fastify.ready();
+  fastify.server.emit('request', req, res);
+}
+
+// Start server only when run directly (not on Vercel)
+if (!process.env.VERCEL) {
+  const start = async () => {
+    try {
+      await ensureDbReady();
+      const port = process.env.PORT || 3000;
+      await fastify.listen({ port, host: '0.0.0.0' });
+      console.log(`🚀 Server running at http://localhost:${port}`);
+      console.log(`📝 Login page: http://localhost:${port}/login.html`);
+    } catch (err) {
+      fastify.log.error(err);
+      process.exit(1);
+    }
+  };
+  start();
+}
