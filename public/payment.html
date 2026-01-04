@@ -310,7 +310,9 @@
     async function init() {
       try {
         // Check auth status
-        const authRes = await fetch('/api/auth/status');
+        const authRes = await fetch('/api/auth/status', {
+          credentials: 'include'
+        });
         const authData = await authRes.json();
 
         if (!authData.isAuthenticated) {
@@ -319,7 +321,9 @@
         }
 
         // Get form data
-        const formRes = await fetch('/api/student/form');
+        const formRes = await fetch('/api/student/form', {
+          credentials: 'include'
+        });
         const formResult = await formRes.json();
 
         if (!formResult.success || !formResult.data) {
@@ -333,7 +337,9 @@
         formData = formResult.data;
 
         // Check if already paid
-        const paymentRes = await fetch(`/api/payment/status?formId=${formData.id}`);
+        const paymentRes = await fetch(`/api/payment/status?formId=${formData.id}`, {
+          credentials: 'include'
+        });
         const paymentData = await paymentRes.json();
 
         if (paymentData.isPaid) {
@@ -383,6 +389,7 @@
         const response = await fetch('/api/payment/create-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({
             formId: formData.id,
             customerPhone: formData.mobile

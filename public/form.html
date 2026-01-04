@@ -1172,7 +1172,9 @@
 
     async function checkAuth() {
       try {
-        const response = await fetch('/api/auth/status');
+        const response = await fetch('/api/auth/status', {
+          credentials: 'include'
+        });
         const data = await response.json();
 
         if (!data.isAuthenticated) {
@@ -1240,6 +1242,7 @@
         const response = await fetch('/api/student/form', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(formData)
         });
 

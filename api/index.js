@@ -14,22 +14,24 @@ dotenv.config();
 
 const fastify = Fastify({ logger: false });
 
-// Register CORS
+// Register CORS - allow credentials for cookies
 await fastify.register(fastifyCors, {
-  origin: true,
+  origin: ['https://elasian.vercel.app', 'http://localhost:3000'],
   credentials: true
 });
 
 // Register cookie plugin
 await fastify.register(fastifyCookie);
 
-// Register session plugin
+// Register session plugin with production-ready settings
 await fastify.register(fastifySession, {
   secret: process.env.SESSION_SECRET || 'a-very-long-secret-key-that-should-be-changed-in-production',
+  cookieName: 'sessionId',
   cookie: {
     secure: true,
     httpOnly: true,
-    sameSite: 'lax',
+    sameSite: 'none',  // Required for cross-site cookies
+    path: '/',
     maxAge: 24 * 60 * 60 * 1000
   },
   saveUninitialized: false

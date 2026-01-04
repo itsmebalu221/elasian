@@ -272,7 +272,9 @@
       }
 
       try {
-        const response = await fetch(`/api/payment/verify?orderId=${orderId}`);
+        const response = await fetch(`/api/payment/verify?orderId=${orderId}`, {
+          credentials: 'include'
+        });
         const data = await response.json();
 
         if (data.success && data.status === 'SUCCESS') {

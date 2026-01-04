@@ -1875,7 +1875,9 @@
 
     async function checkPaymentStatus(formId) {
       try {
-        const response = await fetch(`/api/payment/status?formId=${formId}`);
+        const response = await fetch(`/api/payment/status?formId=${formId}`, {
+          credentials: 'include'
+        });
         const data = await response.json();
         
         const paymentBanner = document.getElementById('payment-banner');
@@ -1930,7 +1932,9 @@
 
     async function loadDashboard() {
       try {
-        const response = await fetch('/api/auth/status');
+        const response = await fetch('/api/auth/status', {
+          credentials: 'include'
+        });
         const data = await response.json();
 
         if (!data.isAuthenticated) {
@@ -1948,7 +1952,9 @@
           return;
         }
 
-        const formResponse = await fetch('/api/student/form');
+        const formResponse = await fetch('/api/student/form', {
+          credentials: 'include'
+        });
         const formData = await formResponse.json();
 
         if (formData.success && formData.data) {

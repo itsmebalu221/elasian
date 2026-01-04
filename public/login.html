@@ -299,7 +299,9 @@
 
     async function checkAuthStatus() {
       try {
-        const response = await fetch('/api/auth/status');
+        const response = await fetch('/api/auth/status', {
+          credentials: 'include'
+        });
         const data = await response.json();
         if (data.isAuthenticated) {
           window.location.href = data.user.hasSubmittedForm ? '/dashboard.html' : '/form.html';
@@ -338,6 +340,7 @@
         const response = await fetch('/api/auth/firebase-login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({
             user: {
               uid: user.uid,
