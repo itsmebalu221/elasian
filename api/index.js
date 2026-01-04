@@ -12,19 +12,19 @@ import { initializeDatabase } from '../src/db/mysql.js';
 
 dotenv.config();
 
-const fastify = Fastify({ logger: true });
+const fastify = Fastify({ logger: false });
 
 // Register CORS
-fastify.register(fastifyCors, {
+await fastify.register(fastifyCors, {
   origin: true,
   credentials: true
 });
 
 // Register cookie plugin
-fastify.register(fastifyCookie);
+await fastify.register(fastifyCookie);
 
 // Register session plugin
-fastify.register(fastifySession, {
+await fastify.register(fastifySession, {
   secret: process.env.SESSION_SECRET || 'a-very-long-secret-key-that-should-be-changed-in-production',
   cookie: {
     secure: true,
@@ -36,10 +36,10 @@ fastify.register(fastifySession, {
 });
 
 // Register routes
-fastify.register(formRoutes);
-fastify.register(authRoutes);
-fastify.register(studentRoutes);
-fastify.register(paymentRoutes);
+await fastify.register(formRoutes);
+await fastify.register(authRoutes);
+await fastify.register(studentRoutes);
+await fastify.register(paymentRoutes);
 
 // Health check
 fastify.get('/api/health', async () => {
@@ -49,15 +49,20 @@ fastify.get('/api/health', async () => {
 // Database init flag
 let dbReady = false;
 
-export default async function handler(req, res) {
+async function initDb() {
   if (!dbReady) {
     try {
       await initializeDatabase();
       dbReady = true;
     } catch (e) {
-      console.error('DB Error:', e);
+      console.error('DB Error:', e.message);
     }
   }
-  await fastify.ready();
+}
+
+await initDb();
+await fastify.ready();
+
+export default async function handler(req, res) {
   fastify.server.emit('request', req, res);
 }
