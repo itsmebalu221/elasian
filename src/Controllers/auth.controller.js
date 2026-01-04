@@ -78,6 +78,16 @@ export async function firebaseLoginHandler(request, reply) {
         hasSubmittedForm,
         isTemporary: dbUser.is_temporary || false
       };
+      
+      // Save session explicitly
+      await new Promise((resolve, reject) => {
+        request.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+      
+      console.log('✅ Session created for:', email, 'hasForm:', hasSubmittedForm);
     } catch (sessionError) {
       console.error('Session error:', sessionError);
       return reply.code(500).send({
@@ -149,6 +159,8 @@ export async function logoutApiHandler(request, reply) {
 export async function checkAuthStatus(request, reply) {
   try {
     const isAuthenticated = !!(request.session && request.session.user);
+    
+    console.log('🔍 Auth check - Session exists:', !!request.session, 'User exists:', !!request.session?.user);
     
     if (isAuthenticated) {
       // Re-check form status in case it changed (but don't fail if error)

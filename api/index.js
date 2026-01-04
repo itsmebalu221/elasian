@@ -34,7 +34,8 @@ await fastify.register(fastifySession, {
     path: '/',
     maxAge: 24 * 60 * 60 * 1000
   },
-  saveUninitialized: false
+  saveUninitialized: false,
+  rolling: true  // Refresh session on each request
 });
 
 // Register routes
