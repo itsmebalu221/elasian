@@ -473,6 +473,103 @@
       background: rgba(90, 90, 96, 0.1);
     }
 
+    /* Payment Info */
+    .payment-info {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, rgba(107, 140, 206, 0.08) 0%, rgba(107, 140, 206, 0.03) 100%);
+      border: 1px solid rgba(107, 140, 206, 0.2);
+      border-radius: 0;
+    }
+
+    .payment-info-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .payment-info-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(107, 140, 206, 0.15);
+      border-radius: 50%;
+      color: var(--accent);
+      font-size: 1.25rem;
+    }
+
+    .payment-info-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .payment-info-amount {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .payment-amount-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .payment-amount-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .payment-info-details {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .payment-info-details ul {
+      list-style: none;
+      margin-top: 0.5rem;
+    }
+
+    .payment-info-details li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0;
+    }
+
+    .payment-info-details li::before {
+      content: '✓';
+      color: var(--success);
+      font-size: 0.75rem;
+    }
+
+    .payment-note {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(107, 140, 206, 0.15);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .payment-note svg {
+      width: 14px;
+      height: 14px;
+      color: var(--success);
+    }
+
     /* Submit Button */
     .form-footer {
       padding-top: 2rem;
@@ -852,10 +949,37 @@
             </div>
           </div>
 
+          <!-- Payment Info -->
+          <div class="payment-info">
+            <div class="payment-info-header">
+              <div class="payment-info-icon">₹</div>
+              <div class="payment-info-title">Registration Fee</div>
+            </div>
+            <div class="payment-info-amount">
+              <span class="payment-amount-value">₹500</span>
+              <span class="payment-amount-label">One-time fee</span>
+            </div>
+            <div class="payment-info-details">
+              Your event pass includes:
+              <ul>
+                <li>Access to all registered events</li>
+                <li>Entry pass with QR code</li>
+                <li>Event refreshments</li>
+                <li>Participation certificate</li>
+              </ul>
+            </div>
+            <div class="payment-note">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+              </svg>
+              Secure payment powered by Cashfree
+            </div>
+          </div>
+
           <!-- Submit -->
           <div class="form-footer">
             <button type="submit" class="btn" id="submit-btn">
-              <span id="btn-text">Submit Registration</span>
+              <span id="btn-text">Continue to Payment</span>
               <div class="btn-spinner" id="spinner"></div>
             </button>
           </div>
@@ -1140,13 +1264,8 @@
             document.getElementById('error-message').style.display = 'block';
           }
         } else {
-          document.getElementById('success-message').style.display = 'block';
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          
-          // Redirect to dashboard after short delay
-          setTimeout(() => {
-            window.location.href = '/dashboard.html';
-          }, 1500);
+          // Redirect to payment page immediately after successful registration
+          window.location.href = '/payment.html';
         }
       } catch (error) {
         document.getElementById('error-message').textContent = 'Network error. Please try again.';
@@ -1155,7 +1274,7 @@
         submitBtn.disabled = false;
         spinner.style.display = 'none';
         if (btnText.textContent === 'Submitting') {
-          btnText.textContent = 'Submit Registration';
+          btnText.textContent = 'Continue to Payment';
         }
       }
     });
