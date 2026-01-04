@@ -2,7 +2,6 @@ import Fastify from 'fastify';
 import fastifyStatic from '@fastify/static';
 import fastifySession from '@fastify/session';
 import fastifyCookie from '@fastify/cookie';
-import fastifyCors from '@fastify/cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -21,14 +20,6 @@ const __dirname = path.dirname(__filename);
 
 const fastify = Fastify({ logger: true });
 
-// Register CORS
-fastify.register(fastifyCors, {
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://elasian.vercel.app', 'https://*.vercel.app']
-    : true,
-  credentials: true
-});
-
 // Register cookie plugin (required for sessions)
 fastify.register(fastifyCookie);
 
@@ -38,9 +29,6 @@ fastify.register(fastifySession, {
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined,
-    path: '/',
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   },
   saveUninitialized: false
@@ -78,10 +66,8 @@ fastify.get('/health', async () => {
 // Start server
 const start = async () => {
   try {
-    // Only initialize database in development or on first Vercel deployment
-    if (process.env.NODE_ENV !== 'production' || process.env.INIT_DB === 'true') {
-      await initializeDatabase();
-    }
+    // Initialize database tables
+    await initializeDatabase();
     
     const port = process.env.PORT || 3000;
     await fastify.listen({ port, host: '0.0.0.0' });
@@ -93,10 +79,4 @@ const start = async () => {
   }
 };
 
-// Only start server if not in Vercel serverless environment
-if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-  start();
-}
-
-// Export for Vercel serverless
-export default fastify;
+start();

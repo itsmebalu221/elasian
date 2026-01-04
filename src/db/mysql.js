@@ -12,11 +12,8 @@ const poolConfig = {
   password: process.env.DB_PASSWORD || '',
   port: process.env.DB_PORT || 3306,
   waitForConnections: true,
-  connectionLimit: process.env.NODE_ENV === 'production' ? 2 : 10, // Reduced for serverless
-  queueLimit: 0,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0,
-  connectTimeout: 10000 // 10 second timeout for Vercel
+  connectionLimit: 10,
+  queueLimit: 0
 };
 
 // Pool with database selected
