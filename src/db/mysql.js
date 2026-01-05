@@ -177,9 +177,17 @@ export async function initializeDatabase() {
     );
     
     for (const row of rowsWithoutId) {
-      const regId = 'HITAM' + new Date().getFullYear().toString().slice(-2) + String(row.id).padStart(6, '0');
+      const regId = 'ELYSIAN' + new Date().getFullYear().toString().slice(-2) + String(row.id).padStart(6, '0');
       await connection.query('UPDATE student_forms SET registration_id = ? WHERE id = ?', [regId, row.id]);
       console.log(`  ✓ Generated registration ID: ${regId}`);
+    }
+
+    console.log('🔄 Updating legacy registration ID prefixes...');
+    const [updatedPrefixes] = await connection.query(
+      "UPDATE student_forms SET registration_id = CONCAT('ELYSIAN', SUBSTRING(registration_id, 6)) WHERE registration_id LIKE 'HITAM%'"
+    );
+    if (updatedPrefixes.affectedRows > 0) {
+      console.log(`  ✓ Updated ${updatedPrefixes.affectedRows} registration IDs to ELYSIAN prefix`);
     }
 
     // Step 10: Seed events catalog (idempotent)

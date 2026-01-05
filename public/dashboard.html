@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard — elasian</title>
+  <title>Dashboard — elysian</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -920,6 +920,11 @@
       word-break: break-all;
     }
 
+    .reg-id-value.locked {
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
     @media (max-width: 480px) {
       .reg-id-value {
         font-size: 1rem;
@@ -1349,6 +1354,11 @@
       letter-spacing: 0.1em;
     }
 
+    .pass-reg-id.locked {
+      color: #7a7a7a;
+      letter-spacing: 0.05em;
+    }
+
     .pass-details {
       flex: 1;
     }
@@ -1503,7 +1513,7 @@
   <nav class="navbar">
     <a href="/" class="navbar-brand">
       <span class="brand-text">
-        <span>e</span><span>l</span><span>a</span><span>s</span><span>i</span><span>a</span><span>n</span>
+        <span>e</span><span>l</span><span>y</span><span>s</span><span>i</span><span>a</span><span>n</span>
       </span>
     </a>
     <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
@@ -1671,7 +1681,7 @@
   <div class="print-pass" id="print-pass">
     <div class="print-pass-inner">
       <div class="pass-header">
-        <div class="pass-brand">elasian</div>
+        <div class="pass-brand">elysian</div>
         <div class="pass-title">
           <h1>Event Pass</h1>
           <p>Technical Symposium 2025</p>
@@ -2127,8 +2137,18 @@
           const hasPaid = !!paymentStatus?.isPaid;
 
           // Display Registration ID and manage QR visibility
-          const regId = form.registration_id || 'N/A';
-          document.getElementById('display-reg-id').textContent = regId;
+          const regIdElement = document.getElementById('display-reg-id');
+
+          if (regIdElement) {
+            if (hasPaid && form.registration_id) {
+              regIdElement.textContent = form.registration_id;
+              regIdElement.classList.remove('locked');
+            } else {
+              regIdElement.textContent = 'Complete payment to view ID';
+              regIdElement.classList.add('locked');
+            }
+          }
+
           updateQRDisplay(hasPaid, form);
 
           document.getElementById('display-name').textContent = form.full_name || '—';
@@ -2191,7 +2211,16 @@
       }
       
       // Basic Info
-      document.getElementById('print-reg-id').textContent = form.registration_id || '—';
+      const printRegIdEl = document.getElementById('print-reg-id');
+      if (printRegIdEl) {
+        if (isPaid && form.registration_id) {
+          printRegIdEl.textContent = form.registration_id;
+          printRegIdEl.classList.remove('locked');
+        } else {
+          printRegIdEl.textContent = 'Payment required to unlock ID';
+          printRegIdEl.classList.add('locked');
+        }
+      }
       document.getElementById('print-name').textContent = form.full_name || '—';
       document.getElementById('print-roll').textContent = form.roll_number || '—';
       document.getElementById('print-branch').textContent = form.branch || '—';

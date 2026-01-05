@@ -10,7 +10,7 @@ const EVENT_TYPE_LOOKUP = EVENT_DEFINITIONS.reduce((acc, event) => {
 function generateRegistrationId() {
   const year = new Date().getFullYear().toString().slice(-2);
   const random = Math.floor(100000 + Math.random() * 900000); // 6 digit random
-  return `HITAM${year}${random}`;
+  return `ELYSIAN${year}${random}`;
 }
 
 // Submit student form to database
