@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>External Registration - Elysian '26</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0a10;
+      --bg-secondary: #12121a;
+      --bg-card: rgba(255, 255, 255, 0.02);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --border-subtle: rgba(255, 255, 255, 0.05);
+      --accent: #6b8cce;
+      --accent-soft: rgba(107, 140, 206, 0.12);
+      --accent-strong: rgba(107, 140, 206, 0.25);
+      --success: #22c55e;
+      --error: #ef4444;
+      --text-primary: #ffffff;
+      --text-secondary: #d6d6dc;
+      --text-muted: #8c8ca0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at top, rgba(107, 140, 206, 0.18) 0%, transparent 35%), var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Fixed Navbar */
+    .top-navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.875rem 2rem;
+      background: rgba(10, 10, 16, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    @media (max-width: 640px) {
+      .top-navbar {
+        padding: 0.75rem 1rem;
+      }
+    }
+
+    .navbar-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+    }
+
+    @media (max-width: 640px) {
+      .navbar-brand {
+        font-size: 1.25rem;
+      }
+    }
+
+    .navbar-brand span {
+      color: var(--accent);
+    }
+
+    .navbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .navbar-right {
+        gap: 0.75rem;
+      }
+    }
+
+    .user-block {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 480px) {
+      .user-block {
+        gap: 0.5rem;
+      }
+    }
+
+    .user-avatar {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      border: 1px solid var(--border-subtle);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .user-meta {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    @media (max-width: 480px) {
+      .user-meta {
+        display: none;
+      }
+    }
+
+    .user-name {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+
+    .user-email {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+
+    .signout-link {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 0.375rem 0.75rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .signout-link:hover {
+      color: var(--text-primary);
+      border-color: var(--text-muted);
+    }
+
+    .page-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 1.5rem 3rem;
+    }
+
+    @media (max-width: 640px) {
+      .page-wrapper {
+        padding: 4.5rem 1rem 2rem;
+      }
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 3rem;
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        grid-template-columns: 1fr;
+        max-width: 600px;
+      }
+    }
+
+    /* Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: sticky;
+      top: 2rem;
+      align-self: start;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        display: none;
+      }
+    }
+
+    .sidebar-header {
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .sidebar-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+
+    .sidebar-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Mobile bottom panel */
+    .mobile-bottom-panel {
+      display: none;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    @media (max-width: 900px) {
+      .mobile-bottom-panel {
+        display: block;
+      }
+    }
+
+    .intro-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.25rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .intro-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .pricing-box {
+      border: 1px solid var(--accent-strong);
+      background: var(--accent-soft);
+      padding: 1.25rem;
+      display: grid;
+      gap: 0.75rem;
+      border-radius: 4px;
+    }
+
+    .pricing-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .pricing-total {
+      border-top: 1px solid var(--accent-strong);
+      padding-top: 0.75rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-primary);
+    }
+
+    .support-copy {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .support-copy a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .support-copy a:hover {
+      text-decoration: underline;
+    }
+
+    /* Sidebar addon promo */
+    .sidebar-addon {
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.03) 100%);
+      padding: 1.25rem;
+      border-radius: 4px;
+    }
+
+    .sidebar-addon-badge {
+      display: inline-flex;
+      font-size: 0.55rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #86efac;
+      background: rgba(34, 197, 94, 0.25);
+      padding: 0.2rem 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .sidebar-addon-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.4rem;
+    }
+
+    .sidebar-addon-desc {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 0.6rem;
+    }
+
+    .sidebar-addon-price {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #86efac;
+    }
+
+    .addon-promo {
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(34, 197, 94, 0.04) 100%);
+      padding: 1.25rem 1.5rem;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .addon-promo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #86efac;
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      padding: 0.25rem 0.6rem;
+      width: fit-content;
+    }
+
+    .addon-promo-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .addon-promo-desc {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .addon-promo-price {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.25rem;
+    }
+
+    .addon-promo-amount {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #86efac;
+    }
+
+    .addon-promo-note {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .addon-toggle {
+      padding: 1rem 1.25rem;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.06) 0%, rgba(34, 197, 94, 0.02) 100%);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.875rem;
+    }
+
+    @media (max-width: 900px) {
+      .addon-toggle {
+        padding: 1rem;
+        gap: 0.75rem;
+      }
+    }
+
+    .addon-toggle:hover {
+      border-color: rgba(34, 197, 94, 0.45);
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.04) 100%);
+    }
+
+    .addon-toggle.selected {
+      border-color: rgba(34, 197, 94, 0.55);
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.06) 100%);
+    }
+
+    .addon-toggle-check {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(34, 197, 94, 0.45);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .addon-toggle.selected .addon-toggle-check {
+      border-color: #22c55e;
+      background: #22c55e;
+    }
+
+    .addon-toggle-check::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: transparent;
+      border-radius: 50%;
+      transition: background-color 0.2s ease;
+    }
+
+    .addon-toggle.selected .addon-toggle-check::after {
+      background: white;
+    }
+
+    .addon-toggle-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    @media (max-width: 900px) {
+      .addon-toggle {
+        flex-wrap: wrap;
+      }
+
+      .addon-toggle-content {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+
+      .addon-toggle-price {
+        margin-left: auto;
+      }
+    }
+
+    .addon-toggle-badge {
+      display: inline-flex;
+      font-size: 0.55rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #86efac;
+      background: rgba(34, 197, 94, 0.25);
+      padding: 0.15rem 0.45rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .addon-toggle-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .addon-toggle-desc {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .addon-toggle-title {
+        font-size: 0.8125rem;
+      }
+
+      .addon-toggle-desc {
+        font-size: 0.7rem;
+        line-height: 1.45;
+      }
+    }
+
+    .addon-toggle-price {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #86efac;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 900px) {
+      .addon-toggle-price {
+        font-size: 0.95rem;
+        padding-top: 0.25rem;
+      }
+    }
+
+    .form-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      border-radius: 4px;
+    }
+
+    @media (max-width: 900px) {
+      .form-card {
+        padding: 1.75rem;
+      }
+    }
+
+    .section {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .form-section {
+      margin-top: 2rem;
+    }
+
+    .section-label {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 0.5rem;
+    }
+
+    .event-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.75rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .section-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 1.25rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .event-groups {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .event-group {
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+    }
+
+    .event-group-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-bottom: 1rem;
+    }
+
+    .event-group-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.02em;
+    }
+
+    .event-group-description {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .event-group-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 720px) {
+      .event-group-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .event-card {
+      position: relative;
+      padding: 1rem;
+      background: rgba(10, 10, 16, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      display: grid;
+      gap: 0.375rem;
+      cursor: pointer;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+      outline: none;
+    }
+
+    .event-card input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .event-card:hover {
+      border-color: rgba(168, 169, 173, 0.3);
+      background: rgba(15, 15, 22, 0.8);
+    }
+
+    .event-card.selected {
+      border-color: var(--accent);
+      background: rgba(107, 140, 206, 0.15);
+    }
+
+    .event-card.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .event-card-check {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 18px;
+      height: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .event-card.selected .event-card-check {
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+
+    .event-card.disabled .event-card-check {
+      border-color: rgba(168, 169, 173, 0.35);
+    }
+
+    .event-card-check::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: transparent;
+      border-radius: 50%;
+      transition: background-color 0.2s ease;
+    }
+
+    .event-card.selected .event-card-check::after {
+      background: white;
+    }
+
+    .event-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.625rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(107, 140, 206, 0.12);
+      border: 1px solid rgba(107, 140, 206, 0.3);
+      padding: 0.125rem 0.5rem;
+      border-radius: 999px;
+      width: fit-content;
+      margin-bottom: 0.25rem;
+    }
+
+    .event-name {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      padding-right: 2rem;
+    }
+
+    .event-organizer {
+      font-size: 0.6875rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .event-meta {
+      font-size: 0.6875rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.03em;
+    }
+
+    .event-description {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .field-error {
+      font-size: 0.75rem;
+      color: var(--error);
+    }
+
+    .selection-summary {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+    }
+
+    .summary-title {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .summary-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .summary-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 0.75rem;
+      background: rgba(10, 10, 16, 0.5);
+      border-radius: 4px;
+    }
+
+    .summary-item .summary-name {
+      font-size: 0.8125rem;
+      color: var(--text-primary);
+    }
+
+    .summary-item .summary-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .summary-empty {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 720px) {
+      .form-card {
+        padding: 2rem 1.75rem;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    input, select, textarea {
+      padding: 0.85rem 1rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      transition: border 0.2s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .checkbox-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 0.15rem;
+    }
+
+    .checkbox-row span {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .form-actions {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 0.95rem 1.25rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #7b9fe9, #5b7ac2);
+      color: #0b1120;
+      box-shadow: 0 10px 30px rgba(91, 122, 194, 0.22);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(91, 122, 194, 0.3);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .message-box {
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.03);
+      padding: 1.25rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      display: none;
+    }
+
+    .message-box.success {
+      border-color: rgba(34, 197, 94, 0.4);
+      background: rgba(34, 197, 94, 0.12);
+      color: var(--text-primary);
+    }
+
+    .message-box.error {
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--text-primary);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.6rem;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      background: rgba(34, 197, 94, 0.15);
+      color: #bbf7d0;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .link-row {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .link-row a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .link-row a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive visibility */
+    .desktop-only {
+      display: grid;
+    }
+
+    @media (max-width: 900px) {
+      .desktop-only {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Fixed Navbar -->
+  <nav class="top-navbar">
+    <a href="/" class="navbar-brand">elysian<span>'26</span></a>
+    <div class="navbar-right">
+      <div class="user-block">
+        <img id="user-avatar" class="user-avatar" src="" alt="">
+        <div class="user-meta">
+          <span class="user-name" id="user-name"></span>
+          <span class="user-email" id="user-email"></span>
+        </div>
+      </div>
+      <a href="/auth/logout" class="signout-link">Sign out</a>
+    </div>
+  </nav>
+
+  <div class="page-wrapper">
+  <div class="page">
+    <!-- Sidebar (Desktop Only) -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 class="sidebar-title">External Registration</h1>
+        <p class="sidebar-subtitle">Secure your Elysian '26 pass. Complete the form to join us for an unforgettable cultural experience.</p>
+      </div>
+
+      <div class="pricing-box" id="sidebar-pricing">
+        <div class="pricing-row">
+          <span>Base pass</span>
+          <strong>₹700</strong>
+        </div>
+        <div class="pricing-row" id="sidebar-pricing-addon" style="display: none;">
+          <span>Cultural add-on</span>
+          <strong>₹300</strong>
+        </div>
+        <div class="pricing-total">
+          <span>Total</span>
+          <strong id="sidebar-pricing-total">₹700</strong>
+        </div>
+      </div>
+
+      <div class="sidebar-addon">
+        <span class="sidebar-addon-badge">✦ Recommended</span>
+        <p class="sidebar-addon-title">Sahitya + Prasasthi</p>
+        <p class="sidebar-addon-desc">Unlock literary fest & traditional dance, music, heritage celebrations.</p>
+        <span class="sidebar-addon-price">+₹300</span>
+      </div>
+
+      <div class="support-copy">
+        Need help? <a href="mailto:elysian@hitam.org">elysian@hitam.org</a>
+      </div>
+    </aside>
+
+    <!-- Main Form -->
+    <main class="form-card">
+      <section class="section">
+        <div>
+          <h2 class="section-title">Participant Details</h2>
+          <p class="section-subtitle">Use an email you actively monitor. We'll send your registration code and receipts there.</p>
+        </div>
+        <form id="external-form">
+          <div class="form-grid">
+            <label>
+              Full name
+              <input type="text" id="full-name" name="full_name" placeholder="Ex: Priya Sharma" required>
+            </label>
+            <label>
+              Email address
+              <input type="email" id="email" name="email" placeholder="name@example.com" required>
+            </label>
+            <label>
+              Mobile number
+              <input type="tel" id="mobile" name="mobile" placeholder="9876543210" required>
+            </label>
+            <label>
+              Institution
+              <input type="text" id="institution" name="institution" placeholder="Your college / organization" required>
+            </label>
+            <label>
+              Department
+              <input type="text" id="department" name="department" placeholder="Ex: Computer Science" required>
+            </label>
+            <label>
+              Year of study
+              <select id="year" name="year_of_study" required>
+                <option value="">Select year</option>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+                <option value="5">5th Year</option>
+                <option value="6">6th Year</option>
+              </select>
+            </label>
+            <label>
+              Identity number
+              <input type="text" id="identity" name="identity_number" placeholder="College ID / Govt. ID" required>
+            </label>
+          </div>
+
+          <div class="form-section">
+            <div class="section-label">Event Selection (Optional)</div>
+            <p class="event-hint">Select events you'd like to attend, or skip this section if you prefer to decide later at the fest.</p>
+            <div class="event-groups" id="event-groups"></div>
+            <div class="field-error" id="events-error"></div>
+          </div>
+
+          <div class="selection-summary">
+            <div class="summary-title">Your Selection</div>
+            <div class="summary-list" id="selection-summary">
+              <div class="summary-empty">No selections yet — you can decide at the fest</div>
+            </div>
+          </div>
+
+          <!-- Mobile Bottom Panel: Pricing -->
+          <div class="mobile-bottom-panel">
+            <div class="pricing-box" id="mobile-pricing-box">
+              <div class="pricing-row">
+                <span>Base pass</span>
+                <strong>₹700</strong>
+              </div>
+              <div class="pricing-row" id="mobile-pricing-addon" style="display: none;">
+                <span>Cultural add-on</span>
+                <strong>₹300</strong>
+              </div>
+              <div class="pricing-total">
+                <span>Total payable</span>
+                <strong id="mobile-pricing-total">₹700</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Desktop Pricing (hidden on mobile via sidebar) -->
+          <div class="pricing-box desktop-only" id="pricing-box" style="margin-top: 1.5rem;">
+            <div class="pricing-row">
+              <span>Base pass</span>
+              <strong>₹700</strong>
+            </div>
+            <div class="pricing-row" id="pricing-addon" style="display: none;">
+              <span>Cultural add-on (Sahitya + Prasasthi)</span>
+              <strong>₹300</strong>
+            </div>
+            <div class="pricing-total">
+              <span>Total payable</span>
+              <strong id="pricing-total">₹700</strong>
+            </div>
+          </div>
+
+          <!-- Cultural Add-On Selection (Bottom Position) -->
+          <div class="section-label" style="margin-top: 2rem;">Cultural Add-On (Optional)</div>
+          <div class="addon-toggle" id="addon-toggle" tabindex="0">
+            <div class="addon-toggle-check"></div>
+            <div class="addon-toggle-content">
+              <span class="addon-toggle-badge">✦ Recommended</span>
+              <p class="addon-toggle-title">Sahitya + Prasasthi Cultural Showcase</p>
+              <p class="addon-toggle-desc">Unlock exclusive access to our literary fest (poetry slams, debates, storytelling) and traditional celebrations (dance, music, heritage performances).</p>
+            </div>
+            <span class="addon-toggle-price">+₹300</span>
+          </div>
+
+          <div class="form-actions" style="margin-top: 1.5rem;">
+            <div id="form-message" class="message-box"></div>
+            <button type="submit" id="submit-btn" class="btn btn-primary">
+              <span id="submit-text">Submit &amp; Continue to Payment</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <div class="link-row">
+        Already registered? Re-submit the form with the same identity number to resume payment, or <a href="/login.html">return to login</a>.
+      </div>
+    </main>
+  </div>
+  </div> <!-- End page-wrapper -->
+
+  <script>
+    const EXTERNAL_BASE_AMOUNT = 700;
+    const EXTERNAL_ADD_ON_AMOUNT = 300;
+
+    const formEl = document.getElementById('external-form');
+    const eventsContainer = document.getElementById('event-groups');
+    const eventsErrorEl = document.getElementById('events-error');
+    const summaryContainer = document.getElementById('selection-summary');
+    const messageBox = document.getElementById('form-message');
+    const submitBtn = document.getElementById('submit-btn');
+    const submitText = document.getElementById('submit-text');
+    
+    // All pricing elements
+    const pricingAddonRow = document.getElementById('pricing-addon');
+    const pricingTotal = document.getElementById('pricing-total');
+    const sidebarPricingAddon = document.getElementById('sidebar-pricing-addon');
+    const sidebarPricingTotal = document.getElementById('sidebar-pricing-total');
+    const mobilePricingAddon = document.getElementById('mobile-pricing-addon');
+    const mobilePricingTotal = document.getElementById('mobile-pricing-total');
+
+    const EVENT_TYPES_ENUM = {
+      MULTI_DAY: 'MULTI_DAY',
+      DAY_1_ONLY: 'DAY_1_ONLY',
+      DAY_2_ONLY: 'DAY_2_ONLY',
+      OPTIONAL: 'OPTIONAL'
+    };
+
+    const EVENT_TYPE_LABELS = {
+      MULTI_DAY: 'Multi-day',
+      DAY_1_ONLY: 'Day 1 Only',
+      DAY_2_ONLY: 'Day 2 Only',
+      OPTIONAL: 'Optional Add-on'
+    };
+
+    let eventCatalog = [];
+    let eventLookup = new Map();
+    const selectedEvents = new Set();
+    let activeRegistration = null;
+    let culturalAddOnSelected = false;
+
+    function resetMessage() {
+      messageBox.className = 'message-box';
+      messageBox.style.display = 'none';
+      messageBox.textContent = '';
+    }
+
+    function showMessage(type, content) {
+      messageBox.className = `message-box ${type}`;
+      messageBox.style.display = 'block';
+      messageBox.innerHTML = content;
+    }
+
+    function setLoading(isLoading, text) {
+      submitBtn.disabled = isLoading;
+      submitText.textContent = isLoading ? text : 'Submit & Continue to Payment';
+    }
+
+    function showEventsError(message) {
+      if (eventsErrorEl) {
+        eventsErrorEl.textContent = message || '';
+      }
+    }
+
+    function clearEventsError() {
+      showEventsError('');
+    }
+
+    function updatePricing() {
+      // Check both the toggle and any optional events selected
+      const hasOptionalEvent = Array.from(selectedEvents).some(id => {
+        const event = eventLookup.get(id);
+        return event && event.type === EVENT_TYPES_ENUM.OPTIONAL;
+      });
+      const hasAddOn = culturalAddOnSelected || hasOptionalEvent;
+      const total = EXTERNAL_BASE_AMOUNT + (hasAddOn ? EXTERNAL_ADD_ON_AMOUNT : 0);
+      const totalText = `₹${total}`;
+
+      // Update all pricing displays (desktop, sidebar, mobile)
+      if (pricingAddonRow) pricingAddonRow.style.display = hasAddOn ? 'flex' : 'none';
+      if (pricingTotal) pricingTotal.textContent = totalText;
+      
+      if (sidebarPricingAddon) sidebarPricingAddon.style.display = hasAddOn ? 'flex' : 'none';
+      if (sidebarPricingTotal) sidebarPricingTotal.textContent = totalText;
+      
+      if (mobilePricingAddon) mobilePricingAddon.style.display = hasAddOn ? 'flex' : 'none';
+      if (mobilePricingTotal) mobilePricingTotal.textContent = totalText;
+
+      return hasAddOn;
+    }
+
+    function toggleCulturalAddOn() {
+      culturalAddOnSelected = !culturalAddOnSelected;
+      const toggle = document.getElementById('addon-toggle');
+      if (culturalAddOnSelected) {
+        toggle.classList.add('selected');
+      } else {
+        toggle.classList.remove('selected');
+      }
+      updatePricing();
+      updateSummary();
+    }
+
+    function getCashfreeMode() {
+      const host = window.location.hostname;
+      if (host === 'localhost' || host === '127.0.0.1') {
+        return 'sandbox';
+      }
+      return 'production';
+    }
+
+    function groupEventsByType(events = []) {
+      return events.reduce((acc, event) => {
+        if (!acc[event.type]) {
+          acc[event.type] = [];
+        }
+        acc[event.type].push(event);
+        return acc;
+      }, {});
+    }
+
+    function validateSelection(selectedIds = []) {
+      const normalized = Array.from(new Set((selectedIds || []).filter(value => typeof value === 'string' && value.trim().length > 0)));
+
+      // Allow empty selection for business canvas
+      if (normalized.length === 0) {
+        return { ok: true };
+      }
+
+      if (normalized.length !== (selectedIds || []).filter(Boolean).length) {
+        return { ok: false, reason: 'Duplicate events cannot be selected.' };
+      }
+
+      const stats = {
+        [EVENT_TYPES_ENUM.MULTI_DAY]: 0,
+        [EVENT_TYPES_ENUM.DAY_1_ONLY]: 0,
+        [EVENT_TYPES_ENUM.DAY_2_ONLY]: 0,
+        [EVENT_TYPES_ENUM.OPTIONAL]: 0
+      };
+
+      const primarySelections = [];
+
+      for (const id of normalized) {
+        const event = eventLookup.get(id);
+        if (!event) {
+          return { ok: false, reason: 'Unknown event selected.' };
+        }
+        stats[event.type] += 1;
+        if (event.type !== EVENT_TYPES_ENUM.OPTIONAL) {
+          primarySelections.push(event.id);
+        }
+      }
+
+      // Allow optional add-ons without primary events
+      if (primarySelections.length === 0 && stats[EVENT_TYPES_ENUM.OPTIONAL] > 0) {
+        return { ok: true };
+      }
+
+      if (stats[EVENT_TYPES_ENUM.MULTI_DAY] > 0) {
+        if (stats[EVENT_TYPES_ENUM.MULTI_DAY] > 1) {
+          return { ok: false, reason: 'Choose only one multi-day experience.' };
+        }
+        if (primarySelections.length > 1) {
+          return { ok: false, reason: 'Multi-day events cannot be combined with other primary selections.' };
+        }
+      }
+
+      if (stats[EVENT_TYPES_ENUM.DAY_1_ONLY] > 1) {
+        return { ok: false, reason: 'Only one Day 1 event can be selected at a time.' };
+      }
+
+      if (stats[EVENT_TYPES_ENUM.DAY_2_ONLY] > 1) {
+        return { ok: false, reason: 'Only one Day 2 event can be selected at a time.' };
+      }
+
+      if (
+        stats[EVENT_TYPES_ENUM.MULTI_DAY] > 0 &&
+        (stats[EVENT_TYPES_ENUM.DAY_1_ONLY] > 0 || stats[EVENT_TYPES_ENUM.DAY_2_ONLY] > 0)
+      ) {
+        return { ok: false, reason: 'Multi-day events block Day 1 and Day 2 selections.' };
+      }
+
+      return { ok: true };
+    }
+
+    function isEventDisabled(event, selectedIds = []) {
+      if (event.type === EVENT_TYPES_ENUM.OPTIONAL) {
+        return false;
+      }
+
+      if (selectedIds.includes(event.id)) {
+        return false;
+      }
+
+      if (selectedIds.length === 0) {
+        return false;
+      }
+
+      const selectedTypes = selectedIds
+        .map(id => eventLookup.get(id)?.type)
+        .filter(Boolean);
+      const hasMultiDay = selectedTypes.includes(EVENT_TYPES_ENUM.MULTI_DAY);
+      const day1Count = selectedTypes.filter(type => type === EVENT_TYPES_ENUM.DAY_1_ONLY).length;
+      const day2Count = selectedTypes.filter(type => type === EVENT_TYPES_ENUM.DAY_2_ONLY).length;
+
+      if (hasMultiDay) {
+        return true;
+      }
+
+      if (
+        event.type === EVENT_TYPES_ENUM.MULTI_DAY &&
+        (day1Count > 0 || day2Count > 0 || selectedTypes.includes(EVENT_TYPES_ENUM.MULTI_DAY))
+      ) {
+        return true;
+      }
+
+      if (event.type === EVENT_TYPES_ENUM.DAY_1_ONLY && day1Count > 0) {
+        return true;
+      }
+
+      if (event.type === EVENT_TYPES_ENUM.DAY_2_ONLY && day2Count > 0) {
+        return true;
+      }
+
+      return false;
+    }
+
+    function renderEvents() {
+      if (!eventsContainer) {
+        return;
+      }
+
+      if (!eventCatalog.length) {
+        eventsContainer.innerHTML = '<p class="summary-empty">Event catalog will be announced shortly. You can still complete your registration now.</p>';
+        return;
+      }
+
+      const selectedIds = Array.from(selectedEvents);
+      const grouped = groupEventsByType(eventCatalog);
+      const typeOrder = [
+        EVENT_TYPES_ENUM.MULTI_DAY,
+        EVENT_TYPES_ENUM.DAY_1_ONLY,
+        EVENT_TYPES_ENUM.DAY_2_ONLY,
+        EVENT_TYPES_ENUM.OPTIONAL
+      ].filter(type => grouped[type] && grouped[type].length);
+
+      const html = typeOrder.map(type => {
+        const events = grouped[type];
+        const title = EVENT_TYPE_LABELS[type] || type;
+        let description = '';
+
+        switch (type) {
+          case EVENT_TYPES_ENUM.MULTI_DAY:
+            description = 'Spans both fest days. Choosing this locks every other primary option.';
+            break;
+          case EVENT_TYPES_ENUM.DAY_1_ONLY:
+            description = 'Day 1 experiences. Pick at most one from this set.';
+            break;
+          case EVENT_TYPES_ENUM.DAY_2_ONLY:
+            description = 'Day 2 experiences. Pick at most one from this set.';
+            break;
+          case EVENT_TYPES_ENUM.OPTIONAL:
+            description = 'Optional cultural bundle covering Sahitya and Prasasthi. Adds ₹300 when selected.';
+            break;
+          default:
+            description = '';
+        }
+
+        const cards = events.map(event => {
+          const selected = selectedEvents.has(event.id);
+          const disabled = !selected && isEventDisabled(event, selectedIds);
+          const scheduleLabel = [
+            event.dayLabel,
+            event.startTime && event.endTime
+              ? `${event.startTime} - ${event.endTime}`
+              : event.startTime || event.endTime || null
+          ].filter(Boolean).join(' · ');
+
+          return `
+            <label class="event-card ${selected ? 'selected' : ''} ${disabled ? 'disabled' : ''}" data-event-id="${event.id}" tabindex="0">
+              <input type="checkbox" ${selected ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
+              <div class="event-card-check"></div>
+              <div class="event-type-badge">${title}</div>
+              <div class="event-name">${event.name}</div>
+              ${event.organizer ? `<div class="event-organizer">${event.organizer}</div>` : ''}
+              ${scheduleLabel ? `<div class="event-meta">${scheduleLabel}</div>` : ''}
+              ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
+            </label>
+          `;
+        }).join('');
+
+        return `
+          <section class="event-group">
+            <header class="event-group-header">
+              <h3 class="event-group-title">${title}</h3>
+              <p class="event-group-description">${description}</p>
+            </header>
+            <div class="event-group-grid">
+              ${cards}
+            </div>
+          </section>
+        `;
+      }).join('');
+
+      eventsContainer.innerHTML = html;
+
+      eventsContainer.querySelectorAll('[data-event-id]').forEach(card => {
+        card.addEventListener('click', handleEventCardClick);
+        card.addEventListener('keydown', handleEventCardKeydown);
+      });
+
+      updatePricing();
+    }
+
+    function handleEventCardClick(event) {
+      const card = event.target.closest('[data-event-id]');
+      if (!card || card.classList.contains('disabled')) {
+        return;
+      }
+
+      event.preventDefault();
+      const eventId = card.getAttribute('data-event-id');
+      toggleEventSelection(eventId);
+    }
+
+    function handleEventCardKeydown(event) {
+      if (event.key !== 'Enter' && event.key !== ' ') {
+        return;
+      }
+
+      const card = event.target.closest('[data-event-id]');
+      if (!card || card.classList.contains('disabled')) {
+        return;
+      }
+
+      event.preventDefault();
+      const eventId = card.getAttribute('data-event-id');
+      toggleEventSelection(eventId);
+    }
+
+    function updateSummary() {
+      const selectedIds = Array.from(selectedEvents);
+
+      if (selectedIds.length === 0) {
+        summaryContainer.innerHTML = '<div class="summary-empty">No events selected yet</div>';
+        return;
+      }
+
+      const rows = selectedIds.map(id => {
+        const event = eventLookup.get(id);
+        if (!event) {
+          return '';
+        }
+
+        const metaParts = [
+          EVENT_TYPE_LABELS[event.type] || 'Event',
+          event.dayLabel || null
+        ].filter(Boolean);
+
+        return `
+          <div class="summary-item">
+            <span class="summary-name">${event.name}</span>
+            ${metaParts.length ? `<span class="summary-meta">${metaParts.join(' · ')}</span>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      // Show add-on in summary if selected via toggle
+      let addOnRow = '';
+      if (culturalAddOnSelected) {
+        addOnRow = `
+          <div class="summary-item">
+            <span class="summary-name">Sahitya + Prasasthi Cultural Showcase</span>
+            <span class="summary-meta">Cultural Add-On · +₹300</span>
+          </div>
+        `;
+      }
+
+      const allContent = addOnRow + rows;
+      summaryContainer.innerHTML = allContent || '<div class="summary-empty">No selections yet — you can decide at the fest</div>';
+    }
+
+    function toggleEventSelection(eventId) {
+      if (!eventLookup.has(eventId)) {
+        return;
+      }
+
+      if (selectedEvents.has(eventId)) {
+        selectedEvents.delete(eventId);
+        clearEventsError();
+        renderEvents();
+        updateSummary();
+        return;
+      }
+
+      const nextSelection = Array.from(selectedEvents);
+      nextSelection.push(eventId);
+
+      const validation = validateSelection(nextSelection);
+      if (!validation.ok) {
+        showEventsError(validation.reason);
+        return;
+      }
+
+      selectedEvents.add(eventId);
+      clearEventsError();
+      renderEvents();
+      updateSummary();
+    }
+
+    async function fetchEvents() {
+      try {
+        const response = await fetch('/api/events/catalog');
+        if (!response.ok) {
+          throw new Error('Unable to load event catalog');
+        }
+
+        const data = await response.json();
+        if (data.success && Array.isArray(data.events)) {
+          eventCatalog = data.events;
+          eventLookup = new Map(eventCatalog.map(event => [event.id, event]));
+          renderEvents();
+          updateSummary();
+        }
+      } catch (error) {
+        console.warn('Event catalog fetch failed:', error);
+        eventsContainer.innerHTML = '<p class="summary-empty">Unable to load events. Please refresh the page.</p>';
+      }
+    }
+
+    function validateForm(formData) {
+      const errors = [];
+
+      const email = formData.get('email')?.trim();
+      const mobile = formData.get('mobile')?.trim();
+      const identity = formData.get('identity_number')?.trim();
+      const year = Number(formData.get('year_of_study'));
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errors.push('Please enter a valid email address.');
+      }
+
+      if (!mobile || !/^[6-9]\d{9}$/.test(mobile)) {
+        errors.push('Enter a valid 10-digit Indian mobile number.');
+      }
+
+      if (!identity || identity.length < 4) {
+        errors.push('Identity number must be at least 4 characters.');
+      }
+
+      if (!Number.isInteger(year) || year < 1 || year > 6) {
+        errors.push('Select a valid study year.');
+      }
+
+      return errors;
+    }
+
+    async function submitForm(event) {
+      event.preventDefault();
+      resetMessage();
+      clearEventsError();
+
+      const formData = new FormData(formEl);
+      const errors = validateForm(formData);
+
+      if (errors.length) {
+        showMessage('error', errors.join('<br>'));
+        return;
+      }
+
+      const selectedIds = Array.from(selectedEvents);
+      const validation = validateSelection(selectedIds);
+      if (!validation.ok) {
+        showEventsError(validation.reason);
+        return;
+      }
+
+      const addOnSelected = culturalAddOnSelected || Array.from(selectedEvents).some(id => {
+        const event = eventLookup.get(id);
+        return event && event.type === EVENT_TYPES_ENUM.OPTIONAL;
+      });
+
+      const payload = {
+        full_name: formData.get('full_name').trim(),
+        email: formData.get('email').trim(),
+        mobile: formData.get('mobile').trim(),
+        institution: formData.get('institution').trim(),
+        department: formData.get('department').trim(),
+        year_of_study: Number(formData.get('year_of_study')),
+        identity_number: formData.get('identity_number').trim(),
+        add_on_selected: addOnSelected,
+        selected_events: selectedIds
+      };
+
+      try {
+        setLoading(true, 'Saving details...');
+
+        const response = await fetch('/api/external/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || 'Registration failed. Please try again.');
+        }
+
+        activeRegistration = result.registration;
+
+        console.log('Registration response:', { 
+          isPaid: result.isPaid, 
+          isExisting: result.isExisting,
+          registrationId: activeRegistration.id 
+        });
+
+        // Don't show registration ID before payment - redirect to payment page
+        if (result.isPaid) {
+          console.log('Registration already paid, redirecting to dashboard');
+          window.location.href = '/dashboard.html';
+          return;
+        }
+
+        // Redirect to external payment page for confirmation and payment
+        console.log('Redirecting to payment confirmation');
+        window.location.href = '/external-payment.html';
+      } catch (error) {
+        console.error('External registration error:', error);
+        showMessage('error', error.message || 'Failed to register. Please try again in a moment.');
+        setLoading(false);
+      }
+    }
+
+    formEl.addEventListener('submit', submitForm);
+
+    // Cultural add-on toggle
+    const addonToggle = document.getElementById('addon-toggle');
+    addonToggle.addEventListener('click', toggleCulturalAddOn);
+    addonToggle.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleCulturalAddOn();
+      }
+    });
+
+    // Check authentication on page load
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/auth/status', {
+          credentials: 'include'
+        });
+        const data = await response.json();
+
+        if (!data.isAuthenticated) {
+          // Not logged in - redirect to login
+          window.location.href = '/login.html';
+          return false;
+        }
+
+        // Check if internal user trying to access external form
+        if (data.user.userType === 'INTERNAL') {
+          window.location.href = data.user.hasSubmittedForm ? '/dashboard.html' : '/form.html';
+          return false;
+        }
+
+        // If external user already submitted, redirect to dashboard
+        if (data.user.hasSubmittedForm) {
+          window.location.href = '/dashboard.html';
+          return false;
+        }
+
+        // Populate header with user info
+        const avatarEl = document.getElementById('user-avatar');
+        const nameEl = document.getElementById('user-name');
+        const emailEl = document.getElementById('user-email');
+        
+        if (data.user.picture) {
+          avatarEl.src = data.user.picture;
+        }
+        if (data.user.name) {
+          nameEl.textContent = data.user.name;
+        }
+        if (data.user.email && emailEl) {
+          emailEl.textContent = data.user.email;
+        }
+
+        // Pre-fill email from auth
+        const emailInput = document.getElementById('email');
+        if (emailInput && data.user.email) {
+          emailInput.value = data.user.email;
+          emailInput.readOnly = true;
+        }
+
+        return true;
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        window.location.href = '/login.html';
+        return false;
+      }
+    }
+
+    // Initialize page
+    async function initPage() {
+      const isAuthenticated = await checkAuth();
+      if (!isAuthenticated) return;
+
+      fetchEvents();
+      updateSummary();
+      updatePricing();
+    }
+
+    initPage();
+  </script>
+</body>
+</html>

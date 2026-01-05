@@ -1,5 +1,6 @@
-import { isAllowedEmail, findOrCreateUser } from '../config/firebase.js';
+import { getUserType, findOrCreateUser } from '../config/passport.js';
 import { getStudentForm } from '../Services/student.service.js';
+import { getExternalRegistrationByEmail } from '../Services/external.service.js';
 import { signToken, getCookieName, getCookieOptions, sanitizeUserPayload } from '../utils/jwt.js';
 
 export async function firebaseLoginHandler(req, res) {
@@ -21,13 +22,7 @@ export async function firebaseLoginHandler(req, res) {
     }
 
     const email = user.email.toLowerCase().trim();
-
-    if (!isAllowedEmail(email)) {
-      return res.status(403).json({
-        success: false,
-        error: 'Only @hitam.org email addresses are allowed'
-      });
-    }
+    const userType = getUserType(email);
 
     let dbUser;
     try {
@@ -52,8 +47,15 @@ export async function firebaseLoginHandler(req, res) {
     let existingForm = null;
     try {
       if (dbUser.id && !dbUser.is_temporary) {
-        existingForm = await getStudentForm(dbUser.id);
-        hasSubmittedForm = !!existingForm;
+        if (userType === 'INTERNAL') {
+          // HITAM students - check student_forms table
+          existingForm = await getStudentForm(dbUser.id);
+          hasSubmittedForm = !!existingForm;
+        } else {
+          // External users - check external_registrations table by email
+          existingForm = await getExternalRegistrationByEmail(email);
+          hasSubmittedForm = !!existingForm;
+        }
       }
     } catch (formError) {
       console.warn('Could not check form status:', formError.message);
@@ -64,6 +66,7 @@ export async function firebaseLoginHandler(req, res) {
       email,
       name: user.displayName || dbUser.name || email.split('@')[0],
       picture: user.photoURL || dbUser.profile_picture || null,
+      userType: dbUser.user_type || userType,
       isVerified: true,
       hasSubmittedForm,
       isTemporary: dbUser.is_temporary || false
@@ -71,13 +74,14 @@ export async function firebaseLoginHandler(req, res) {
 
     const token = signToken(authUser);
 
-    console.log('✅ Auth token issued for:', email, 'hasForm:', hasSubmittedForm);
+    console.log('✅ Auth token issued for:', email, 'Type:', authUser.userType, 'hasForm:', hasSubmittedForm);
 
     res.cookie(getCookieName(), token, getCookieOptions());
     return res.json({
       success: true,
       message: 'Login successful',
       user: authUser,
+      userType: authUser.userType,
       hasSubmittedForm,
       formData: existingForm
     });
@@ -136,7 +140,16 @@ export async function checkAuthStatus(req, res) {
     if (isAuthenticated && authUser) {
       try {
         if (authUser.id && !authUser.isTemporary) {
-          const existingForm = await getStudentForm(authUser.id);
+          let existingForm = null;
+          
+          if (authUser.userType === 'INTERNAL') {
+            // HITAM students - check student_forms table
+            existingForm = await getStudentForm(authUser.id);
+          } else {
+            // External users - check external_registrations table by email
+            existingForm = await getExternalRegistrationByEmail(authUser.email);
+          }
+          
           const hasSubmittedForm = !!existingForm;
 
           if (hasSubmittedForm !== authUser.hasSubmittedForm) {

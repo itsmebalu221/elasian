@@ -1,12 +1,17 @@
 import pool from '../db/mysql.js';
 
-// Allowed email domain
-const ALLOWED_DOMAIN = 'hitam.org';
+// Allowed email domain for HITAM internal students
+const HITAM_DOMAIN = 'hitam.org';
 
-// Verify if email belongs to allowed domain
-export function isAllowedEmail(email) {
+// Verify if email belongs to HITAM domain
+export function isHitamEmail(email) {
   if (!email) return false;
-  return email.toLowerCase().endsWith(`@${ALLOWED_DOMAIN}`);
+  return email.toLowerCase().endsWith(`@${HITAM_DOMAIN}`);
+}
+
+// Determine user type based on email
+export function getUserType(email) {
+  return isHitamEmail(email) ? 'INTERNAL' : 'EXTERNAL';
 }
 
 // Google OAuth configuration
@@ -32,6 +37,7 @@ export const googleOAuthConfig = {
 // Find or create user in database
 export async function findOrCreateUser(profile) {
   const { id: googleId, email, name, picture } = profile;
+  const userType = getUserType(email);
   
   try {
     // Check if user exists
@@ -43,16 +49,16 @@ export async function findOrCreateUser(profile) {
     if (rows.length > 0) {
       // Update existing user
       await pool.query(
-        'UPDATE students SET google_id = ?, name = ?, profile_picture = ?, is_verified = TRUE WHERE id = ?',
-        [googleId, name, picture, rows[0].id]
+        'UPDATE students SET google_id = ?, name = ?, profile_picture = ?, user_type = ?, is_verified = TRUE WHERE id = ?',
+        [googleId, name, picture, userType, rows[0].id]
       );
-      return { ...rows[0], name, profile_picture: picture, is_verified: true };
+      return { ...rows[0], name, profile_picture: picture, user_type: userType, is_verified: true };
     }
 
     // Create new user
     const [result] = await pool.query(
-      'INSERT INTO students (google_id, email, name, profile_picture, is_verified) VALUES (?, ?, ?, ?, TRUE)',
-      [googleId, email, name, picture]
+      'INSERT INTO students (google_id, email, name, profile_picture, user_type, is_verified) VALUES (?, ?, ?, ?, ?, TRUE)',
+      [googleId, email, name, picture, userType]
     );
 
     return {
@@ -61,6 +67,7 @@ export async function findOrCreateUser(profile) {
       email,
       name,
       profile_picture: picture,
+      user_type: userType,
       is_verified: true
     };
   } catch (error) {

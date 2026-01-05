@@ -37,9 +37,143 @@
       color: var(--text-primary);
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
+    }
+
+    /* Fixed Navbar */
+    .top-navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.875rem 2rem;
+      background: rgba(10, 10, 15, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    @media (max-width: 640px) {
+      .top-navbar {
+        padding: 0.75rem 1rem;
+      }
+    }
+
+    .navbar-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+    }
+
+    @media (max-width: 640px) {
+      .navbar-brand {
+        font-size: 1.25rem;
+      }
+    }
+
+    .navbar-brand span {
+      color: var(--accent);
+    }
+
+    .navbar-right {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 640px) {
+      .navbar-right {
+        gap: 0.75rem;
+      }
+    }
+
+    .user-block {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 480px) {
+      .user-block {
+        gap: 0.5rem;
+      }
+    }
+
+    .user-avatar {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .user-meta {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    @media (max-width: 480px) {
+      .user-meta {
+        display: none;
+      }
+    }
+
+    .user-name {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+
+    .user-email {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+
+    .signout-link {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 0.375rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .signout-link:hover {
+      color: var(--text-primary);
+      border-color: var(--text-muted);
+    }
+
+    .page-content {
+      flex: 1;
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 2rem;
+      padding: 5rem 2rem 2rem;
+    }
+
+    @media (max-width: 640px) {
+      .page-content {
+        padding: 4.5rem 1rem 1.5rem;
+      }
     }
 
     .status-container {
@@ -52,6 +186,19 @@
       border: 1px solid var(--border);
       padding: 3rem 2.5rem;
       text-align: center;
+    }
+
+    .payment-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.1em;
+      margin-bottom: 2rem;
+    }
+
+    .payment-logo span {
+      color: var(--accent);
     }
 
     .status-icon {
@@ -246,6 +393,22 @@
   </style>
 </head>
 <body>
+  <!-- Fixed Navbar -->
+  <nav class="top-navbar">
+    <a href="/" class="navbar-brand">elysian<span>'26</span></a>
+    <div class="navbar-right">
+      <div class="user-block">
+        <img id="user-avatar" class="user-avatar" src="" alt="">
+        <div class="user-meta">
+          <span class="user-name" id="user-name"></span>
+          <span class="user-email" id="user-email"></span>
+        </div>
+      </div>
+      <a href="/auth/logout" class="signout-link">Sign out</a>
+    </div>
+  </nav>
+
+  <div class="page-content">
   <div class="status-container">
     <div class="status-card" id="status-card">
       <div class="status-icon loading" id="status-icon">
@@ -257,6 +420,7 @@
       <div id="action-buttons"></div>
     </div>
   </div>
+  </div>
 
   <div class="confetti" id="confetti"></div>
 
@@ -264,6 +428,23 @@
     // Get order ID from URL
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('order_id');
+    const flowTypeParam = urlParams.get('type');
+    let flowContext = (flowTypeParam && flowTypeParam.toLowerCase() === 'external') ? 'EXTERNAL' : 'INTERNAL';
+
+    // Load user info for navbar
+    async function loadUserInfo() {
+      try {
+        const authRes = await fetch('/api/auth/status', { credentials: 'include' });
+        const authData = await authRes.json();
+        if (authData.isAuthenticated && authData.user) {
+          document.getElementById('user-avatar').src = authData.user.picture || '';
+          document.getElementById('user-name').textContent = authData.user.name || '';
+          document.getElementById('user-email').textContent = authData.user.email || '';
+        }
+      } catch (e) {
+        console.error('Failed to load user info:', e);
+      }
+    }
 
     async function verifyPayment() {
       if (!orderId) {
@@ -276,6 +457,14 @@
           credentials: 'include'
         });
         const data = await response.json();
+
+        if (data.context) {
+          flowContext = data.context;
+        }
+
+        if (flowContext !== 'INTERNAL' && flowContext !== 'EXTERNAL') {
+          flowContext = 'INTERNAL';
+        }
 
         if (data.success && data.status === 'SUCCESS') {
           showSuccess(data);
@@ -307,7 +496,12 @@
       title.className = 'status-title success';
       title.textContent = 'Payment Successful!';
 
-      message.textContent = 'Your registration is now complete. You can download your event pass from the dashboard.';
+      const isExternal = flowContext === 'EXTERNAL';
+      const registrationCode = data.registrationCode || null;
+
+      message.textContent = isExternal
+        ? 'Your external registration is confirmed. A copy of your receipt and pass instructions has been sent to your email.'
+        : 'Your registration is now complete. You can download your event pass from the dashboard.';
 
       details.style.display = 'block';
       details.innerHTML = `
@@ -325,16 +519,34 @@
           <span class="detail-value">${data.paymentMethod}</span>
         </div>
         ` : ''}
+        ${registrationCode ? `
+        <div class="detail-row">
+          <span class="detail-label">Registration Code</span>
+          <span class="detail-value">${registrationCode}</span>
+        </div>
+        ` : ''}
       `;
 
-      buttons.innerHTML = `
-        <a href="/dashboard.html" class="btn-primary">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          Go to Dashboard
-        </a>
-      `;
+      if (isExternal) {
+        buttons.innerHTML = `
+          <a href="/dashboard.html" class="btn-primary">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L20 7"/>
+            </svg>
+            Go to Dashboard
+          </a>
+          <a href="/login.html" class="btn-secondary">Back to Login</a>
+        `;
+      } else {
+        buttons.innerHTML = `
+          <a href="/dashboard.html" class="btn-primary">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Go to Dashboard
+          </a>
+        `;
+      }
 
       // Show confetti
       createConfetti();
@@ -353,15 +565,24 @@
         </svg>
       `;
 
+      const isExternal = flowContext === 'EXTERNAL';
+
       title.className = 'status-title failed';
       title.textContent = 'Payment Failed';
 
       message.textContent = data.message || 'Your payment could not be processed. Please try again.';
 
-      buttons.innerHTML = `
-        <a href="/payment.html" class="btn-primary">Try Again</a>
-        <a href="/dashboard.html" class="btn-secondary">Back to Dashboard</a>
-      `;
+      if (isExternal) {
+        buttons.innerHTML = `
+          <a href="/external-payment.html" class="btn-primary">Try Payment Again</a>
+          <a href="/dashboard.html" class="btn-secondary">Go to Dashboard</a>
+        `;
+      } else {
+        buttons.innerHTML = `
+          <a href="/payment.html" class="btn-primary">Try Again</a>
+          <a href="/dashboard.html" class="btn-secondary">Back to Dashboard</a>
+        `;
+      }
     }
 
     function showPending(data) {
@@ -380,12 +601,23 @@
       title.className = 'status-title pending';
       title.textContent = 'Payment Pending';
 
-      message.textContent = 'Your payment is being processed. This may take a few minutes. Please check back later.';
+      const isExternal = flowContext === 'EXTERNAL';
 
-      buttons.innerHTML = `
-        <button onclick="verifyPayment()" class="btn-primary">Check Again</button>
-        <a href="/dashboard.html" class="btn-secondary">Back to Dashboard</a>
-      `;
+      message.textContent = isExternal
+        ? 'Your payment is being processed. You can safely close this page and revisit the external portal with your registration ID.'
+        : 'Your payment is being processed. This may take a few minutes. Please check back later.';
+
+      if (isExternal) {
+        buttons.innerHTML = `
+          <button onclick="verifyPayment()" class="btn-primary">Check Again</button>
+          <a href="/external-form.html" class="btn-secondary">Return to External Portal</a>
+        `;
+      } else {
+        buttons.innerHTML = `
+          <button onclick="verifyPayment()" class="btn-primary">Check Again</button>
+          <a href="/dashboard.html" class="btn-secondary">Back to Dashboard</a>
+        `;
+      }
     }
 
     function showError(msg) {
@@ -432,6 +664,7 @@
     }
 
     // Verify payment on page load
+    loadUserInfo();
     verifyPayment();
   </script>
 </body>

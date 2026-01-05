@@ -19,6 +19,12 @@ export async function createOrder(req, res) {
       customerPhone
     });
 
+    // Verify the form belongs to this user
+    const formOwnership = await paymentService.verifyFormOwnership(formId, user.id);
+    if (!formOwnership.valid) {
+      return res.status(403).json({ error: 'You are not authorized to pay for this registration' });
+    }
+
     const isPaid = await paymentService.isFormPaid(formId);
     if (isPaid) {
       return res.status(400).json({ error: 'Payment already completed for this registration' });
@@ -41,13 +47,13 @@ export async function createOrder(req, res) {
       }
     }
 
-    const result = await paymentService.createPaymentOrder(
-      validated.studentId,
-      validated.formId,
-      validated.customerName,
-      validated.customerEmail,
-      validated.customerPhone
-    );
+    const result = await paymentService.createPaymentOrder({
+      studentId: validated.studentId,
+      formId: validated.formId,
+      customerName: validated.customerName,
+      customerEmail: validated.customerEmail,
+      customerPhone: validated.customerPhone
+    });
 
     return res.json(result);
   } catch (error) {
@@ -65,6 +71,14 @@ export async function verifyPayment(req, res) {
 
     if (!orderId) {
       return res.status(400).json({ error: 'Order ID is required' });
+    }
+
+    // Verify ownership if user is authenticated
+    if (req.user?.id) {
+      const ownershipValid = await paymentService.verifyPaymentOwnership(orderId, req.user.id, req.user.email);
+      if (!ownershipValid) {
+        return res.status(403).json({ error: 'You are not authorized to view this payment' });
+      }
     }
 
     const result = await paymentService.verifyPaymentStatus(orderId);
@@ -104,6 +118,13 @@ export async function getPaymentStatus(req, res) {
     }
 
     const numericFormId = parseInt(formId, 10);
+
+    // Verify the form belongs to this user
+    const formOwnership = await paymentService.verifyFormOwnership(numericFormId, req.user.id);
+    if (!formOwnership.valid) {
+      return res.status(403).json({ error: 'You are not authorized to view this payment status' });
+    }
+
     const payment = await paymentService.getPaymentByFormId(numericFormId);
     const isPaid = await paymentService.isFormPaid(numericFormId);
 

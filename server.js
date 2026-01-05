@@ -9,6 +9,8 @@ import { formRoutes } from './src/Routes/form.routes.js';
 import { authRoutes } from './src/Routes/auth.routes.js';
 import { studentRoutes } from './src/Routes/student.routes.js';
 import { paymentRoutes } from './src/Routes/payment.routes.js';
+import { externalRoutes } from './src/Routes/external.routes.js';
+import { eventRoutes } from './src/Routes/event.routes.js';
 import { initializeDatabase } from './src/db/mysql.js';
 import { verifyToken, getCookieName, getCookieOptions } from './src/utils/jwt.js';
 
@@ -20,10 +22,70 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// Security headers middleware
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  next();
+});
+
+// Simple rate limiting for API endpoints (in-memory, resets on restart)
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 100; // 100 requests per minute per IP
+
+function rateLimiter(req, res, next) {
+  // Only rate limit API endpoints
+  if (!req.path.startsWith('/api/')) {
+    return next();
+  }
+  
+  const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+  const now = Date.now();
+  
+  if (!rateLimitMap.has(ip)) {
+    rateLimitMap.set(ip, { count: 1, startTime: now });
+    return next();
+  }
+  
+  const record = rateLimitMap.get(ip);
+  
+  if (now - record.startTime > RATE_LIMIT_WINDOW_MS) {
+    // Reset window
+    rateLimitMap.set(ip, { count: 1, startTime: now });
+    return next();
+  }
+  
+  record.count++;
+  
+  if (record.count > RATE_LIMIT_MAX_REQUESTS) {
+    return res.status(429).json({ 
+      error: 'Too many requests. Please try again later.',
+      retryAfter: Math.ceil((RATE_LIMIT_WINDOW_MS - (now - record.startTime)) / 1000)
+    });
+  }
+  
+  return next();
+}
+
+// Clean up rate limit map periodically (every 5 minutes)
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, record] of rateLimitMap.entries()) {
+    if (now - record.startTime > RATE_LIMIT_WINDOW_MS * 2) {
+      rateLimitMap.delete(ip);
+    }
+  }
+}, 5 * 60 * 1000);
+
 app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
+app.use(rateLimiter);
 
 app.use((req, res, next) => {
   const token = req.cookies?.[getCookieName()];
@@ -51,6 +113,8 @@ formRoutes(app);
 authRoutes(app);
 studentRoutes(app);
 paymentRoutes(app);
+externalRoutes(app);
+eventRoutes(app);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

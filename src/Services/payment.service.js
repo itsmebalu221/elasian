@@ -10,46 +10,84 @@ function generateOrderId() {
 }
 
 // Create payment order
-export async function createPaymentOrder(studentId, formId, customerName, customerEmail, customerPhone) {
+export async function createPaymentOrder({
+  studentId = null,
+  formId = null,
+  externalRegistrationId = null,
+  customerName,
+  customerEmail,
+  customerPhone,
+  amount = PAYMENT_AMOUNT,
+  returnUrlPath = '/payment-status.html?order_id={order_id}',
+  notifyPath = '/api/payment/webhook',
+  orderNote
+}) {
   const orderId = generateOrderId();
-  
+  const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+
   try {
-    // Create order in Cashfree
     const orderRequest = {
       order_id: orderId,
-      order_amount: PAYMENT_AMOUNT,
+      order_amount: amount,
       order_currency: 'INR',
       customer_details: {
-        customer_id: `STU_${studentId}`,
+        customer_id: studentId
+          ? `STU_${studentId}`
+          : externalRegistrationId
+            ? `EXT_${externalRegistrationId}`
+            : `GUEST_${Date.now()}`,
         customer_name: customerName,
         customer_email: customerEmail,
         customer_phone: customerPhone
       },
       order_meta: {
-        return_url: `${process.env.APP_URL || 'http://localhost:3000'}/payment-status.html?order_id={order_id}`,
-        notify_url: `${process.env.APP_URL || 'http://localhost:3000'}/api/payment/webhook`
+        return_url: `${baseUrl}${returnUrlPath}`,
+        notify_url: `${baseUrl}${notifyPath}`
       },
-      order_note: `Elysian 2026 Event Pass - Form ID: ${formId}`
+      order_note: orderNote
+        || (formId
+          ? `Elysian 2026 Event Pass - Form ID: ${formId}`
+          : externalRegistrationId
+            ? `Elysian 2026 External Pass - Registration ID: ${externalRegistrationId}`
+            : 'Elysian 2026 Payment')
     };
 
     const response = await Cashfree.PGCreateOrder(orderRequest);
-    
+
     if (response.data) {
-      // Store payment record in database
       await db.query(`
-        INSERT INTO payments (order_id, student_id, form_id, amount, status, cf_order_id, payment_session_id, created_at)
-        VALUES (?, ?, ?, ?, 'PENDING', ?, ?, NOW())
-      `, [orderId, studentId, formId, PAYMENT_AMOUNT, response.data.cf_order_id, response.data.payment_session_id]);
+        INSERT INTO payments (
+          order_id,
+          student_id,
+          form_id,
+          external_registration_id,
+          amount,
+          status,
+          cf_order_id,
+          payment_session_id,
+          created_at
+        )
+        VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?, NOW())
+      `,
+      [
+        orderId,
+        studentId,
+        formId,
+        externalRegistrationId,
+        amount,
+        response.data.cf_order_id,
+        response.data.payment_session_id
+      ]);
 
       return {
         success: true,
-        orderId: orderId,
+        orderId,
         cfOrderId: response.data.cf_order_id,
         paymentSessionId: response.data.payment_session_id,
-        orderAmount: PAYMENT_AMOUNT
+        orderAmount: amount
       };
     }
-    
+
     throw new Error('Failed to create order');
   } catch (error) {
     console.error('Payment order creation error:', error);
@@ -71,6 +109,23 @@ export async function verifyPaymentStatus(orderId) {
     }
 
     const payment = payments[0];
+    const isExternal = !!payment.external_registration_id;
+    const context = isExternal ? 'EXTERNAL' : 'INTERNAL';
+
+    let registrationCode = null;
+    if (payment.form_id) {
+      const [forms] = await db.query(
+        'SELECT registration_id FROM student_forms WHERE id = ?',
+        [payment.form_id]
+      );
+      registrationCode = forms[0]?.registration_id || null;
+    } else if (isExternal) {
+      const [externals] = await db.query(
+        'SELECT registration_id FROM external_registrations WHERE id = ?',
+        [payment.external_registration_id]
+      );
+      registrationCode = externals[0]?.registration_id || null;
+    }
 
     // If already successful, return cached status
     if (payment.status === 'SUCCESS') {
@@ -79,7 +134,10 @@ export async function verifyPaymentStatus(orderId) {
         status: 'SUCCESS',
         orderId: payment.order_id,
         amount: payment.amount,
-        paidAt: payment.paid_at
+        paidAt: payment.paid_at,
+        paymentMethod: payment.payment_method,
+        context,
+        registrationCode
       };
     }
 
@@ -101,30 +159,51 @@ export async function verifyPaymentStatus(orderId) {
           WHERE order_id = ?
         `, [latestPayment.cf_payment_id, latestPayment.payment_group, orderId]);
 
-        // Mark form as paid
-        await db.query(`
-          UPDATE student_forms 
-          SET payment_status = 'PAID', payment_id = ?
-          WHERE id = ?
-        `, [payment.id, payment.form_id]);
+        if (payment.form_id) {
+          await db.query(`
+            UPDATE student_forms 
+            SET payment_status = 'PAID', payment_id = ?
+            WHERE id = ?
+          `, [payment.id, payment.form_id]);
+        } else if (isExternal) {
+          await db.query(`
+            UPDATE external_registrations
+            SET payment_status = 'PAID', payment_id = ?, updated_at = NOW()
+            WHERE id = ?
+          `, [payment.id, payment.external_registration_id]);
+        }
 
         return {
           success: true,
           status: 'SUCCESS',
-          orderId: orderId,
+          orderId,
           amount: payment.amount,
-          paymentMethod: latestPayment.payment_group
+          paymentMethod: latestPayment.payment_group,
+          context,
+          registrationCode
         };
       } else if (latestPayment.payment_status === 'FAILED') {
         await db.query(`
           UPDATE payments SET status = 'FAILED', updated_at = NOW() WHERE order_id = ?
         `, [orderId]);
 
+        if (payment.form_id) {
+          await db.query(`
+            UPDATE student_forms SET payment_status = 'FAILED', updated_at = NOW() WHERE id = ?
+          `, [payment.form_id]);
+        } else if (isExternal) {
+          await db.query(`
+            UPDATE external_registrations SET payment_status = 'FAILED', updated_at = NOW() WHERE id = ?
+          `, [payment.external_registration_id]);
+        }
+
         return {
           success: false,
           status: 'FAILED',
-          orderId: orderId,
-          message: latestPayment.payment_message || 'Payment failed'
+          orderId,
+          message: latestPayment.payment_message || 'Payment failed',
+          context,
+          registrationCode: null  // Don't reveal on failed payment
         };
       }
     }
@@ -132,8 +211,10 @@ export async function verifyPaymentStatus(orderId) {
     return {
       success: false,
       status: payment.status,
-      orderId: orderId,
-      message: 'Payment pending or not completed'
+      orderId,
+      message: 'Payment pending or not completed',
+      context,
+      registrationCode: null  // Don't reveal on pending payment
     };
   } catch (error) {
     console.error('Payment verification error:', error);
@@ -144,19 +225,23 @@ export async function verifyPaymentStatus(orderId) {
 // Handle webhook from Cashfree
 export async function handleWebhook(payload, signature) {
   try {
-    // Verify webhook signature
-    const timestamp = payload.data?.payment?.payment_time || Date.now().toString();
-    const body = JSON.stringify(payload);
+    const isProduction = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
     
-    const expectedSignature = crypto
-      .createHmac('sha256', process.env.CASHFREE_SECRET_KEY)
-      .update(timestamp + body)
-      .digest('base64');
+    // Verify webhook signature in production
+    if (isProduction && process.env.CASHFREE_SECRET_KEY) {
+      const timestamp = payload.data?.payment?.payment_time || '';
+      const body = JSON.stringify(payload);
+      
+      const expectedSignature = crypto
+        .createHmac('sha256', process.env.CASHFREE_SECRET_KEY)
+        .update(timestamp + body)
+        .digest('base64');
 
-    // For production, verify signature strictly
-    // if (signature !== expectedSignature) {
-    //   throw new Error('Invalid webhook signature');
-    // }
+      if (signature !== expectedSignature) {
+        console.warn('Webhook signature verification failed');
+        throw new Error('Invalid webhook signature');
+      }
+    }
 
     const eventType = payload.type;
     const orderData = payload.data?.order;
@@ -179,14 +264,27 @@ export async function handleWebhook(payload, signature) {
         WHERE order_id = ?
       `, [paymentData?.cf_payment_id, paymentData?.payment_group, orderId]);
 
-      // Get payment to update form
-      const [payments] = await db.query('SELECT form_id, id FROM payments WHERE order_id = ?', [orderId]);
+      const [payments] = await db.query(
+        'SELECT form_id, external_registration_id, id FROM payments WHERE order_id = ?',
+        [orderId]
+      );
+
       if (payments.length > 0) {
-        await db.query(`
-          UPDATE student_forms 
-          SET payment_status = 'PAID', payment_id = ?
-          WHERE id = ?
-        `, [payments[0].id, payments[0].form_id]);
+        const payment = payments[0];
+
+        if (payment.form_id) {
+          await db.query(`
+            UPDATE student_forms 
+            SET payment_status = 'PAID', payment_id = ?
+            WHERE id = ?
+          `, [payment.id, payment.form_id]);
+        } else if (payment.external_registration_id) {
+          await db.query(`
+            UPDATE external_registrations
+            SET payment_status = 'PAID', payment_id = ?, updated_at = NOW()
+            WHERE id = ?
+          `, [payment.id, payment.external_registration_id]);
+        }
       }
 
       console.log(`✅ Payment successful for order: ${orderId}`);
@@ -194,6 +292,25 @@ export async function handleWebhook(payload, signature) {
       await db.query(`
         UPDATE payments SET status = 'FAILED', updated_at = NOW() WHERE order_id = ?
       `, [orderId]);
+
+      const [payments] = await db.query(
+        'SELECT form_id, external_registration_id FROM payments WHERE order_id = ?',
+        [orderId]
+      );
+
+      if (payments.length > 0) {
+        const payment = payments[0];
+
+        if (payment.form_id) {
+          await db.query(`
+            UPDATE student_forms SET payment_status = 'FAILED', updated_at = NOW() WHERE id = ?
+          `, [payment.form_id]);
+        } else if (payment.external_registration_id) {
+          await db.query(`
+            UPDATE external_registrations SET payment_status = 'FAILED', updated_at = NOW() WHERE id = ?
+          `, [payment.external_registration_id]);
+        }
+      }
       
       console.log(`❌ Payment failed for order: ${orderId}`);
     }
@@ -221,4 +338,68 @@ export async function isFormPaid(formId) {
     [formId]
   );
   return forms[0]?.payment_status === 'PAID';
+}
+
+export async function getPaymentByExternalRegistrationId(externalRegistrationId) {
+  const [payments] = await db.query(
+    'SELECT * FROM payments WHERE external_registration_id = ? ORDER BY created_at DESC LIMIT 1',
+    [externalRegistrationId]
+  );
+  return payments[0] || null;
+}
+
+export async function isExternalRegistrationPaid(externalRegistrationId) {
+  const [rows] = await db.query(
+    'SELECT payment_status FROM external_registrations WHERE id = ?',
+    [externalRegistrationId]
+  );
+  return rows[0]?.payment_status === 'PAID';
+}
+
+// Verify that a form belongs to a specific student
+export async function verifyFormOwnership(formId, studentId) {
+  const [forms] = await db.query(
+    'SELECT id, student_id FROM student_forms WHERE id = ?',
+    [formId]
+  );
+  
+  if (forms.length === 0) {
+    return { valid: false, reason: 'Form not found' };
+  }
+  
+  if (forms[0].student_id !== studentId) {
+    return { valid: false, reason: 'Form belongs to another user' };
+  }
+  
+  return { valid: true };
+}
+
+// Verify that a payment belongs to a specific user (by student_id or email for external)
+export async function verifyPaymentOwnership(orderId, studentId, email) {
+  const [payments] = await db.query(
+    'SELECT student_id, external_registration_id FROM payments WHERE order_id = ?',
+    [orderId]
+  );
+  
+  if (payments.length === 0) {
+    return false;
+  }
+  
+  const payment = payments[0];
+  
+  // Check if it's an internal payment
+  if (payment.student_id) {
+    return payment.student_id === studentId;
+  }
+  
+  // Check if it's an external payment
+  if (payment.external_registration_id && email) {
+    const [externals] = await db.query(
+      'SELECT email FROM external_registrations WHERE id = ?',
+      [payment.external_registration_id]
+    );
+    return externals[0]?.email?.toLowerCase() === email?.toLowerCase();
+  }
+  
+  return false;
 }

@@ -135,14 +135,41 @@ export async function initializeDatabase() {
         MODIFY COLUMN selection_type ENUM('MULTI_DAY','DAY_1_ONLY','DAY_2_ONLY','OPTIONAL') NOT NULL
     `);
 
-    // Step 7: Create payments table
+    // Step 7: Create external registrations table
+    console.log('🔄 Creating external_registrations table...');
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS external_registrations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        registration_id VARCHAR(25) UNIQUE,
+        full_name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        mobile VARCHAR(15) NOT NULL,
+        institution VARCHAR(255) NOT NULL,
+        department VARCHAR(255) NOT NULL,
+        year_of_study INT NOT NULL,
+        identity_number VARCHAR(100) NOT NULL UNIQUE,
+        add_on_selected BOOLEAN DEFAULT FALSE,
+        total_amount DECIMAL(10, 2) NOT NULL,
+        selected_events JSON NULL,
+        payment_status ENUM('PENDING','PAID','FAILED') DEFAULT 'PENDING',
+        payment_id INT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_external_email (email),
+        INDEX idx_external_mobile (mobile),
+        INDEX idx_external_payment_status (payment_status)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
+    // Step 8: Create payments table
     console.log('🔄 Creating payments table...');
     await connection.query(`
       CREATE TABLE IF NOT EXISTS payments (
         id INT AUTO_INCREMENT PRIMARY KEY,
         order_id VARCHAR(50) UNIQUE NOT NULL,
-        student_id INT NOT NULL,
-        form_id INT NOT NULL,
+        student_id INT NULL,
+        form_id INT NULL,
+        external_registration_id INT NULL,
         amount DECIMAL(10, 2) NOT NULL,
         status ENUM('PENDING', 'SUCCESS', 'FAILED', 'CANCELLED') DEFAULT 'PENDING',
         cf_order_id VARCHAR(100),
@@ -154,14 +181,16 @@ export async function initializeDatabase() {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
         FOREIGN KEY (form_id) REFERENCES student_forms(id) ON DELETE CASCADE,
+        FOREIGN KEY (external_registration_id) REFERENCES external_registrations(id) ON DELETE CASCADE,
         INDEX idx_order_id (order_id),
         INDEX idx_student_id (student_id),
         INDEX idx_form_id (form_id),
+        INDEX idx_external_registration (external_registration_id),
         INDEX idx_status (status)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
-    // Step 8: Add any missing columns to existing tables
+    // Step 9: Add any missing columns to existing tables
     console.log('🔄 Ensuring student_forms has selected_events column...');
     const [selectedEventsColumn] = await connection.query(
       "SHOW COLUMNS FROM student_forms LIKE 'selected_events'"
@@ -203,7 +232,56 @@ export async function initializeDatabase() {
       ).catch(() => {});
     }
 
-    // Step 9: Generate registration IDs for existing records
+    // Ensure students table has user_type column for INTERNAL/EXTERNAL users
+    console.log('🔄 Ensuring students table has user_type column...');
+    const [userTypeColumn] = await connection.query(
+      "SHOW COLUMNS FROM students LIKE 'user_type'"
+    );
+    if (userTypeColumn.length === 0) {
+      await connection.query(
+        "ALTER TABLE students ADD COLUMN user_type ENUM('INTERNAL', 'EXTERNAL') DEFAULT 'INTERNAL' AFTER is_verified"
+      );
+      console.log('  ✓ Added user_type column to students');
+    }
+
+    console.log('🔄 Ensuring payments table supports external registrations...');
+    await connection.query('ALTER TABLE payments MODIFY COLUMN student_id INT NULL').catch(() => {});
+    await connection.query('ALTER TABLE payments MODIFY COLUMN form_id INT NULL').catch(() => {});
+
+    const [externalRegistrationColumn] = await connection.query(
+      "SHOW COLUMNS FROM payments LIKE 'external_registration_id'"
+    );
+    if (externalRegistrationColumn.length === 0) {
+      await connection.query(
+        'ALTER TABLE payments ADD COLUMN external_registration_id INT NULL AFTER form_id'
+      );
+      await connection.query(
+        'ALTER TABLE payments ADD INDEX idx_external_registration (external_registration_id)'
+      ).catch(() => {});
+    }
+
+    try {
+      // Check if foreign key already exists before trying to add it
+      const [existingFk] = await connection.query(`
+        SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS 
+        WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'payments' 
+        AND CONSTRAINT_NAME = 'fk_payments_external_registration'
+      `, [DB_NAME]);
+      
+      if (existingFk.length === 0) {
+        await connection.query(
+          'ALTER TABLE payments ADD CONSTRAINT fk_payments_external_registration FOREIGN KEY (external_registration_id) REFERENCES external_registrations(id) ON DELETE CASCADE'
+        );
+        console.log('  ✓ Added external registration foreign key');
+      }
+    } catch (err) {
+      // Silently ignore if constraint already exists
+      if (!err.message.includes('Duplicate') && err.code !== 'ER_FK_ALREADY_EXISTS' && err.code !== 'ER_DUP_KEYNAME') {
+        console.warn('  ⚠️ Could not add external registration foreign key:', err.message);
+      }
+    }
+
+    // Step 10: Generate registration IDs for existing records
     console.log('🔄 Checking registration IDs...');
     const [rowsWithoutId] = await connection.query(
       'SELECT id FROM student_forms WHERE registration_id IS NULL'

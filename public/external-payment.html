@@ -250,6 +250,22 @@
       margin-top: 0.5rem;
     }
 
+    .amount-breakdown {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+
     .order-details {
       margin-bottom: 2rem;
     }
@@ -273,6 +289,8 @@
     .detail-value {
       font-weight: 500;
       text-align: right;
+      word-break: break-word;
+      max-width: 60%;
     }
 
     .btn-pay {
@@ -406,7 +424,7 @@
     <div class="payment-card">
       <div class="payment-header">
         <h1 class="payment-title">Complete Payment</h1>
-        <p class="payment-subtitle">Event Pass Registration Fee</p>
+        <p class="payment-subtitle">External Participant Registration</p>
       </div>
 
       <div id="error-container"></div>
@@ -414,8 +432,18 @@
 
       <div class="amount-box">
         <div class="amount-label">Total Amount</div>
-        <div class="amount-value">500</div>
+        <div class="amount-value" id="amount-display">700</div>
         <div class="amount-note">One-time registration fee (non-refundable)</div>
+        <div class="amount-breakdown" id="amount-breakdown" style="display: none;">
+          <div class="breakdown-row">
+            <span>Base Pass</span>
+            <span>₹700</span>
+          </div>
+          <div class="breakdown-row" id="addon-breakdown" style="display: none;">
+            <span>Cultural Add-on (Sahitya + Prasasthi)</span>
+            <span>₹300</span>
+          </div>
+        </div>
       </div>
 
       <div class="order-details" id="order-details">
@@ -428,8 +456,12 @@
           <span class="detail-value" id="detail-email">—</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Registration ID</span>
-          <span class="detail-value" id="detail-reg-id">—</span>
+          <span class="detail-label">Mobile</span>
+          <span class="detail-value" id="detail-mobile">—</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Institution</span>
+          <span class="detail-value" id="detail-institution">—</span>
         </div>
       </div>
 
@@ -437,7 +469,7 @@
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
         </svg>
-        Pay ₹500 Securely
+        <span id="btn-text">Pay Securely</span>
       </button>
 
       <div class="secure-badge">
@@ -447,16 +479,16 @@
         Secured by Cashfree Payments
       </div>
 
-      <a href="/dashboard.html" class="back-link">← Back to Dashboard</a>
+      <a href="/external-form.html" class="back-link">← Back to Registration Form</a>
     </div>
   </div>
   </div>
 
   <script>
-    let formData = null;
+    let registrationData = null;
     let paymentSessionId = null;
 
-    // Check authentication and get form data
+    // Check authentication and get registration data
     async function init() {
       try {
         // Check auth status
@@ -470,35 +502,39 @@
           return;
         }
 
-        // External users should use external-payment.html
-        if (authData.user.userType === 'EXTERNAL') {
-          window.location.href = '/external-payment.html';
+        // HITAM internal users should use payment.html
+        if (authData.user.userType === 'INTERNAL') {
+          window.location.href = '/payment.html';
           return;
         }
 
-        // Get form data
-        const formRes = await fetch('/api/student/form', {
+        // Get external registration by authenticated user (server uses auth email)
+        const regRes = await fetch('/api/external/registration/by-email', {
           credentials: 'include'
         });
-        const formResult = await formRes.json();
 
-        if (!formResult.success || !formResult.data) {
-          showError('Please complete your registration form first');
+        if (!regRes.ok) {
+          showError('No registration found. Please complete the registration form first.');
           setTimeout(() => {
-            window.location.href = '/form.html';
+            window.location.href = '/external-form.html';
           }, 2000);
           return;
         }
 
-        formData = formResult.data;
+        const regResult = await regRes.json();
+
+        if (!regResult.success || !regResult.registration) {
+          showError('Please complete your registration form first');
+          setTimeout(() => {
+            window.location.href = '/external-form.html';
+          }, 2000);
+          return;
+        }
+
+        registrationData = regResult.registration;
 
         // Check if already paid
-        const paymentRes = await fetch(`/api/payment/status?formId=${formData.id}`, {
-          credentials: 'include'
-        });
-        const paymentData = await paymentRes.json();
-
-        if (paymentData.isPaid) {
+        if (registrationData.payment_status === 'PAID') {
           showInfo('Payment already completed! Redirecting to dashboard...');
           setTimeout(() => {
             window.location.href = '/dashboard.html';
@@ -506,15 +542,27 @@
           return;
         }
 
-        // Update UI with user details
-        document.getElementById('detail-name').textContent = formData.full_name;
-        document.getElementById('detail-email').textContent = authData.user.email;
-        document.getElementById('detail-reg-id').textContent = formData.registration_id;
+        // Update UI with registration details
+        document.getElementById('detail-name').textContent = registrationData.full_name;
+        document.getElementById('detail-email').textContent = registrationData.email;
+        document.getElementById('detail-mobile').textContent = registrationData.mobile;
+        document.getElementById('detail-institution').textContent = registrationData.institution;
         
         // Update navbar user info
         document.getElementById('user-avatar').src = authData.user.picture || '';
-        document.getElementById('user-name').textContent = formData.full_name;
-        document.getElementById('user-email').textContent = authData.user.email;
+        document.getElementById('user-name').textContent = registrationData.full_name;
+        document.getElementById('user-email').textContent = registrationData.email;
+
+        // Update amount display
+        const totalAmount = registrationData.total_amount;
+        document.getElementById('amount-display').textContent = totalAmount;
+        document.getElementById('btn-text').textContent = `Pay ₹${totalAmount} Securely`;
+
+        // Show breakdown if add-on is selected
+        if (registrationData.add_on_selected) {
+          document.getElementById('amount-breakdown').style.display = 'flex';
+          document.getElementById('addon-breakdown').style.display = 'flex';
+        }
 
       } catch (error) {
         console.error('Init error:', error);
@@ -534,11 +582,20 @@
       `;
     }
 
+    function getCashfreeMode() {
+      const host = window.location.hostname;
+      if (host === 'localhost' || host === '127.0.0.1') {
+        return 'sandbox';
+      }
+      return 'production';
+    }
+
     async function initiatePayment() {
       const btn = document.getElementById('btn-pay');
+      const btnText = document.getElementById('btn-text');
       
-      if (!formData) {
-        showError('Form data not loaded. Please refresh the page.');
+      if (!registrationData) {
+        showError('Registration data not loaded. Please refresh the page.');
         return;
       }
 
@@ -546,28 +603,36 @@
         btn.disabled = true;
         btn.innerHTML = '<div class="loading-spinner"></div> Processing...';
 
+        console.log('Creating payment order for registration:', registrationData.id);
+
         // Create order
-        const response = await fetch('/api/payment/create-order', {
+        const response = await fetch('/api/external/payment/create-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify({
-            formId: formData.id,
-            customerPhone: formData.mobile
+            registrationId: registrationData.id
           })
         });
 
         const data = await response.json();
+        console.log('Payment order response:', data);
 
         if (!response.ok) {
           throw new Error(data.error || 'Failed to create order');
         }
 
+        if (!data.paymentSessionId) {
+          throw new Error('Payment session not available. Please check your Cashfree configuration.');
+        }
+
         paymentSessionId = data.paymentSessionId;
+
+        console.log('Initializing Cashfree checkout with mode:', getCashfreeMode());
 
         // Initialize Cashfree checkout
         const cashfree = Cashfree({
-          mode: 'sandbox' // Change to 'production' for live
+          mode: getCashfreeMode()
         });
 
         const checkoutOptions = {
@@ -575,17 +640,19 @@
           redirectTarget: '_self'
         };
 
+        console.log('Launching Cashfree checkout...');
         await cashfree.checkout(checkoutOptions);
 
       } catch (error) {
         console.error('Payment error:', error);
         showError(error.message || 'Payment failed. Please try again.');
         btn.disabled = false;
+        const amount = registrationData?.total_amount || 700;
         btn.innerHTML = `
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
           </svg>
-          Pay ₹500 Securely
+          <span id="btn-text">Pay ₹${amount} Securely</span>
         `;
       }
     }

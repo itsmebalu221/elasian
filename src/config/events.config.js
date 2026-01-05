@@ -79,12 +79,12 @@ export const EVENT_DEFINITIONS = [
     description: 'Flagship conference spotlighting the latest advances in emerging tech domains.'
   },
   {
-    id: 'EVT_BUSINESS_CANVAS',
-    name: 'Business Canvas Presentation',
-    organizer: 'EDC',
+    id: 'EVT_SAHITYA_PRASASTHI',
+    name: 'Sahitya + Prasasthi Cultural Showcase',
+    organizer: 'Cultural Committee',
     type: EVENT_TYPES.OPTIONAL,
-    dayLabel: 'Optional Add-on (Day 1)',
-    description: 'Optional entrepreneurship add-on you can pair with any primary event.'
+    dayLabel: 'Optional Cultural Add-on',
+    description: 'Immerse yourself in the Sahitya literary fest and Prasasthi traditional celebrations as a bundled add-on.'
   }
 ];
 

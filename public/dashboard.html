@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
   <style>
     :root {
       --bg-primary: #141416;
@@ -53,171 +54,125 @@
     }
 
     /* Navbar */
-    .navbar {
+    .top-navbar {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      z-index: 100;
+      width: 100%;
+      z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem var(--page-margin);
-      background: rgba(20, 20, 22, 0.9);
-      backdrop-filter: blur(10px);
+      padding: 0.875rem 2rem;
+      background: rgba(20, 20, 22, 0.95);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
     }
 
+    @media (max-width: 640px) {
+      .top-navbar {
+        padding: 0.75rem 1rem;
+      }
+    }
+
     .navbar-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-decoration: none;
-    }
-
-    .brand-text {
-      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-family: 'Cormorant Garamond', serif;
       font-size: 1.5rem;
-      font-weight: 500;
-      letter-spacing: 0.15em;
+      font-weight: 600;
       color: var(--text-primary);
-      text-transform: lowercase;
-      position: relative;
-      overflow: hidden;
+      text-decoration: none;
+      letter-spacing: 0.1em;
     }
 
-    .brand-text span {
-      display: inline-block;
-      animation: wave 2.5s ease-in-out infinite;
-    }
-
-    .brand-text span:nth-child(1) { animation-delay: 0s; }
-    .brand-text span:nth-child(2) { animation-delay: 0.1s; }
-    .brand-text span:nth-child(3) { animation-delay: 0.2s; }
-    .brand-text span:nth-child(4) { animation-delay: 0.3s; }
-    .brand-text span:nth-child(5) { animation-delay: 0.4s; }
-    .brand-text span:nth-child(6) { animation-delay: 0.5s; }
-    .brand-text span:nth-child(7) { animation-delay: 0.6s; }
-
-    @keyframes wave {
-      0%, 100% {
-        transform: translateY(0);
-        opacity: 1;
-      }
-      25% {
-        transform: translateY(-3px);
-        opacity: 0.8;
-      }
-      50% {
-        transform: translateY(0);
-        opacity: 1;
+    @media (max-width: 640px) {
+      .navbar-brand {
+        font-size: 1.25rem;
       }
     }
 
-    .navbar-actions {
+    .navbar-brand span {
+      color: var(--accent);
+    }
+
+    .navbar-right {
       display: flex;
       align-items: center;
       gap: 1.5rem;
     }
 
-    .nav-link {
+    @media (max-width: 640px) {
+      .navbar-right {
+        gap: 0.75rem;
+      }
+    }
+
+    .user-block {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 480px) {
+      .user-block {
+        gap: 0.5rem;
+      }
+    }
+
+    .user-avatar {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .user-meta {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    @media (max-width: 480px) {
+      .user-meta {
+        display: none;
+      }
+    }
+
+    .user-name {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+
+    .user-email {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+
+    .signout-link {
       font-size: 0.75rem;
       color: var(--text-muted);
       text-decoration: none;
-      letter-spacing: 0.02em;
-      transition: color 0.2s ease;
-    }
-
-    .nav-link:hover {
-      color: var(--text-secondary);
-    }
-
-    /* Mobile Menu Toggle */
-    .menu-toggle {
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      gap: 4px;
-      width: 32px;
-      height: 32px;
-      padding: 6px;
-      background: none;
+      padding: 0.375rem 0.75rem;
       border: 1px solid var(--border);
-      cursor: pointer;
-      transition: border-color 0.2s ease;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
     }
 
-    .menu-toggle:hover {
+    .signout-link:hover {
+      color: var(--text-primary);
       border-color: var(--silver-muted);
-    }
-
-    .menu-toggle span {
-      width: 100%;
-      height: 1.5px;
-      background: var(--text-primary);
-      transition: all 0.3s ease;
-    }
-
-    .menu-toggle.active span:nth-child(1) {
-      transform: rotate(45deg) translate(4px, 4px);
-    }
-
-    .menu-toggle.active span:nth-child(2) {
-      opacity: 0;
-    }
-
-    .menu-toggle.active span:nth-child(3) {
-      transform: rotate(-45deg) translate(4px, -4px);
-    }
-
-    @media (max-width: 576px) {
-      .navbar {
-        padding: 0.875rem 1.25rem;
-      }
-
-      .brand-text {
-        font-size: 1.25rem;
-      }
-
-      .menu-toggle {
-        display: flex;
-      }
-
-      .navbar-actions {
-        position: fixed;
-        top: 56px;
-        left: 0;
-        right: 0;
-        background: rgba(20, 20, 22, 0.98);
-        backdrop-filter: blur(10px);
-        flex-direction: column;
-        padding: 0;
-        gap: 0;
-        border-bottom: 1px solid var(--border);
-        transform: translateY(-100%);
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s ease;
-      }
-
-      .navbar-actions.open {
-        transform: translateY(0);
-        opacity: 1;
-        visibility: visible;
-      }
-
-      .nav-link {
-        display: block;
-        padding: 1rem 1.25rem;
-        width: 100%;
-        text-align: left;
-        border-bottom: 1px solid var(--border);
-        font-size: 0.8125rem;
-      }
-
-      .nav-link:last-child {
-        border-bottom: none;
-      }
     }
 
     /* Page Layout */
@@ -261,138 +216,6 @@
       max-width: 800px;
       width: 100%;
       margin: 0 auto;
-    }
-
-    /* Header Bar */
-    .header-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.5rem 0;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 0;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    @media (max-width: 480px) {
-      .header-bar {
-        padding: 1.25rem 0;
-      }
-    }
-
-    .user-block {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    @media (max-width: 480px) {
-      .user-block {
-        gap: 0.75rem;
-      }
-    }
-
-    .user-avatar {
-      width: 2.5rem;
-      height: 2.5rem;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      object-fit: cover;
-      flex-shrink: 0;
-    }
-
-    @media (max-width: 480px) {
-      .user-avatar {
-        width: 2.25rem;
-        height: 2.25rem;
-      }
-    }
-
-    .user-meta {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
-    .user-name {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .user-email {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 200px;
-    }
-
-    @media (max-width: 480px) {
-      .user-name {
-        font-size: 0.8125rem;
-      }
-
-      .user-email {
-        font-size: 0.6875rem;
-        max-width: 150px;
-      }
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-      flex-shrink: 0;
-    }
-
-    @media (max-width: 480px) {
-      .header-actions {
-        gap: 1rem;
-      }
-    }
-
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.6875rem;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--success);
-    }
-
-    @media (max-width: 400px) {
-      .status-badge {
-        font-size: 0.625rem;
-        letter-spacing: 0.05em;
-      }
-    }
-
-    .status-badge::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      background: var(--success);
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .logout-link {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.2s ease;
-    }
-
-    .logout-link:hover {
-      color: var(--text-secondary);
     }
 
     /* Success Header */
@@ -1509,20 +1332,18 @@
   </style>
 </head>
 <body>
-  <!-- Navbar -->
-  <nav class="navbar">
-    <a href="/" class="navbar-brand">
-      <span class="brand-text">
-        <span>e</span><span>l</span><span>y</span><span>s</span><span>i</span><span>a</span><span>n</span>
-      </span>
-    </a>
-    <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-    <div class="navbar-actions" id="navbar-actions">
-      <a href="/auth/logout" class="nav-link">Sign out</a>
+  <!-- Fixed Navbar -->
+  <nav class="top-navbar">
+    <a href="/" class="navbar-brand">elysian<span>'26</span></a>
+    <div class="navbar-right">
+      <div class="user-block">
+        <img id="user-avatar" class="user-avatar" src="" alt="">
+        <div class="user-meta">
+          <span class="user-name" id="user-name"></span>
+          <span class="user-email" id="user-email"></span>
+        </div>
+      </div>
+      <a href="/auth/logout" class="signout-link">Sign out</a>
     </div>
   </nav>
 
@@ -1536,20 +1357,6 @@
 
       <!-- Main Content -->
       <div id="main-content" style="display: none;">
-        <!-- Header Bar -->
-        <header class="header-bar">
-          <div class="user-block">
-            <img id="user-avatar" class="user-avatar" src="" alt="">
-            <div class="user-meta">
-              <span class="user-name" id="user-name"></span>
-              <span class="user-email" id="user-email"></span>
-            </div>
-          </div>
-          <div class="header-actions">
-            <div class="status-badge">Verified</div>
-          </div>
-        </header>
-
         <!-- Success Header -->
         <div class="success-header">
           <div class="success-icon">✓</div>
@@ -1746,23 +1553,6 @@
   </div>
 
   <script>
-    // Mobile menu toggle
-    const menuToggle = document.getElementById('menu-toggle');
-    const navbarActions = document.getElementById('navbar-actions');
-
-    menuToggle.addEventListener('click', () => {
-      menuToggle.classList.toggle('active');
-      navbarActions.classList.toggle('open');
-    });
-
-    // Close menu when clicking a nav link
-    navbarActions.querySelectorAll('.nav-link').forEach(link => {
-      link.addEventListener('click', () => {
-        menuToggle.classList.remove('active');
-        navbarActions.classList.remove('open');
-      });
-    });
-
     const yearLabels = {
       1: 'First Year',
       2: 'Second Year',
@@ -2112,11 +1902,20 @@
           return;
         }
 
+        const userType = data.user.userType || 'INTERNAL';
+
         document.getElementById('user-avatar').src = data.user.picture || 'https://via.placeholder.com/40';
         document.getElementById('user-name').textContent = data.user.name;
         document.getElementById('user-email').textContent = data.user.email;
         document.getElementById('display-email').textContent = data.user.email;
 
+        // Handle EXTERNAL users
+        if (userType === 'EXTERNAL') {
+          await loadExternalDashboard(data.user);
+          return;
+        }
+
+        // Handle INTERNAL users (existing logic)
         if (!data.user.hasSubmittedForm) {
           window.location.href = '/form.html';
           return;
@@ -2193,6 +1992,309 @@
         console.error('Error loading dashboard:', error);
         window.location.href = '/login.html';
       }
+    }
+
+    async function loadExternalDashboard(user) {
+      try {
+        // Check if user has external registration (server uses authenticated user's email)
+        const response = await fetch('/api/external/registration/by-email', {
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.registration) {
+            // User has external registration - show it
+            await displayExternalRegistration(data.registration);
+            return;
+          }
+        }
+
+        // No registration found - redirect to external form
+        window.location.href = '/external-form.html';
+      } catch (error) {
+        console.error('Error loading external dashboard:', error);
+        // On error, redirect to form
+        window.location.href = '/external-form.html';
+      }
+    }
+
+    async function displayExternalRegistration(registration) {
+      await loadEventCatalog();
+
+      const hasPaid = registration.payment_status === 'PAID';
+      const amount = registration.total_amount || 700;
+      
+      // Update registration ID display
+      const regIdElement = document.getElementById('display-reg-id');
+      if (regIdElement) {
+        if (hasPaid && registration.registration_id) {
+          regIdElement.textContent = registration.registration_id;
+          regIdElement.classList.remove('locked');
+        } else {
+          regIdElement.textContent = 'Complete payment to view ID';
+          regIdElement.classList.add('locked');
+        }
+      }
+
+      // Update QR code with correct amount for external users
+      updateQRDisplayExternal(hasPaid, registration, amount);
+
+      // Update labels for external users
+      const rollLabel = document.querySelector('[for="display-roll"], .data-item:has(#display-roll) .data-label');
+      const branchLabel = document.querySelector('[for="display-branch"], .data-item:has(#display-branch) .data-label');
+      const sectionLabel = document.querySelector('[for="display-section"], .data-item:has(#display-section) .data-label');
+      
+      // Update data labels for external context
+      document.querySelectorAll('.data-label').forEach(label => {
+        if (label.textContent.trim() === 'Roll Number') label.textContent = 'ID Number';
+        if (label.textContent.trim() === 'Branch') label.textContent = 'Institution';
+        if (label.textContent.trim() === 'Section') label.textContent = 'Department';
+      });
+
+      // Update QR section labels
+      document.querySelectorAll('.qr-info-label').forEach(label => {
+        if (label.textContent.trim() === 'Roll No') label.textContent = 'ID No';
+        if (label.textContent.trim() === 'Branch') label.textContent = 'Institution';
+      });
+
+      // Update basic info
+      document.getElementById('display-name').textContent = registration.full_name || '—';
+      document.getElementById('display-roll').textContent = registration.identity_number || '—';
+      document.getElementById('display-mobile').textContent = registration.mobile || '—';
+      document.getElementById('display-branch').textContent = registration.institution || '—';
+      document.getElementById('display-year').textContent = yearLabels[registration.year_of_study] || '—';
+      document.getElementById('display-section').textContent = registration.department || '—';
+
+      // Update QR section info
+      document.getElementById('qr-display-name').textContent = registration.full_name || '—';
+      document.getElementById('qr-display-roll').textContent = registration.identity_number || '—';
+      document.getElementById('qr-display-branch').textContent = registration.institution || '—';
+
+      // Display events
+      displayEvents(registration);
+
+      // Populate print pass for external user
+      populatePrintPassExternal(registration, hasPaid);
+
+      // Show payment status
+      if (registration.created_at) {
+        const date = new Date(registration.created_at);
+        document.getElementById('submission-date').textContent = 
+          `Submitted ${date.toLocaleDateString('en-GB', { 
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric'
+          })}`;
+      }
+
+      // Handle payment banner for external users
+      showExternalPaymentBanner(registration, hasPaid, amount);
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('main-content').style.display = 'block';
+    }
+
+    function updateQRDisplayExternal(isPaid, registration, amount) {
+      const qrCard = document.getElementById('qr-card');
+      const qrImg = document.getElementById('qr-code');
+      const placeholder = document.getElementById('qr-placeholder');
+      const instructions = document.getElementById('qr-instructions-text');
+
+      if (!qrCard || !qrImg || !placeholder || !instructions) {
+        return;
+      }
+
+      if (isPaid && registration?.registration_id) {
+        qrCard.classList.add('ready');
+        qrCard.classList.remove('pending');
+        qrImg.src = generateQRCode(registration.registration_id);
+        placeholder.textContent = 'QR ready';
+        instructions.textContent = 'Show this QR code at the entrance for verification';
+      } else {
+        qrCard.classList.add('pending');
+        qrCard.classList.remove('ready');
+        qrImg.removeAttribute('src');
+        placeholder.textContent = 'Complete payment to unlock QR';
+        instructions.textContent = `Pay ₹${amount} to unlock your digital event pass QR code`;
+      }
+    }
+
+    function showExternalPaymentBanner(registration, hasPaid, amount) {
+      const paymentBanner = document.getElementById('payment-banner');
+      const downloadBtn = document.getElementById('download-pass-btn');
+
+      if (hasPaid) {
+        // User has paid - show success banner
+        paymentBanner.classList.remove('pending');
+        paymentBanner.classList.add('paid');
+        paymentBanner.innerHTML = `
+          <div class="payment-info">
+            <div class="payment-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <div class="payment-text">
+              <h3>Payment Complete</h3>
+              <p>Your event pass is confirmed</p>
+            </div>
+          </div>
+        `;
+        
+        // Enable download button
+        if (downloadBtn) {
+          downloadBtn.style.opacity = '1';
+          downloadBtn.style.pointerEvents = 'auto';
+          downloadBtn.title = 'Download your event pass';
+        }
+      } else {
+        // User hasn't paid - show pending banner
+        paymentBanner.classList.add('pending');
+        paymentBanner.classList.remove('paid');
+        paymentBanner.innerHTML = `
+          <div class="payment-info">
+            <div class="payment-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <div class="payment-text">
+              <h3>Payment Pending</h3>
+              <p>Complete payment of ₹${amount} to download your event pass</p>
+            </div>
+          </div>
+          <a href="/external-payment.html" class="btn-pay-now">Pay ₹${amount} Now</a>
+        `;
+        
+        // Disable download button
+        if (downloadBtn) {
+          downloadBtn.style.opacity = '0.5';
+          downloadBtn.style.pointerEvents = 'none';
+          downloadBtn.title = 'Complete payment to download pass';
+        }
+      }
+
+      paymentBanner.style.display = 'flex';
+    }
+
+    function populatePrintPassExternal(registration, isPaid) {
+      const printQrImg = document.getElementById('print-qr-code');
+
+      if (isPaid && registration.registration_id) {
+        printQrImg.src = generateQRCode(registration.registration_id, 200, '000000');
+      } else {
+        const placeholderSvg = encodeURIComponent(`
+          <svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'>
+            <rect width='100%' height='100%' fill='#f1f1f5'/>
+            <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#444' font-family='Inter, Arial, sans-serif' font-size='16'>PAY TO UNLOCK</text>
+          </svg>
+        `);
+        printQrImg.src = `data:image/svg+xml,${placeholderSvg}`;
+      }
+
+      // Basic Info for external user
+      const printRegIdEl = document.getElementById('print-reg-id');
+      if (printRegIdEl) {
+        if (isPaid && registration.registration_id) {
+          printRegIdEl.textContent = registration.registration_id;
+          printRegIdEl.classList.remove('locked');
+        } else {
+          printRegIdEl.textContent = 'Payment required to unlock ID';
+          printRegIdEl.classList.add('locked');
+        }
+      }
+      
+      document.getElementById('print-name').textContent = registration.full_name || '—';
+      document.getElementById('print-roll').textContent = registration.identity_number || '—';
+      document.getElementById('print-branch').textContent = registration.institution || '—';
+      document.getElementById('print-year').textContent = yearLabels[registration.year_of_study] || '—';
+      document.getElementById('print-section').textContent = registration.department || 'N/A';
+      document.getElementById('print-mobile').textContent = registration.mobile || '—';
+      document.getElementById('print-email').textContent = registration.email || document.getElementById('display-email').textContent || '—';
+
+      // Update print pass labels for external users
+      document.querySelectorAll('.pass-info-label').forEach(label => {
+        if (label.textContent.trim() === 'Roll Number') label.textContent = 'ID Number';
+        if (label.textContent.trim() === 'Branch') label.textContent = 'Institution';
+        if (label.textContent.trim() === 'Section') label.textContent = 'Department';
+      });
+
+      // Current date
+      document.getElementById('print-date').textContent = new Date().toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+
+      // Render schedule for print
+      const renderPrintScheduleSection = (events, label) => {
+        if (!events || events.length === 0) {
+          return '';
+        }
+
+        const dateBadge = events.find(event => event.dayLabel)?.dayLabel;
+        const safeLabel = escapeHtml(label);
+        const safeDateBadge = escapeHtml(dateBadge);
+
+        return `
+          <div class="pass-day">
+            <div class="pass-day-header">
+              <span class="pass-day-badge">${safeLabel}</span>
+              ${dateBadge ? `<span class="pass-day-date">${safeDateBadge}</span>` : ''}
+            </div>
+            <table class="pass-events-table">
+              <thead>
+                <tr>
+                  <th>Schedule</th>
+                  <th>Event</th>
+                  <th>Organizer</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${events.map(event => {
+                  const schedule = formatScheduleDetails(event) || 'Schedule TBA';
+                  const organizer = event.organizer || '—';
+                  return `
+                  <tr>
+                    <td class="pass-event-time">${escapeHtml(schedule)}</td>
+                    <td class="pass-event-name">${escapeHtml(event.name)}</td>
+                    <td class="pass-event-venue">${escapeHtml(organizer)}</td>
+                  </tr>
+                `; }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      };
+
+      const scheduleContainer = document.getElementById('print-schedule');
+      const selectedIds = Array.isArray(registration.selected_events) ? registration.selected_events : [];
+      const groups = groupSelectedEvents(selectedIds);
+      const matchedEvents = selectedIds.map(id => eventLookup.get(id)).filter(Boolean);
+
+      if (matchedEvents.length === 0) {
+        scheduleContainer.innerHTML = '<div class="pass-no-events">No events registered</div>';
+        return;
+      }
+
+      let scheduleHtml = '';
+      eventTypeOrder.forEach(type => {
+        const events = groups[type];
+        if (events && events.length > 0) {
+          scheduleHtml += renderPrintScheduleSection(events, eventTypeLabels[type] || 'Event Selection');
+        }
+      });
+
+      const remainingTypes = Object.keys(groups).filter(type => !eventTypeOrder.includes(type));
+      remainingTypes.forEach(type => {
+        const events = groups[type];
+        if (events && events.length > 0) {
+          scheduleHtml += renderPrintScheduleSection(events, eventTypeLabels[type] || 'Event Selection');
+        }
+      });
+
+      scheduleContainer.innerHTML = scheduleHtml;
     }
 
     function populatePrintPass(form, isPaid) {

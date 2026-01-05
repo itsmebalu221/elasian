@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Portal — HITAM</title>
+  <title>Elysian Event Registration Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -21,6 +21,48 @@
       --border: rgba(168, 169, 173, 0.12);
       --glass: rgba(255, 255, 255, 0.02);
       --glass-border: rgba(168, 169, 173, 0.08);
+      --accent: #6b8cce;
+    }
+
+    .top-navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      padding: 1rem 2rem;
+      z-index: 100;
+      background: rgba(20, 20, 22, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    @media (max-width: 640px) {
+      .top-navbar {
+        padding: 0.875rem 1rem;
+      }
+    }
+
+    .navbar-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+    }
+
+    @media (max-width: 640px) {
+      .navbar-brand {
+        font-size: 1.25rem;
+      }
+    }
+
+    .navbar-brand span {
+      color: var(--accent);
     }
 
     * {
@@ -51,18 +93,34 @@
 
     .page {
       min-height: 100vh;
-      height: 100%;
+      min-height: 100dvh; /* Dynamic viewport height for mobile */
+      height: auto;
       width: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 3rem 1.5rem;
+      padding: 2rem 1.5rem;
+      padding-top: 5rem;
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        justify-content: flex-start;
+        padding: 1.5rem 1rem;
+        padding-top: 5rem;
+      }
     }
 
     .container {
       width: 100%;
-      max-width: 420px;
+      max-width: 780px;
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        max-width: 420px;
+      }
     }
 
     .serif {
@@ -110,7 +168,84 @@
     .card {
       background: var(--glass);
       border: 1px solid var(--glass-border);
-      padding: 2.5rem 2rem;
+      padding: 2rem 1.75rem;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0;
+      max-width: 720px;
+    }
+
+    .card-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .card-section .btn {
+      margin-top: auto;
+    }
+
+    .card-divider {
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(168, 169, 173, 0.35), transparent);
+      margin: 0 2rem;
+      position: relative;
+    }
+
+    .card-divider::before {
+      content: 'OR';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--bg-primary);
+      color: var(--text-muted);
+      font-size: 0.625rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      padding: 0.75rem 0;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .card-divider {
+        width: 100%;
+        height: 1px;
+        margin: 0;
+        background: linear-gradient(to right, transparent, rgba(168, 169, 173, 0.35), transparent);
+      }
+
+      .card-divider::before {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 0 0.75rem;
+      }
+    }
+
+    .card-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .card-title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.75rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .card-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
     }
 
     .info-box {
@@ -167,6 +302,28 @@
     .btn:hover {
       border-color: var(--silver-muted);
       background: rgba(168, 169, 173, 0.04);
+    }
+
+    .btn-accent {
+      border-color: rgba(107, 140, 206, 0.5);
+      background: rgba(107, 140, 206, 0.08);
+      color: #dbe6ff;
+    }
+
+    .btn-accent:hover {
+      border-color: rgba(107, 140, 206, 0.7);
+      background: rgba(107, 140, 206, 0.12);
+    }
+
+    .btn-secondary {
+      border-color: rgba(93, 201, 133, 0.5);
+      background: rgba(34, 197, 94, 0.08);
+      color: #d6f5e4;
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(34, 197, 94, 0.7);
+      background: rgba(34, 197, 94, 0.12);
     }
 
     .btn:disabled {
@@ -229,37 +386,76 @@
         font-size: 1.875rem;
       }
       .card {
-        padding: 2rem 1.5rem;
+        padding: 1.75rem 1.5rem;
       }
     }
   </style>
 </head>
 <body>
+  <nav class="top-navbar">
+    <a href="/" class="navbar-brand">elysian<span>'26</span></a>
+  </nav>
   <div class="page">
     <div class="container">
       <header class="header">
         <p class="institution">Hyderabad Institute of Technology and Management</p>
         <div class="divider"></div>
-        <h1 class="title">Student Portal</h1>
-        <p class="subtitle">Registration & Verification System</p>
+        <h1 class="title">Event Registration Portal</h1>
       </header>
 
-      <div class="card">
-        <div class="info-box">
-          <p class="info-label">Authentication Required</p>
-          <p class="info-text">
-            Sign in with your institutional email address to access the student registration portal.
-          </p>
-          <span class="domain-tag">@hitam.org</span>
+      <div class="card login-card">
+        <div class="card-section">
+          <div class="card-header">
+            <p class="card-title">HITAM Students</p>
+            <p class="card-subtitle">Sign in with your official HITAM Google account to continue your registration journey.</p>
+          </div>
+
+          <div class="info-box">
+            <p class="info-label">Authentication Required</p>
+            <p class="info-text">
+              Sign in with your institutional email address to access the student registration portal.
+            </p>
+            <span class="domain-tag">@hitam.org</span>
+          </div>
+
+          <div id="error-container"></div>
+
+          <button id="google-signin-btn" class="btn" onclick="signInWithGoogle()">
+            <img class="btn-icon" src="/assets/Hitam-logo-greenbg.png" alt="HITAM">
+            <span id="btn-text">Continue with HITAM ID</span>
+            <div class="btn-spinner" id="spinner"></div>
+          </button>
         </div>
 
-        <div id="error-container"></div>
+        <div class="card-divider"></div>
 
-        <button id="google-signin-btn" class="btn" onclick="signInWithGoogle()">
-          <img class="btn-icon" src="/assets/Hitam-logo-greenbg.png" alt="HITAM">
-          <span id="btn-text">Continue with HITAM ID</span>
-          <div class="btn-spinner" id="spinner"></div>
-        </button>
+        <div class="card-section">
+          <div class="card-header">
+            <p class="card-title">Non-HITAM Participants</p>
+            <p class="card-subtitle">Login with any Google account to access your external participant dashboard and registration.</p>
+          </div>
+
+          <div class="info-box">
+            <p class="info-label">External Access</p>
+            <p class="info-text">
+              Sign in with any Gmail account to manage your Elysian '26 registration, event selections, and payment status.
+            </p>
+            <p class="info-text" style="margin-top: 0.75rem;">
+              New users: Your account will be created automatically on first login.
+            </p>
+          </div>
+
+          <button id="external-signin-btn" class="btn" onclick="signInWithGoogle('external')">
+            <svg class="btn-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+              <path d="M9.003 18c2.43 0 4.467-.806 5.956-2.18L12.05 13.56c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.44 15.983 5.485 18 9.003 18z" fill="#34A853"/>
+              <path d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71 0-.593.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+              <path d="M9.003 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.426 0 9.003 0 5.485 0 2.44 2.017.96 4.958L3.967 7.29c.708-2.127 2.692-3.71 5.036-3.71z" fill="#EA4335"/>
+            </svg>
+            <span id="external-btn-text">Continue with Google</span>
+            <div class="btn-spinner" id="external-spinner"></div>
+          </button>
+        </div>
       </div>
 
       <footer class="footer">
@@ -321,21 +517,31 @@
       document.getElementById('error-container').innerHTML = '';
     }
 
-    function setLoading(loading, text = null) {
-      const btn = document.getElementById('google-signin-btn');
-      const btnText = document.getElementById('btn-text');
-      const spinner = document.getElementById('spinner');
+    function setLoading(loading, text = null, type = 'internal') {
+      if (type === 'internal') {
+        const btn = document.getElementById('google-signin-btn');
+        const btnText = document.getElementById('btn-text');
+        const spinner = document.getElementById('spinner');
 
-      btn.disabled = loading;
-      btnText.textContent = text || (loading ? 'Authenticating...' : 'Continue with HITAM ID');
-      spinner.style.display = loading ? 'block' : 'none';
+        btn.disabled = loading;
+        btnText.textContent = text || (loading ? 'Authenticating...' : 'Continue with HITAM ID');
+        spinner.style.display = loading ? 'block' : 'none';
+      } else {
+        const btn = document.getElementById('external-signin-btn');
+        const btnText = document.getElementById('external-btn-text');
+        const spinner = document.getElementById('external-spinner');
+
+        btn.disabled = loading;
+        btnText.textContent = text || (loading ? 'Authenticating...' : 'Continue with Google');
+        spinner.style.display = loading ? 'block' : 'none';
+      }
     }
 
     async function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    async function sendLoginToServer(user, attempt = 1) {
+    async function sendLoginToServer(user, attempt = 1, type = 'internal') {
       try {
         const response = await fetch('/api/auth/firebase-login', {
           method: 'POST',
@@ -362,17 +568,21 @@
         console.error(`Server login attempt ${attempt} failed:`, error);
         
         if (attempt < MAX_RETRIES) {
-          setLoading(true, `Retrying... (${attempt}/${MAX_RETRIES})`);
+          setLoading(true, `Retrying... (${attempt}/${MAX_RETRIES})`, type);
           await sleep(RETRY_DELAY);
-          return sendLoginToServer(user, attempt + 1);
+          return sendLoginToServer(user, attempt + 1, type);
         }
         
         return { success: false, error: 'Connection failed. Please check your internet and try again.' };
       }
     }
 
-    async function signInWithGoogle() {
-      setLoading(true);
+    function startExternalRegistration() {
+      window.location.href = '/external-form.html';
+    }
+
+    async function signInWithGoogle(type = 'internal') {
+      setLoading(true, null, type);
       clearError();
 
       let user = null;
@@ -380,36 +590,51 @@
       try {
         // Step 1: Firebase Authentication
         const provider = new firebase.auth.GoogleAuthProvider();
-        provider.setCustomParameters({ 
-          prompt: 'select_account',
-          hd: 'hitam.org' // Hint for Google to show only hitam.org accounts
-        });
+        
+        if (type === 'internal') {
+          provider.setCustomParameters({ 
+            prompt: 'select_account',
+            hd: 'hitam.org' // Hint for Google to show only hitam.org accounts
+          });
+        } else {
+          provider.setCustomParameters({ 
+            prompt: 'select_account'
+          });
+        }
         
         const result = await firebase.auth().signInWithPopup(provider);
         user = result.user;
 
-        // Validate email domain
-        if (!user.email || !user.email.toLowerCase().endsWith('@hitam.org')) {
+        // Validate email domain for internal users
+        if (type === 'internal' && (!user.email || !user.email.toLowerCase().endsWith('@hitam.org'))) {
           await firebase.auth().signOut();
-          showError('Access restricted to @hitam.org email addresses only.');
-          setLoading(false);
+          showError('HITAM students must use @hitam.org email addresses. Use the right panel for external registration.');
+          setLoading(false, null, type);
           return;
         }
 
-        setLoading(true, 'Setting up session...');
+        setLoading(true, 'Setting up session...', type);
 
         // Step 2: Server Authentication with retry
-        const serverResult = await sendLoginToServer(user);
+        const serverResult = await sendLoginToServer(user, 1, type);
 
         if (serverResult.success) {
-          // Success - redirect
+          // Success - redirect based on user type
           const hasForm = serverResult.data.hasSubmittedForm;
-          window.location.href = hasForm ? '/dashboard.html' : '/form.html';
+          const userType = serverResult.data.userType;
+          
+          if (userType === 'INTERNAL') {
+            // HITAM students go to internal form or dashboard
+            window.location.href = hasForm ? '/dashboard.html' : '/form.html';
+          } else {
+            // External users go to external form or dashboard
+            window.location.href = hasForm ? '/dashboard.html' : '/external-form.html';
+          }
         } else {
           // Server auth failed
           await firebase.auth().signOut();
           showError(serverResult.error);
-          setLoading(false);
+          setLoading(false, null, type);
         }
 
       } catch (error) {
@@ -423,13 +648,13 @@
         // Handle specific Firebase errors
         if (error.code === 'auth/popup-closed-by-user') {
           // User closed popup - not an error, just reset
-          setLoading(false);
+          setLoading(false, null, type);
           return;
         }
         
         if (error.code === 'auth/cancelled-popup-request') {
           // Multiple popup requests - ignore
-          setLoading(false);
+          setLoading(false, null, type);
           return;
         }
 
@@ -447,7 +672,7 @@
           showError('An unexpected error occurred. Please try again.');
         }
         
-        setLoading(false);
+        setLoading(false, null, type);
       }
     }
 
