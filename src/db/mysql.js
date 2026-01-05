@@ -159,6 +159,17 @@ export async function initializeDatabase() {
     `);
 
     // Step 8: Add any missing columns to existing tables
+    console.log('🔄 Ensuring student_forms has selected_events column...');
+    const [selectedEventsColumn] = await connection.query(
+      "SHOW COLUMNS FROM student_forms LIKE 'selected_events'"
+    );
+    if (selectedEventsColumn.length === 0) {
+      await connection.query(
+        "ALTER TABLE student_forms ADD COLUMN selected_events JSON NULL AFTER address"
+      );
+      console.log('  ✓ Added selected_events column to student_forms');
+    }
+
     // Step 9: Generate registration IDs for existing records
     console.log('🔄 Checking registration IDs...');
     const [rowsWithoutId] = await connection.query(

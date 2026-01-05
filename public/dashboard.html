@@ -1760,135 +1760,232 @@
       4: 'Fourth Year'
     };
 
-    // Event Configuration
-    const EVENT_CONFIG = {
-      timeSlots: {
-        slot1: '10:00 AM - 12:00 PM',
-        slot2: '1:00 PM - 3:00 PM',
-        slot3: '3:00 PM - 5:00 PM'
-      },
-      events: {
-        day1: {
-          slot1: [
-            { id: 'D1S1E1', name: 'Technical Quiz', venue: 'Seminar Hall A' },
-            { id: 'D1S1E2', name: 'Coding Challenge', venue: 'Computer Lab 1' },
-            { id: 'D1S1E3', name: 'Paper Presentation', venue: 'Conference Room' },
-            { id: 'D1S1E4', name: 'Poster Exhibition', venue: 'Main Lobby' }
-          ],
-          slot2: [
-            { id: 'D1S2E1', name: 'Hackathon Round 1', venue: 'Computer Lab 1 & 2' },
-            { id: 'D1S2E2', name: 'Web Development', venue: 'Computer Lab 3' },
-            { id: 'D1S2E3', name: 'Debugging Contest', venue: 'Computer Lab 4' },
-            { id: 'D1S2E4', name: 'Tech Talk', venue: 'Auditorium' }
-          ],
-          slot3: [
-            { id: 'D1S3E1', name: 'Gaming Tournament', venue: 'Gaming Arena' },
-            { id: 'D1S3E2', name: 'UI/UX Design', venue: 'Design Lab' },
-            { id: 'D1S3E3', name: 'Database Challenge', venue: 'Computer Lab 2' },
-            { id: 'D1S3E4', name: 'Networking Workshop', venue: 'Network Lab' }
-          ]
-        },
-        day2: {
-          slot1: [
-            { id: 'D2S1E1', name: 'AI/ML Workshop', venue: 'AI Lab' },
-            { id: 'D2S1E2', name: 'Mobile App Dev', venue: 'Computer Lab 1' },
-            { id: 'D2S1E3', name: 'Cybersecurity CTF', venue: 'Security Lab' },
-            { id: 'D2S1E4', name: 'Group Discussion', venue: 'Seminar Hall B' }
-          ],
-          slot2: [
-            { id: 'D2S2E1', name: 'Hackathon Final', venue: 'Computer Lab 1 & 2' },
-            { id: 'D2S2E2', name: 'Cloud Computing', venue: 'Cloud Lab' },
-            { id: 'D2S2E3', name: 'IoT Workshop', venue: 'IoT Lab' },
-            { id: 'D2S2E4', name: 'Tech Debate', venue: 'Auditorium' }
-          ],
-          slot3: [
-            { id: 'D2S3E1', name: 'Project Showcase', venue: 'Main Hall' },
-            { id: 'D2S3E2', name: 'Blockchain Basics', venue: 'Computer Lab 3' },
-            { id: 'D2S3E3', name: 'DevOps Workshop', venue: 'DevOps Lab' },
-            { id: 'D2S3E4', name: 'Prize Distribution', venue: 'Auditorium' }
-          ]
-        }
-      }
+    const FALLBACK_EVENT_TYPE = 'OTHER';
+
+    let EVENT_TYPES_ENUM = {
+      MULTI_DAY: 'MULTI_DAY',
+      DAY_1_ONLY: 'DAY_1_ONLY',
+      DAY_2_ONLY: 'DAY_2_ONLY',
+      OPTIONAL: 'OPTIONAL'
     };
 
-    function getEventById(eventId) {
-      for (const day of ['day1', 'day2']) {
-        for (const slot of ['slot1', 'slot2', 'slot3']) {
-          const event = EVENT_CONFIG.events[day][slot].find(e => e.id === eventId);
-          if (event) {
-            return { ...event, day, slot, time: EVENT_CONFIG.timeSlots[slot] };
-          }
-        }
+    const DEFAULT_TYPE_LABELS = {
+      MULTI_DAY: 'Multi-day Experience',
+      DAY_1_ONLY: 'Day 1 Experience',
+      DAY_2_ONLY: 'Day 2 Experience',
+      OPTIONAL: 'Optional Add-on',
+      [FALLBACK_EVENT_TYPE]: 'Additional Events'
+    };
+
+    let eventTypeLabels = { ...DEFAULT_TYPE_LABELS };
+    let eventTypeOrder = [
+      EVENT_TYPES_ENUM.MULTI_DAY,
+      EVENT_TYPES_ENUM.DAY_1_ONLY,
+      EVENT_TYPES_ENUM.DAY_2_ONLY,
+      EVENT_TYPES_ENUM.OPTIONAL,
+      FALLBACK_EVENT_TYPE
+    ];
+
+    let eventCatalog = [];
+    let eventLookup = new Map();
+
+    async function loadEventCatalog() {
+      if (eventCatalog.length > 0) {
+        return;
       }
-      return null;
+
+      try {
+        const response = await fetch('/api/events', {
+          credentials: 'include'
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch event catalog');
+        }
+
+        const data = await response.json();
+        eventCatalog = Array.isArray(data.events) ? data.events : [];
+        eventLookup = new Map(eventCatalog.map(event => [event.id, event]));
+
+        if (data.types) {
+          EVENT_TYPES_ENUM = data.types;
+          eventTypeOrder = [
+            data.types.MULTI_DAY,
+            data.types.DAY_1_ONLY,
+            data.types.DAY_2_ONLY,
+            data.types.OPTIONAL
+          ].filter(Boolean);
+
+          if (!eventTypeOrder.includes(FALLBACK_EVENT_TYPE)) {
+            eventTypeOrder.push(FALLBACK_EVENT_TYPE);
+          }
+
+          eventTypeLabels = {
+            ...DEFAULT_TYPE_LABELS,
+            ...Object.entries(data.types).reduce((acc, [key, value]) => {
+              acc[value] = DEFAULT_TYPE_LABELS[key] || key;
+              return acc;
+            }, {})
+          };
+        } else if (!eventTypeOrder.includes(FALLBACK_EVENT_TYPE)) {
+          eventTypeOrder.push(FALLBACK_EVENT_TYPE);
+        }
+      } catch (error) {
+        console.error('Unable to load event catalog:', error);
+      }
+    }
+
+    function escapeHtml(value) {
+      if (value === null || value === undefined) {
+        return '';
+      }
+
+      return String(value).replace(/[&<>"']/g, match => {
+        switch (match) {
+          case '&':
+            return '&amp;';
+          case '<':
+            return '&lt;';
+          case '>':
+            return '&gt;';
+          case '"':
+            return '&quot;';
+          case "'":
+            return '&#39;';
+          default:
+            return match;
+        }
+      });
+    }
+
+    function formatScheduleDetails(event) {
+      if (!event) {
+        return '';
+      }
+
+      const parts = [];
+
+      if (event.dayLabel) {
+        parts.push(event.dayLabel);
+      }
+
+      if (event.startTime && event.endTime) {
+        parts.push(`${event.startTime} - ${event.endTime}`);
+      } else if (event.startTime) {
+        parts.push(event.startTime);
+      } else if (event.endTime) {
+        parts.push(event.endTime);
+      }
+
+      return parts.join(' · ');
+    }
+
+    function groupSelectedEvents(selectedIds) {
+      const groups = {};
+
+      selectedIds.forEach(id => {
+        const event = eventLookup.get(id);
+        if (!event) {
+          return;
+        }
+
+        const type = event.type || FALLBACK_EVENT_TYPE;
+        if (!groups[type]) {
+          groups[type] = [];
+        }
+        groups[type].push(event);
+      });
+
+      Object.keys(groups).forEach(type => {
+        groups[type].sort((a, b) => {
+          const orderA = typeof a.displayOrder === 'number' ? a.displayOrder : Number.MAX_SAFE_INTEGER;
+          const orderB = typeof b.displayOrder === 'number' ? b.displayOrder : Number.MAX_SAFE_INTEGER;
+
+          if (orderA !== orderB) {
+            return orderA - orderB;
+          }
+
+          return (a.name || '').localeCompare(b.name || '');
+        });
+      });
+
+      return groups;
+    }
+
+    function renderEventSummarySection(events, label) {
+      if (!events || events.length === 0) {
+        return '';
+      }
+
+      const safeLabel = escapeHtml(label);
+      const eventItems = events.map(event => {
+        const schedule = formatScheduleDetails(event) || 'Schedule will be announced';
+        const safeSchedule = escapeHtml(schedule);
+        const safeName = escapeHtml(event.name);
+        const organizer = event.organizer ? `<div class="event-venue">${escapeHtml(event.organizer)}</div>` : '';
+        const description = event.description ? `<div class="event-description">${escapeHtml(event.description)}</div>` : '';
+
+        return `
+          <div class="event-item">
+            <span class="event-time">${safeSchedule}</span>
+            <div class="event-details">
+              <div class="event-name">${safeName}</div>
+              ${organizer}
+              ${description}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="day-header">
+          <span class="day-badge">${safeLabel}</span>
+        </div>
+        <div class="event-list">
+          ${eventItems}
+        </div>
+      `;
     }
 
     function displayEvents(formData) {
       const container = document.getElementById('events-container');
-      const eventFields = ['day1_slot1', 'day1_slot2', 'day1_slot3', 'day2_slot1', 'day2_slot2', 'day2_slot3'];
-      
-      const day1Events = [];
-      const day2Events = [];
+      const selectedIds = Array.isArray(formData.selected_events) ? formData.selected_events : [];
 
-      eventFields.forEach(field => {
-        if (formData[field]) {
-          const event = getEventById(formData[field]);
-          if (event) {
-            if (event.day === 'day1') {
-              day1Events.push(event);
-            } else {
-              day2Events.push(event);
-            }
-          }
-        }
-      });
+      if (selectedIds.length === 0) {
+        container.innerHTML = '<div class="no-events">No events registered yet</div>';
+        return;
+      }
 
-      const totalEvents = day1Events.length + day2Events.length;
+      const groups = groupSelectedEvents(selectedIds);
+      const totalEvents = selectedIds.filter(id => eventLookup.has(id)).length;
 
       if (totalEvents === 0) {
-        container.innerHTML = '<div class="no-events">No events registered yet</div>';
+        container.innerHTML = '<div class="no-events">Event details will be updated soon</div>';
         return;
       }
 
       let html = '';
 
-      if (day1Events.length > 0) {
-        html += `
-          <div class="day-header">
-            <span class="day-badge">Day 1</span>
-          </div>
-          <div class="event-list">
-            ${day1Events.map(event => `
-              <div class="event-item">
-                <span class="event-time">${event.time}</span>
-                <div class="event-details">
-                  <div class="event-name">${event.name}</div>
-                  <div class="event-venue">${event.venue}</div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      }
+      eventTypeOrder.forEach(type => {
+        const events = groups[type];
+        if (!events || events.length === 0) {
+          return;
+        }
 
-      if (day2Events.length > 0) {
-        html += `
-          <div class="day-header">
-            <span class="day-badge">Day 2</span>
-          </div>
-          <div class="event-list">
-            ${day2Events.map(event => `
-              <div class="event-item">
-                <span class="event-time">${event.time}</span>
-                <div class="event-details">
-                  <div class="event-name">${event.name}</div>
-                  <div class="event-venue">${event.venue}</div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      }
+        const label = eventTypeLabels[type] || 'Event Selection';
+        html += renderEventSummarySection(events, label);
+      });
+
+      const remainingTypes = Object.keys(groups).filter(type => !eventTypeOrder.includes(type));
+      remainingTypes.forEach(type => {
+        const events = groups[type];
+        if (!events || events.length === 0) {
+          return;
+        }
+
+        const label = eventTypeLabels[type] || 'Event Selection';
+        html += renderEventSummarySection(events, label);
+      });
 
       html += `
         <div class="events-summary">
@@ -2015,6 +2112,8 @@
           return;
         }
 
+        await loadEventCatalog();
+
         const formResponse = await fetch('/api/student/form', {
           credentials: 'include'
         });
@@ -2108,93 +2207,82 @@
         year: 'numeric'
       });
 
-      // Build schedule
-      const eventFields = ['day1_slot1', 'day1_slot2', 'day1_slot3', 'day2_slot1', 'day2_slot2', 'day2_slot3'];
-      const day1Events = [];
-      const day2Events = [];
-
-      eventFields.forEach(field => {
-        if (form[field]) {
-          const event = getEventById(form[field]);
-          if (event) {
-            if (event.day === 'day1') {
-              day1Events.push(event);
-            } else {
-              day2Events.push(event);
-            }
-          }
+      const renderPrintScheduleSection = (events, label) => {
+        if (!events || events.length === 0) {
+          return '';
         }
-      });
 
-      // Sort by slot
-      const slotOrder = { slot1: 1, slot2: 2, slot3: 3 };
-      day1Events.sort((a, b) => slotOrder[a.slot] - slotOrder[b.slot]);
-      day2Events.sort((a, b) => slotOrder[a.slot] - slotOrder[b.slot]);
+        const dateBadge = events.find(event => event.dayLabel)?.dayLabel;
+        const safeLabel = escapeHtml(label);
+        const safeDateBadge = escapeHtml(dateBadge);
+
+        return `
+          <div class="pass-day">
+            <div class="pass-day-header">
+              <span class="pass-day-badge">${safeLabel}</span>
+              ${dateBadge ? `<span class="pass-day-date">${safeDateBadge}</span>` : ''}
+            </div>
+            <table class="pass-events-table">
+              <thead>
+                <tr>
+                  <th>Schedule</th>
+                  <th>Event</th>
+                  <th>Organizer</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${events.map(event => {
+                  const schedule = formatScheduleDetails(event) || 'Schedule TBA';
+                  const organizer = event.organizer || '—';
+                  const safeSchedule = escapeHtml(schedule);
+                  const safeName = escapeHtml(event.name);
+                  const safeOrganizer = escapeHtml(organizer);
+
+                  return `
+                  <tr>
+                    <td class="pass-event-time">${safeSchedule}</td>
+                    <td class="pass-event-name">${safeName}</td>
+                    <td class="pass-event-venue">${safeOrganizer}</td>
+                  </tr>
+                `; }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      };
 
       const scheduleContainer = document.getElementById('print-schedule');
+      const selectedIds = Array.isArray(form.selected_events) ? form.selected_events : [];
+      const groups = groupSelectedEvents(selectedIds);
+      const matchedEvents = selectedIds.map(id => eventLookup.get(id)).filter(Boolean);
+
+      if (matchedEvents.length === 0) {
+        scheduleContainer.innerHTML = '<div class="pass-no-events">No events registered</div>';
+        return;
+      }
+
       let scheduleHtml = '';
 
-      if (day1Events.length === 0 && day2Events.length === 0) {
-        scheduleHtml = '<div class="pass-no-events">No events registered</div>';
-      } else {
-        if (day1Events.length > 0) {
-          scheduleHtml += `
-            <div class="pass-day">
-              <div class="pass-day-header">
-                <span class="pass-day-badge">Day 1</span>
-                <span class="pass-day-date">January 15, 2025</span>
-              </div>
-              <table class="pass-events-table">
-                <thead>
-                  <tr>
-                    <th>Time</th>
-                    <th>Event</th>
-                    <th>Venue</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${day1Events.map(event => `
-                    <tr>
-                      <td class="pass-event-time">${event.time}</td>
-                      <td class="pass-event-name">${event.name}</td>
-                      <td class="pass-event-venue">${event.venue}</td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          `;
+      eventTypeOrder.forEach(type => {
+        const events = groups[type];
+        if (!events || events.length === 0) {
+          return;
         }
 
-        if (day2Events.length > 0) {
-          scheduleHtml += `
-            <div class="pass-day">
-              <div class="pass-day-header">
-                <span class="pass-day-badge">Day 2</span>
-                <span class="pass-day-date">January 16, 2025</span>
-              </div>
-              <table class="pass-events-table">
-                <thead>
-                  <tr>
-                    <th>Time</th>
-                    <th>Event</th>
-                    <th>Venue</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${day2Events.map(event => `
-                    <tr>
-                      <td class="pass-event-time">${event.time}</td>
-                      <td class="pass-event-name">${event.name}</td>
-                      <td class="pass-event-venue">${event.venue}</td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          `;
+        const label = eventTypeLabels[type] || 'Event Selection';
+        scheduleHtml += renderPrintScheduleSection(events, label);
+      });
+
+      const remainingTypes = Object.keys(groups).filter(type => !eventTypeOrder.includes(type));
+      remainingTypes.forEach(type => {
+        const events = groups[type];
+        if (!events || events.length === 0) {
+          return;
         }
-      }
+
+        const label = eventTypeLabels[type] || 'Event Selection';
+        scheduleHtml += renderPrintScheduleSection(events, label);
+      });
 
       scheduleContainer.innerHTML = scheduleHtml;
     }

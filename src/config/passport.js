@@ -1,4 +1,3 @@
-import fp from 'fastify-plugin';
 import pool from '../db/mysql.js';
 
 // Allowed email domain

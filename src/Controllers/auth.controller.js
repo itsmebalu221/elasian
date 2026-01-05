@@ -2,60 +2,52 @@ import { isAllowedEmail, findOrCreateUser } from '../config/firebase.js';
 import { getStudentForm } from '../Services/student.service.js';
 import { signToken, getCookieName, getCookieOptions, sanitizeUserPayload } from '../utils/jwt.js';
 
-// Handle Firebase login - verify token and issue auth cookie
-export async function firebaseLoginHandler(request, reply) {
+export async function firebaseLoginHandler(req, res) {
   try {
-    const { user } = request.body;
+    const { user } = req.body;
 
-    // Validate input
     if (!user) {
-      return reply.code(400).send({
+      return res.status(400).json({
         success: false,
         error: 'User data is required'
       });
     }
 
-    // Ensure we have at minimum an email
     if (!user.email) {
-      return reply.code(400).send({
+      return res.status(400).json({
         success: false,
         error: 'Email is required for authentication'
       });
     }
 
-    // Normalize email
     const email = user.email.toLowerCase().trim();
 
-    // Check if email is from allowed domain
     if (!isAllowedEmail(email)) {
-      return reply.code(403).send({
+      return res.status(403).json({
         success: false,
         error: 'Only @hitam.org email addresses are allowed'
       });
     }
 
-    // Find or create user in database (with built-in retries)
     let dbUser;
     try {
       dbUser = await findOrCreateUser({
         uid: user.uid || `google_${Date.now()}`,
-        email: email,
+        email,
         displayName: user.displayName || email.split('@')[0],
         photoURL: user.photoURL || null
       });
     } catch (dbError) {
       console.error('Database error during login:', dbError);
-      // Create session anyway with minimal data - user experience is priority
       dbUser = {
         id: `session_${Date.now()}`,
-        email: email,
+        email,
         name: user.displayName || email.split('@')[0],
         profile_picture: user.photoURL || null,
         is_temporary: true
       };
     }
 
-    // Check if user has already submitted a form (don't fail login if this errors)
     let hasSubmittedForm = false;
     let existingForm = null;
     try {
@@ -65,7 +57,6 @@ export async function firebaseLoginHandler(request, reply) {
       }
     } catch (formError) {
       console.warn('Could not check form status:', formError.message);
-      // Continue without form status - will be checked again when needed
     }
 
     const authUser = {
@@ -82,75 +73,67 @@ export async function firebaseLoginHandler(request, reply) {
 
     console.log('✅ Auth token issued for:', email, 'hasForm:', hasSubmittedForm);
 
-    return reply
-      .setCookie(getCookieName(), token, getCookieOptions())
-      .send({
-        success: true,
-        message: 'Login successful',
-        user: authUser,
-        hasSubmittedForm,
-        formData: existingForm
-      });
+    res.cookie(getCookieName(), token, getCookieOptions());
+    return res.json({
+      success: true,
+      message: 'Login successful',
+      user: authUser,
+      hasSubmittedForm,
+      formData: existingForm
+    });
   } catch (error) {
     console.error('Firebase login error:', error);
-    
-    // Try to provide a helpful error message
+
     let errorMessage = 'Authentication failed. Please try again.';
     if (error.code === 'ECONNREFUSED') {
       errorMessage = 'Service temporarily unavailable. Please try again in a moment.';
     } else if (error.code === 'ETIMEDOUT') {
       errorMessage = 'Connection timed out. Please check your internet and try again.';
     }
-    
-    return reply.code(500).send({
+
+    return res.status(500).json({
       success: false,
       error: errorMessage
     });
   }
 }
 
-// Get current user
-export async function getCurrentUser(request, reply) {
-  if (!request.user) {
-    return reply.code(401).send({
+export async function getCurrentUser(req, res) {
+  if (!req.user) {
+    return res.status(401).json({
       success: false,
       error: 'Not authenticated'
     });
   }
 
-  return reply.send({
+  return res.json({
     success: true,
-    user: sanitizeUserPayload(request.user)
+    user: sanitizeUserPayload(req.user)
   });
 }
 
-// Logout handler
-export async function logoutHandler(request, reply) {
-  reply
-    .clearCookie(getCookieName(), getCookieOptions())
-    .redirect('/login.html');
+export async function logoutHandler(req, res) {
+  res.clearCookie(getCookieName(), getCookieOptions());
+  return res.redirect('/login.html');
 }
 
-// Logout API handler
-export async function logoutApiHandler(request, reply) {
-  reply.clearCookie(getCookieName(), getCookieOptions());
-  return reply.send({
+export async function logoutApiHandler(req, res) {
+  res.clearCookie(getCookieName(), getCookieOptions());
+  return res.json({
     success: true,
     message: 'Logged out successfully'
   });
 }
 
-// Check auth status (for API)
-export async function checkAuthStatus(request, reply) {
+export async function checkAuthStatus(req, res) {
   try {
-    const isAuthenticated = !!request.user;
+    const isAuthenticated = !!req.user;
 
     console.log('🔍 Auth check - user present:', isAuthenticated);
 
-    let authUser = sanitizeUserPayload(request.user);
+    let authUser = sanitizeUserPayload(req.user);
 
-    if (isAuthenticated) {
-      // Re-check form status in case it changed (but don't fail if error)
+    if (isAuthenticated && authUser) {
       try {
         if (authUser.id && !authUser.isTemporary) {
           const existingForm = await getStudentForm(authUser.id);
@@ -163,7 +146,7 @@ export async function checkAuthStatus(request, reply) {
             };
 
             const token = signToken(authUser);
-            reply.setCookie(getCookieName(), token, getCookieOptions());
+            res.cookie(getCookieName(), token, getCookieOptions());
           } else {
             authUser = {
               ...authUser,
@@ -173,19 +156,17 @@ export async function checkAuthStatus(request, reply) {
         }
       } catch (formError) {
         console.warn('Could not refresh form status:', formError.message);
-        // Keep existing hasSubmittedForm value
       }
     }
-    
-    return reply.send({
+
+    return res.json({
       success: true,
       isAuthenticated,
       user: isAuthenticated ? authUser : null
     });
   } catch (error) {
     console.error('Auth status check error:', error);
-    // Even if there's an error, try to return a valid response
-    return reply.send({
+    return res.json({
       success: true,
       isAuthenticated: false,
       user: null

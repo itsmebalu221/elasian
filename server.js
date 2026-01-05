@@ -1,7 +1,6 @@
-import Fastify from 'fastify';
-import fastifyStatic from '@fastify/static';
-import fastifyCookie from '@fastify/cookie';
-import fastifyCors from '@fastify/cors';
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -19,70 +18,50 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const fastify = Fastify({ logger: true });
+const app = express();
 
-// Register CORS
-fastify.register(fastifyCors, {
-  origin: true,
-  credentials: true
-});
+app.use(cors({ origin: true, credentials: true }));
+app.use(cookieParser());
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true }));
 
-// Register cookie plugin
-fastify.register(fastifyCookie);
-
-// Decorate request with user parsed from JWT cookies
-fastify.decorateRequest('user', null);
-
-fastify.addHook('preHandler', async (request, reply) => {
-  const token = request.cookies?.[getCookieName()];
+app.use((req, res, next) => {
+  const token = req.cookies?.[getCookieName()];
 
   if (!token) {
-    request.user = null;
-    return;
+    req.user = null;
+    return next();
   }
 
   try {
-    request.user = verifyToken(token);
+    req.user = verifyToken(token);
   } catch (error) {
     console.warn('Invalid auth token:', error.message);
-    request.user = null;
-    reply.clearCookie(getCookieName(), getCookieOptions());
+    req.user = null;
+    res.clearCookie(getCookieName(), getCookieOptions());
   }
+
+  return next();
 });
 
-// Register static file serving for public folder
-fastify.register(fastifyStatic, {
-  root: path.join(__dirname, 'public'),
-  prefix: '/'
+app.use(express.static(path.join(__dirname, 'public')));
+app.use('/assets', express.static(path.join(__dirname, 'Assets')));
+
+formRoutes(app);
+authRoutes(app);
+studentRoutes(app);
+paymentRoutes(app);
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Register static file serving for Assets folder
-fastify.register(fastifyStatic, {
-  root: path.join(__dirname, 'Assets'),
-  prefix: '/assets/',
-  decorateReply: false
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Register routes
-fastify.register(formRoutes);
-fastify.register(authRoutes);
-fastify.register(studentRoutes);
-fastify.register(paymentRoutes);
-
-// Root serves index.html (landing page)
-fastify.get('/', async (request, reply) => {
-  return reply.sendFile('index.html');
-});
-
-// Health check endpoint
-fastify.get('/health', async () => {
-  return { status: 'ok', timestamp: new Date().toISOString() };
-});
-
-// Database initialization flag
 let dbInitialized = false;
 
-// Initialize database once
 async function ensureDbReady() {
   if (!dbInitialized) {
     try {
@@ -94,26 +73,25 @@ async function ensureDbReady() {
   }
 }
 
-// Export for Vercel serverless
 export default async function handler(req, res) {
   await ensureDbReady();
-  await fastify.ready();
-  fastify.server.emit('request', req, res);
+  return app(req, res);
 }
 
-// Start server only when run directly (not on Vercel)
 if (!process.env.VERCEL) {
   const start = async () => {
     try {
       await ensureDbReady();
       const port = process.env.PORT || 3000;
-      await fastify.listen({ port, host: '0.0.0.0' });
-      console.log(`🚀 Server running at http://localhost:${port}`);
-      console.log(`📝 Login page: http://localhost:${port}/login.html`);
+      app.listen(port, '0.0.0.0', () => {
+        console.log(`🚀 Server running at http://localhost:${port}`);
+        console.log(`📝 Login page: http://localhost:${port}/login.html`);
+      });
     } catch (err) {
-      fastify.log.error(err);
+      console.error(err);
       process.exit(1);
     }
   };
+
   start();
 }

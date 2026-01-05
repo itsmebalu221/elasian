@@ -2,25 +2,22 @@ import studentFormSchema from '../Schemas/student.schema.js';
 import { submitStudentForm, getStudentForm } from '../Services/student.service.js';
 import { signToken, getCookieName, getCookieOptions, sanitizeUserPayload } from '../utils/jwt.js';
 
-// Submit student form
-export async function submitStudentFormHandler(request, reply) {
+export async function submitStudentFormHandler(req, res) {
   try {
-    // Check if user is authenticated
-    if (!request.user) {
-      return reply.code(401).send({
+    if (!req.user) {
+      return res.status(401).json({
         success: false,
         error: 'Unauthorized. Please login with your HITAM email first.'
       });
     }
 
-    const user = sanitizeUserPayload(request.user);
+    const user = sanitizeUserPayload(req.user);
     const studentId = user.id;
 
-    // Validate form data
-    const parsed = studentFormSchema.safeParse(request.body);
-    
+    const parsed = studentFormSchema.safeParse(req.body);
+
     if (!parsed.success) {
-      return reply.code(400).send({
+      return res.status(400).json({
         success: false,
         errors: parsed.error.errors.map(err => ({
           field: err.path.join('.'),
@@ -29,7 +26,6 @@ export async function submitStudentFormHandler(request, reply) {
       });
     }
 
-    // Submit form to database
     const result = await submitStudentForm(studentId, parsed.data);
 
     const updatedUser = {
@@ -38,50 +34,47 @@ export async function submitStudentFormHandler(request, reply) {
     };
 
     const token = signToken(updatedUser);
+    res.cookie(getCookieName(), token, getCookieOptions());
 
-    return reply
-      .setCookie(getCookieName(), token, getCookieOptions())
-      .code(201)
-      .send({
-        success: true,
-        data: result
-      });
+    return res.status(201).json({
+      success: true,
+      data: result
+    });
   } catch (error) {
     console.error('Form submission error:', error);
-    return reply.code(500).send({
+    return res.status(500).json({
       success: false,
       error: error.message || 'Internal server error'
     });
   }
 }
 
-// Get current user's form
-export async function getStudentFormHandler(request, reply) {
+export async function getStudentFormHandler(req, res) {
   try {
-    if (!request.user) {
-      return reply.code(401).send({
+    if (!req.user) {
+      return res.status(401).json({
         success: false,
         error: 'Unauthorized. Please login first.'
       });
     }
 
-    const studentId = sanitizeUserPayload(request.user).id;
+    const studentId = sanitizeUserPayload(req.user).id;
     const form = await getStudentForm(studentId);
 
     if (!form) {
-      return reply.code(404).send({
+      return res.status(404).json({
         success: false,
         error: 'No form submitted yet'
       });
     }
 
-    return reply.send({
+    return res.json({
       success: true,
       data: form
     });
   } catch (error) {
     console.error('Get form error:', error);
-    return reply.code(500).send({
+    return res.status(500).json({
       success: false,
       error: 'Internal server error'
     });

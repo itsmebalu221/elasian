@@ -1,18 +1,9 @@
 import { firebaseLoginHandler, getCurrentUser, logoutHandler, logoutApiHandler, checkAuthStatus } from '../Controllers/auth.controller.js';
 
-export async function authRoutes(fastify) {
-  // Firebase login - verify and issue auth cookie
-  fastify.post('/api/auth/firebase-login', firebaseLoginHandler);
-
-  // Get current user
-  fastify.get('/api/auth/me', getCurrentUser);
-
-  // Check auth status
-  fastify.get('/api/auth/status', checkAuthStatus);
-
-  // Logout (redirect)
-  fastify.get('/auth/logout', logoutHandler);
-
-  // Logout API
-  fastify.post('/api/auth/logout', logoutApiHandler);
+export function authRoutes(app) {
+  app.post('/api/auth/firebase-login', firebaseLoginHandler);
+  app.get('/api/auth/me', getCurrentUser);
+  app.get('/api/auth/status', checkAuthStatus);
+  app.get('/auth/logout', logoutHandler);
+  app.post('/api/auth/logout', logoutApiHandler);
 }

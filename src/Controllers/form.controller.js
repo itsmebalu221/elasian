@@ -1,14 +1,14 @@
 import { formSchema } from '../Schemas/form.schema.js';
 import { processFormSubmission } from '../Services/form.service.js';
 
-export async function submitForm(request, reply) {
-  console.log('REQUEST BODY:', request.body);
+export async function submitForm(req, res) {
+  console.log('REQUEST BODY:', req.body);
 
-  const parsed = formSchema.safeParse(request.body);
+  const parsed = formSchema.safeParse(req.body);
   console.log('PARSED RESULT:', parsed);
 
   if (!parsed.success) {
-    return reply.code(400).send({
+    return res.status(400).json({
       success: false,
       errors: parsed.error.errors
     });
@@ -16,8 +16,8 @@ export async function submitForm(request, reply) {
 
   const result = await processFormSubmission(parsed.data);
 
-  return {
+  return res.json({
     success: true,
     data: result
-  };
+  });
 }

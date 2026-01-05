@@ -1,43 +1,37 @@
 import * as paymentService from '../Services/payment.service.js';
-import { createOrderSchema, verifyPaymentSchema } from '../Schemas/payment.schema.js';
+import { createOrderSchema } from '../Schemas/payment.schema.js';
 import { PAYMENT_AMOUNT } from '../config/cashfree.js';
 
-// Create payment order
-export async function createOrder(request, reply) {
+export async function createOrder(req, res) {
   try {
-    // Check if user is authenticated
-    if (!request.user?.id) {
-      return reply.status(401).send({ error: 'Unauthorized' });
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { formId, customerPhone } = request.body;
-    const user = request.user;
+    const { formId, customerPhone } = req.body;
+    const user = req.user;
 
-    // Validate input
     const validated = createOrderSchema.parse({
       studentId: user.id,
-      formId: formId,
+      formId,
       customerName: user.name,
       customerEmail: user.email,
-      customerPhone: customerPhone
+      customerPhone
     });
 
-    // Check if already paid
     const isPaid = await paymentService.isFormPaid(formId);
     if (isPaid) {
-      return reply.status(400).send({ error: 'Payment already completed for this registration' });
+      return res.status(400).json({ error: 'Payment already completed for this registration' });
     }
 
-    // Check for existing pending payment
     const existingPayment = await paymentService.getPaymentByFormId(formId);
     if (existingPayment && existingPayment.status === 'PENDING') {
-      // Return existing session if still valid (created within last 30 minutes)
       const createdAt = new Date(existingPayment.created_at);
       const now = new Date();
       const diffMinutes = (now - createdAt) / (1000 * 60);
-      
+
       if (diffMinutes < 30 && existingPayment.payment_session_id) {
-        return reply.send({
+        return res.json({
           success: true,
           orderId: existingPayment.order_id,
           paymentSessionId: existingPayment.payment_session_id,
@@ -55,78 +49,78 @@ export async function createOrder(request, reply) {
       validated.customerPhone
     );
 
-    return reply.send(result);
+    return res.json(result);
   } catch (error) {
     console.error('Create order error:', error);
-    return reply.status(500).send({ 
+    return res.status(500).json({
       error: 'Failed to create payment order',
-      message: error.message 
+      message: error.message
     });
   }
 }
 
-// Verify payment status
-export async function verifyPayment(request, reply) {
+export async function verifyPayment(req, res) {
   try {
-    const { orderId } = request.query;
+    const { orderId } = req.query;
 
     if (!orderId) {
-      return reply.status(400).send({ error: 'Order ID is required' });
+      return res.status(400).json({ error: 'Order ID is required' });
     }
 
     const result = await paymentService.verifyPaymentStatus(orderId);
-    return reply.send(result);
+    return res.json(result);
   } catch (error) {
     console.error('Verify payment error:', error);
-    return reply.status(500).send({ 
+    return res.status(500).json({
       error: 'Failed to verify payment',
-      message: error.message 
+      message: error.message
     });
   }
 }
 
-// Webhook handler
-export async function handleWebhook(request, reply) {
+export async function handleWebhook(req, res) {
   try {
-    const signature = request.headers['x-webhook-signature'];
-    const payload = request.body;
+    const signature = req.headers['x-webhook-signature'];
+    const payload = req.body;
 
     const result = await paymentService.handleWebhook(payload, signature);
-    return reply.send(result);
+    return res.json(result);
   } catch (error) {
     console.error('Webhook error:', error);
-    return reply.status(500).send({ error: 'Webhook processing failed' });
+    return res.status(500).json({ error: 'Webhook processing failed' });
   }
 }
 
-// Get payment status for current user's form
-export async function getPaymentStatus(request, reply) {
+export async function getPaymentStatus(req, res) {
   try {
-    if (!request.user?.id) {
-      return reply.status(401).send({ error: 'Unauthorized' });
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { formId } = request.query;
+    const { formId } = req.query;
 
     if (!formId) {
-      return reply.status(400).send({ error: 'Form ID is required' });
+      return res.status(400).json({ error: 'Form ID is required' });
     }
 
-    const payment = await paymentService.getPaymentByFormId(parseInt(formId));
-    const isPaid = await paymentService.isFormPaid(parseInt(formId));
+    const numericFormId = parseInt(formId, 10);
+    const payment = await paymentService.getPaymentByFormId(numericFormId);
+    const isPaid = await paymentService.isFormPaid(numericFormId);
 
-    return reply.send({
+    return res.json({
       isPaid,
-      payment: payment ? {
-        orderId: payment.order_id,
-        status: payment.status,
-        amount: payment.amount,
-        paidAt: payment.paid_at
-      } : null,
+      payment: payment
+        ? {
+            orderId: payment.order_id,
+            status: payment.status,
+            amount: payment.amount,
+            paidAt: payment.paid_at
+          }
+        : null,
       amount: PAYMENT_AMOUNT
     });
   } catch (error) {
     console.error('Get payment status error:', error);
-    return reply.status(500).send({ error: 'Failed to get payment status' });
+    return res.status(500).json({ error: 'Failed to get payment status' });
   }
 }
