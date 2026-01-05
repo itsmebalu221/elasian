@@ -77,12 +77,15 @@ export async function initializeDatabase() {
         father_name VARCHAR(255),
         address TEXT,
         selected_events JSON NULL,
+        payment_status ENUM('PENDING','PAID','FAILED') DEFAULT 'PENDING',
+        payment_id INT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
         INDEX idx_student_id (student_id),
         INDEX idx_roll_number (roll_number),
-        INDEX idx_registration_id (registration_id)
+        INDEX idx_registration_id (registration_id),
+        INDEX idx_payment_status (payment_status)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
@@ -168,6 +171,36 @@ export async function initializeDatabase() {
         "ALTER TABLE student_forms ADD COLUMN selected_events JSON NULL AFTER address"
       );
       console.log('  ✓ Added selected_events column to student_forms');
+    }
+
+    console.log('🔄 Ensuring student_forms has payment status columns...');
+    const [paymentStatusColumn] = await connection.query(
+      "SHOW COLUMNS FROM student_forms LIKE 'payment_status'"
+    );
+    if (paymentStatusColumn.length === 0) {
+      await connection.query(
+        "ALTER TABLE student_forms ADD COLUMN payment_status ENUM('PENDING','PAID','FAILED') DEFAULT 'PENDING' AFTER selected_events"
+      );
+      console.log('  ✓ Added payment_status column to student_forms');
+    }
+
+    const [paymentIdColumn] = await connection.query(
+      "SHOW COLUMNS FROM student_forms LIKE 'payment_id'"
+    );
+    if (paymentIdColumn.length === 0) {
+      await connection.query(
+        'ALTER TABLE student_forms ADD COLUMN payment_id INT NULL AFTER payment_status'
+      );
+      console.log('  ✓ Added payment_id column to student_forms');
+    }
+
+    const [paymentStatusIndex] = await connection.query(
+      "SHOW INDEX FROM student_forms WHERE Key_name = 'idx_payment_status'"
+    );
+    if (paymentStatusIndex.length === 0) {
+      await connection.query(
+        'ALTER TABLE student_forms ADD INDEX idx_payment_status (payment_status)'
+      ).catch(() => {});
     }
 
     // Step 9: Generate registration IDs for existing records
