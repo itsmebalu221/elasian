@@ -1,4 +1,5 @@
-import { getUserType, findOrCreateUser } from '../config/passport.js';
+import { getUserType } from '../config/passport.js';
+import { findOrCreateUser } from '../config/firebase.js';
 import { getStudentForm } from '../Services/student.service.js';
 import { getExternalRegistrationByEmail } from '../Services/external.service.js';
 import { signToken, getCookieName, getCookieOptions, sanitizeUserPayload } from '../utils/jwt.js';
