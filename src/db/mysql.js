@@ -1,5 +1,6 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import { EVENT_DEFINITIONS } from '../config/events.config.js';
 
 dotenv.config();
 
@@ -75,12 +76,7 @@ export async function initializeDatabase() {
         section VARCHAR(10),
         father_name VARCHAR(255),
         address TEXT,
-        day1_slot1 VARCHAR(20) NULL,
-        day1_slot2 VARCHAR(20) NULL,
-        day1_slot3 VARCHAR(20) NULL,
-        day2_slot1 VARCHAR(20) NULL,
-        day2_slot2 VARCHAR(20) NULL,
-        day2_slot3 VARCHAR(20) NULL,
+        selected_events JSON NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
@@ -90,7 +86,53 @@ export async function initializeDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
-    // Step 5: Create payments table
+    // Step 5: Create events catalog table
+    console.log('🔄 Creating events table...');
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS events (
+        id VARCHAR(50) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        type ENUM('MULTI_DAY','DAY_1_ONLY','DAY_2_ONLY','OPTIONAL') NOT NULL,
+        day_label VARCHAR(50),
+        start_time VARCHAR(20),
+        end_time VARCHAR(20),
+        venue VARCHAR(255),
+        description TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_type (type)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
+    await connection.query(`
+      ALTER TABLE events
+        MODIFY COLUMN type ENUM('MULTI_DAY','DAY_1_ONLY','DAY_2_ONLY','OPTIONAL') NOT NULL
+    `);
+
+    // Step 6: Create event registrations table
+    console.log('🔄 Creating event_registrations table...');
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS event_registrations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        student_id INT NOT NULL,
+        form_id INT NOT NULL,
+        event_id VARCHAR(50) NOT NULL,
+        selection_type ENUM('MULTI_DAY','DAY_1_ONLY','DAY_2_ONLY','OPTIONAL') NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+        FOREIGN KEY (form_id) REFERENCES student_forms(id) ON DELETE CASCADE,
+        FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+        UNIQUE KEY uniq_student_event (student_id, event_id),
+        INDEX idx_event_id (event_id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
+    await connection.query(`
+      ALTER TABLE event_registrations
+        MODIFY COLUMN selection_type ENUM('MULTI_DAY','DAY_1_ONLY','DAY_2_ONLY','OPTIONAL') NOT NULL
+    `);
+
+    // Step 7: Create payments table
     console.log('🔄 Creating payments table...');
     await connection.query(`
       CREATE TABLE IF NOT EXISTS payments (
@@ -116,33 +158,8 @@ export async function initializeDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
-    // Step 6: Add any missing columns to existing tables
-    console.log('🔄 Checking for missing columns...');
-    const columnsToAdd = [
-      { name: 'registration_id', definition: 'VARCHAR(20) UNIQUE' },
-      { name: 'day1_slot1', definition: 'VARCHAR(20) NULL' },
-      { name: 'day1_slot2', definition: 'VARCHAR(20) NULL' },
-      { name: 'day1_slot3', definition: 'VARCHAR(20) NULL' },
-      { name: 'day2_slot1', definition: 'VARCHAR(20) NULL' },
-      { name: 'day2_slot2', definition: 'VARCHAR(20) NULL' },
-      { name: 'day2_slot3', definition: 'VARCHAR(20) NULL' },
-      { name: 'payment_status', definition: "ENUM('PENDING', 'PAID') DEFAULT 'PENDING'" },
-      { name: 'payment_id', definition: 'INT NULL' }
-    ];
-
-    for (const col of columnsToAdd) {
-      try {
-        await connection.query(`ALTER TABLE student_forms ADD COLUMN ${col.name} ${col.definition}`);
-        console.log(`  ✓ Added column: ${col.name}`);
-      } catch (e) {
-        // Column already exists - that's fine
-        if (!e.message.includes('Duplicate column')) {
-          console.warn(`  ⚠ Column ${col.name}: ${e.message}`);
-        }
-      }
-    }
-
-    // Step 7: Generate registration IDs for existing records
+    // Step 8: Add any missing columns to existing tables
+    // Step 9: Generate registration IDs for existing records
     console.log('🔄 Checking registration IDs...');
     const [rowsWithoutId] = await connection.query(
       'SELECT id FROM student_forms WHERE registration_id IS NULL'
@@ -154,6 +171,33 @@ export async function initializeDatabase() {
       console.log(`  ✓ Generated registration ID: ${regId}`);
     }
 
+    // Step 10: Seed events catalog (idempotent)
+    console.log('🔄 Seeding events catalog...');
+    for (const event of EVENT_DEFINITIONS) {
+      await connection.query(
+        `INSERT INTO events (id, name, type, day_label, start_time, end_time, venue, description)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+           name = VALUES(name),
+           type = VALUES(type),
+           day_label = VALUES(day_label),
+           start_time = VALUES(start_time),
+           end_time = VALUES(end_time),
+           venue = VALUES(venue),
+           description = VALUES(description)`
+        , [
+          event.id,
+          event.name,
+          event.type,
+          event.dayLabel || null,
+          event.startTime || null,
+          event.endTime || null,
+          event.venue || null,
+          event.description || null
+        ]
+      );
+    }
+
     connection.release();
     await tempPool.end();
     
@@ -162,7 +206,7 @@ export async function initializeDatabase() {
     
     console.log('✅ Database initialized successfully!');
     console.log(`   Database: ${DB_NAME}`);
-    console.log(`   Tables: students, student_forms`);
+    console.log('   Tables: students, student_forms, events, event_registrations');
     
   } catch (error) {
     console.error('❌ Database initialization error:', error.message);

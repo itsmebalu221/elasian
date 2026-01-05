@@ -1,4 +1,10 @@
 import pool from '../db/mysql.js';
+import { EVENT_DEFINITIONS, EVENT_TYPES } from '../config/events.config.js';
+
+const EVENT_TYPE_LOOKUP = EVENT_DEFINITIONS.reduce((acc, event) => {
+  acc[event.id] = event.type;
+  return acc;
+}, {});
 
 // Generate unique registration ID
 function generateRegistrationId() {
@@ -16,71 +22,116 @@ export async function submitStudentForm(studentId, formData) {
     mobile,
     year_of_study,
     section,
-    day1_slot1,
-    day1_slot2,
-    day1_slot3,
-    day2_slot1,
-    day2_slot2,
-    day2_slot3
+    selected_events
   } = formData;
 
+  const selectedEventsJson = JSON.stringify(selected_events);
+
+  const connection = await pool.getConnection();
+
   try {
-    // Check if student already submitted a form
-    const [existing] = await pool.query(
+    await connection.beginTransaction();
+
+    const [existing] = await connection.query(
       'SELECT id, registration_id FROM student_forms WHERE student_id = ?',
       [studentId]
     );
 
+    let formId;
+    let registrationId;
+
     if (existing.length > 0) {
-      // Update existing form (keep existing registration_id)
-      await pool.query(
+      formId = existing[0].id;
+      registrationId = existing[0].registration_id;
+
+      await connection.query(
         `UPDATE student_forms SET 
-          full_name = ?, branch = ?, roll_number = ?, mobile = ?, 
-          year_of_study = ?, section = ?,
-          day1_slot1 = ?, day1_slot2 = ?, day1_slot3 = ?,
-          day2_slot1 = ?, day2_slot2 = ?, day2_slot3 = ?
+          full_name = ?,
+          branch = ?,
+          roll_number = ?,
+          mobile = ?,
+          year_of_study = ?,
+          section = ?,
+          selected_events = ?
         WHERE student_id = ?`,
-        [full_name, branch, roll_number, mobile, year_of_study, section || null,
-         day1_slot1 || null, day1_slot2 || null, day1_slot3 || null,
-         day2_slot1 || null, day2_slot2 || null, day2_slot3 || null,
-         studentId]
+        [
+          full_name,
+          branch,
+          roll_number,
+          mobile,
+          year_of_study,
+          section || null,
+          selectedEventsJson,
+          studentId
+        ]
+      );
+    } else {
+      registrationId = generateRegistrationId();
+
+      const [result] = await connection.query(
+        `INSERT INTO student_forms (
+          student_id,
+          registration_id,
+          full_name,
+          branch,
+          roll_number,
+          mobile,
+          year_of_study,
+          section,
+          selected_events
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        , [
+          studentId,
+          registrationId,
+          full_name,
+          branch,
+          roll_number,
+          mobile,
+          year_of_study,
+          section || null,
+          selectedEventsJson
+        ]
       );
 
-      return {
-        status: 'updated',
-        message: 'Form updated successfully',
-        formId: existing[0].id,
-        registrationId: existing[0].registration_id
-      };
+      formId = result.insertId;
     }
 
-    // Generate unique registration ID for new submission
-    const registrationId = generateRegistrationId();
+    await connection.query('DELETE FROM event_registrations WHERE form_id = ?', [formId]);
 
-    // Insert new form with registration ID
-    const [result] = await pool.query(
-      `INSERT INTO student_forms 
-        (student_id, registration_id, full_name, branch, roll_number, mobile, year_of_study, section,
-         day1_slot1, day1_slot2, day1_slot3, day2_slot1, day2_slot2, day2_slot3) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [studentId, registrationId, full_name, branch, roll_number, mobile, year_of_study, section || null,
-       day1_slot1 || null, day1_slot2 || null, day1_slot3 || null,
-       day2_slot1 || null, day2_slot2 || null, day2_slot3 || null]
-    );
+    const registrationRows = selected_events.map(eventId => ([
+      studentId,
+      formId,
+      eventId,
+      EVENT_TYPE_LOOKUP[eventId] || EVENT_TYPES.DAY_1_ONLY
+    ]));
+
+    if (registrationRows.length > 0) {
+      await connection.query(
+        `INSERT INTO event_registrations (student_id, form_id, event_id, selection_type)
+         VALUES ?`,
+        [registrationRows]
+      );
+    }
+
+    await connection.commit();
 
     return {
-      status: 'created',
-      message: 'Form submitted successfully',
-      formId: result.insertId,
-      registrationId: registrationId
+      status: existing.length > 0 ? 'updated' : 'created',
+      message: existing.length > 0 ? 'Form updated successfully' : 'Form submitted successfully',
+      formId,
+      registrationId
     };
   } catch (error) {
+    await connection.rollback();
+
     if (error.code === 'ER_DUP_ENTRY') {
       if (error.message.includes('roll_number')) {
         throw new Error('This roll number is already registered');
       }
     }
     throw error;
+  } finally {
+    connection.release();
   }
 }
 
@@ -90,7 +141,23 @@ export async function getStudentForm(studentId) {
     'SELECT * FROM student_forms WHERE student_id = ?',
     [studentId]
   );
-  return rows[0] || null;
+
+  const form = rows[0];
+
+  if (!form) {
+    return null;
+  }
+
+  form.selected_events = form.selected_events ? JSON.parse(form.selected_events) : [];
+
+  const [registrations] = await pool.query(
+    'SELECT event_id, selection_type FROM event_registrations WHERE form_id = ? ORDER BY id',
+    [form.id]
+  );
+
+  form.event_registrations = registrations;
+
+  return form;
 }
 
 // Get student by ID

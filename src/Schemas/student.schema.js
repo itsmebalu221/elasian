@@ -1,21 +1,7 @@
 import { z } from 'zod/v4';
-import { eventSelectionsSchema, EVENT_CONFIG } from './event.schema.js';
+import { EVENT_DEFINITIONS, validateEventSelections } from '../config/events.config.js';
 
-// Get all valid event IDs for validation
-function getAllEventIds() {
-  const eventIds = [];
-  for (const day of Object.keys(EVENT_CONFIG.events)) {
-    for (const slot of Object.keys(EVENT_CONFIG.events[day])) {
-      for (const event of EVENT_CONFIG.events[day][slot]) {
-        eventIds.push(event.id);
-      }
-    }
-  }
-  return eventIds;
-}
-
-// Event selection schema for a single slot
-const eventSelectionSchema = z.string().nullable().optional();
+const VALID_EVENT_IDS = new Set(EVENT_DEFINITIONS.map(event => event.id));
 
 // Student form validation schema
 export const studentFormSchema = z.object({
@@ -46,33 +32,26 @@ export const studentFormSchema = z.object({
     .max(10, 'Section must be less than 10 characters')
     .optional(),
 
-  // Event selections - one event per time slot per day
-  day1_slot1: eventSelectionSchema,
-  day1_slot2: eventSelectionSchema,
-  day1_slot3: eventSelectionSchema,
-  day2_slot1: eventSelectionSchema,
-  day2_slot2: eventSelectionSchema,
-  day2_slot3: eventSelectionSchema
-}).refine((data) => {
-  // Validate that selected event IDs are valid
-  const validIds = getAllEventIds();
-  const eventFields = ['day1_slot1', 'day1_slot2', 'day1_slot3', 'day2_slot1', 'day2_slot2', 'day2_slot3'];
-  const selections = eventFields
-    .map(f => data[f])
-    .filter(v => v !== null && v !== undefined && v !== '');
-  return selections.every(id => validIds.includes(id));
-}, {
-  message: 'Invalid event selection'
-}).refine((data) => {
-  // Ensure at least one event is selected
-  const eventFields = ['day1_slot1', 'day1_slot2', 'day1_slot3', 'day2_slot1', 'day2_slot2', 'day2_slot3'];
-  const selections = eventFields
-    .map(f => data[f])
-    .filter(v => v !== null && v !== undefined && v !== '');
-  return selections.length > 0;
-}, {
-  message: 'Please select at least one event to attend'
+  selected_events: z.array(z.string().min(1))
+    .min(1, 'Please select at least one event to attend')
+    .superRefine((events, ctx) => {
+      if (!events.every(id => VALID_EVENT_IDS.has(id))) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Invalid event selection',
+          path: ['selected_events']
+        });
+      }
+    })
+}).superRefine((data, ctx) => {
+  const result = validateEventSelections(data.selected_events);
+  if (!result.ok) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: result.reason,
+      path: ['selected_events']
+    });
+  }
 });
 
-export { EVENT_CONFIG };
 export default studentFormSchema;

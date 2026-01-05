@@ -386,7 +386,13 @@
       background: var(--accent-muted);
     }
 
-    .event-card input[type="radio"] {
+    .event-card.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .event-card input[type="checkbox"] {
       position: absolute;
       opacity: 0;
       width: 0;
@@ -412,6 +418,10 @@
       background: var(--accent);
     }
 
+    .event-card.disabled .event-card-check {
+      border-color: rgba(168, 169, 173, 0.35);
+    }
+
     .event-card-check::after {
       content: '';
       width: 6px;
@@ -433,7 +443,7 @@
       padding-right: 2rem;
     }
 
-    .event-venue {
+    .event-organizer {
       font-size: 0.6875rem;
       color: var(--accent);
       margin-bottom: 0.5rem;
@@ -441,10 +451,83 @@
       letter-spacing: 0.05em;
     }
 
+    .event-meta {
+      font-size: 0.6875rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.03em;
+    }
+
     .event-description {
       font-size: 0.75rem;
       color: var(--text-secondary);
       line-height: 1.5;
+    }
+
+    .event-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.625rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: rgba(107, 140, 206, 0.12);
+      border: 1px solid rgba(107, 140, 206, 0.3);
+      padding: 0.125rem 0.5rem;
+      border-radius: 999px;
+      margin-bottom: 0.5rem;
+    }
+
+    .event-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .event-groups {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .event-group {
+      padding: 1.5rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    .event-group-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-bottom: 1rem;
+    }
+
+    .event-group-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.02em;
+    }
+
+    .event-group-description {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .event-group-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      .event-group-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .skip-slot {
@@ -825,118 +908,9 @@
           <!-- Event Selection -->
           <div class="form-section">
             <div class="section-label">Event Selection <span class="required">*</span></div>
-            
-            <!-- Day Tabs -->
-            <div class="day-tabs">
-              <button type="button" class="day-tab active" data-day="day1">Day 1</button>
-              <button type="button" class="day-tab" data-day="day2">Day 2</button>
-            </div>
+            <p class="event-hint">Select either one multi-day experience or one event per available day. Conflicting choices are automatically disabled.</p>
 
-            <!-- Day 1 Events -->
-            <div class="day-content active" id="day1-content">
-              <!-- Slot 1: 10:00 AM - 12:00 PM -->
-              <div class="time-slot">
-                <div class="time-slot-header">
-                  <span class="time-slot-title">Slot 1</span>
-                  <span class="time-slot-time">10:00 AM - 12:00 PM</span>
-                </div>
-                <div class="events-grid" id="day1-slot1-events">
-                  <!-- Events will be populated by JavaScript -->
-                </div>
-                <label class="skip-slot" id="day1-slot1-skip">
-                  <input type="radio" name="day1_slot1" value="">
-                  <span>Skip this slot</span>
-                </label>
-              </div>
-
-              <!-- Lunch Break -->
-              <div class="lunch-break">
-                <span class="lunch-break-text">🍽️ Lunch Break — 12:00 PM - 1:00 PM</span>
-              </div>
-
-              <!-- Slot 2: 1:00 PM - 3:00 PM -->
-              <div class="time-slot">
-                <div class="time-slot-header">
-                  <span class="time-slot-title">Slot 2</span>
-                  <span class="time-slot-time">1:00 PM - 3:00 PM</span>
-                </div>
-                <div class="events-grid" id="day1-slot2-events">
-                  <!-- Events will be populated by JavaScript -->
-                </div>
-                <label class="skip-slot" id="day1-slot2-skip">
-                  <input type="radio" name="day1_slot2" value="">
-                  <span>Skip this slot</span>
-                </label>
-              </div>
-
-              <!-- Slot 3: 3:00 PM - 5:00 PM -->
-              <div class="time-slot">
-                <div class="time-slot-header">
-                  <span class="time-slot-title">Slot 3</span>
-                  <span class="time-slot-time">3:00 PM - 5:00 PM</span>
-                </div>
-                <div class="events-grid" id="day1-slot3-events">
-                  <!-- Events will be populated by JavaScript -->
-                </div>
-                <label class="skip-slot" id="day1-slot3-skip">
-                  <input type="radio" name="day1_slot3" value="">
-                  <span>Skip this slot</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Day 2 Events -->
-            <div class="day-content" id="day2-content">
-              <!-- Slot 1: 10:00 AM - 12:00 PM -->
-              <div class="time-slot">
-                <div class="time-slot-header">
-                  <span class="time-slot-title">Slot 1</span>
-                  <span class="time-slot-time">10:00 AM - 12:00 PM</span>
-                </div>
-                <div class="events-grid" id="day2-slot1-events">
-                  <!-- Events will be populated by JavaScript -->
-                </div>
-                <label class="skip-slot" id="day2-slot1-skip">
-                  <input type="radio" name="day2_slot1" value="">
-                  <span>Skip this slot</span>
-                </label>
-              </div>
-
-              <!-- Lunch Break -->
-              <div class="lunch-break">
-                <span class="lunch-break-text">🍽️ Lunch Break — 12:00 PM - 1:00 PM</span>
-              </div>
-
-              <!-- Slot 2: 1:00 PM - 3:00 PM -->
-              <div class="time-slot">
-                <div class="time-slot-header">
-                  <span class="time-slot-title">Slot 2</span>
-                  <span class="time-slot-time">1:00 PM - 3:00 PM</span>
-                </div>
-                <div class="events-grid" id="day2-slot2-events">
-                  <!-- Events will be populated by JavaScript -->
-                </div>
-                <label class="skip-slot" id="day2-slot2-skip">
-                  <input type="radio" name="day2_slot2" value="">
-                  <span>Skip this slot</span>
-                </label>
-              </div>
-
-              <!-- Slot 3: 3:00 PM - 5:00 PM -->
-              <div class="time-slot">
-                <div class="time-slot-header">
-                  <span class="time-slot-title">Slot 3</span>
-                  <span class="time-slot-time">3:00 PM - 5:00 PM</span>
-                </div>
-                <div class="events-grid" id="day2-slot3-events">
-                  <!-- Events will be populated by JavaScript -->
-                </div>
-                <label class="skip-slot" id="day2-slot3-skip">
-                  <input type="radio" name="day2_slot3" value="">
-                  <span>Skip this slot</span>
-                </label>
-              </div>
-            </div>
+            <div class="event-groups" id="event-groups"></div>
 
             <div class="field-error" id="events-error"></div>
           </div>
@@ -989,185 +963,320 @@
   </div>
 
   <script>
-    // Event Configuration
-    const EVENT_CONFIG = {
-      days: [
-        { id: 'day1', name: 'Day 1', date: '2025-01-15' },
-        { id: 'day2', name: 'Day 2', date: '2025-01-16' }
-      ],
-      timeSlots: [
-        { id: 'slot1', name: 'Slot 1', time: '10:00 AM - 12:00 PM' },
-        { id: 'slot2', name: 'Slot 2', time: '1:00 PM - 3:00 PM' },
-        { id: 'slot3', name: 'Slot 3', time: '3:00 PM - 5:00 PM' }
-      ],
-      events: {
-        day1: {
-          slot1: [
-            { id: 'D1S1E1', name: 'Technical Quiz', venue: 'Seminar Hall A', description: 'Test your technical knowledge' },
-            { id: 'D1S1E2', name: 'Coding Challenge', venue: 'Computer Lab 1', description: 'Competitive programming contest' },
-            { id: 'D1S1E3', name: 'Paper Presentation', venue: 'Conference Room', description: 'Present your research papers' },
-            { id: 'D1S1E4', name: 'Poster Exhibition', venue: 'Main Lobby', description: 'Display your creative posters' }
-          ],
-          slot2: [
-            { id: 'D1S2E1', name: 'Hackathon Round 1', venue: 'Computer Lab 1 & 2', description: 'Build innovative solutions' },
-            { id: 'D1S2E2', name: 'Web Development', venue: 'Computer Lab 3', description: 'Create stunning websites' },
-            { id: 'D1S2E3', name: 'Debugging Contest', venue: 'Computer Lab 4', description: 'Find and fix bugs' },
-            { id: 'D1S2E4', name: 'Tech Talk', venue: 'Auditorium', description: 'Listen to industry experts' }
-          ],
-          slot3: [
-            { id: 'D1S3E1', name: 'Gaming Tournament', venue: 'Gaming Arena', description: 'Compete in esports' },
-            { id: 'D1S3E2', name: 'UI/UX Design', venue: 'Design Lab', description: 'Design user interfaces' },
-            { id: 'D1S3E3', name: 'Database Challenge', venue: 'Computer Lab 2', description: 'SQL and NoSQL challenges' },
-            { id: 'D1S3E4', name: 'Networking Workshop', venue: 'Network Lab', description: 'Learn networking concepts' }
-          ]
-        },
-        day2: {
-          slot1: [
-            { id: 'D2S1E1', name: 'AI/ML Workshop', venue: 'AI Lab', description: 'Hands-on machine learning' },
-            { id: 'D2S1E2', name: 'Mobile App Dev', venue: 'Computer Lab 1', description: 'Build mobile applications' },
-            { id: 'D2S1E3', name: 'Cybersecurity CTF', venue: 'Security Lab', description: 'Capture the flag challenge' },
-            { id: 'D2S1E4', name: 'Group Discussion', venue: 'Seminar Hall B', description: 'Discuss trending topics' }
-          ],
-          slot2: [
-            { id: 'D2S2E1', name: 'Hackathon Final', venue: 'Computer Lab 1 & 2', description: 'Final hackathon round' },
-            { id: 'D2S2E2', name: 'Cloud Computing', venue: 'Cloud Lab', description: 'Deploy on cloud platforms' },
-            { id: 'D2S2E3', name: 'IoT Workshop', venue: 'IoT Lab', description: 'Internet of Things hands-on' },
-            { id: 'D2S2E4', name: 'Tech Debate', venue: 'Auditorium', description: 'Debate on tech topics' }
-          ],
-          slot3: [
-            { id: 'D2S3E1', name: 'Project Showcase', venue: 'Main Hall', description: 'Display your projects' },
-            { id: 'D2S3E2', name: 'Blockchain Basics', venue: 'Computer Lab 3', description: 'Learn blockchain technology' },
-            { id: 'D2S3E3', name: 'DevOps Workshop', venue: 'DevOps Lab', description: 'CI/CD and automation' },
-            { id: 'D2S3E4', name: 'Prize Distribution', venue: 'Auditorium', description: 'Award ceremony' }
-          ]
-        }
-      }
+    const eventsContainer = document.getElementById('event-groups');
+    const eventsErrorEl = document.getElementById('events-error');
+    const summaryContainer = document.getElementById('selection-summary');
+
+    let EVENT_TYPES_ENUM = {
+      MULTI_DAY: 'MULTI_DAY',
+      DAY_1_ONLY: 'DAY_1_ONLY',
+      DAY_2_ONLY: 'DAY_2_ONLY',
+      OPTIONAL: 'OPTIONAL'
     };
 
-    // Populate events
-    function populateEvents() {
-      for (const day of EVENT_CONFIG.days) {
-        for (const slot of EVENT_CONFIG.timeSlots) {
-          const containerId = `${day.id}-${slot.id}-events`;
-          const container = document.getElementById(containerId);
-          const events = EVENT_CONFIG.events[day.id][slot.id];
-          const fieldName = `${day.id}_${slot.id}`;
+    const EVENT_TYPE_LABELS = {
+      MULTI_DAY: 'Multi-day',
+      DAY_1_ONLY: 'Day 1 Only',
+      DAY_2_ONLY: 'Day 2 Only',
+      OPTIONAL: 'Optional Add-on'
+    };
 
-          if (container && events) {
-            container.innerHTML = events.map(event => `
-              <label class="event-card" data-event-id="${event.id}">
-                <input type="radio" name="${fieldName}" value="${event.id}">
-                <div class="event-card-check"></div>
-                <div class="event-name">${event.name}</div>
-                <div class="event-venue">${event.venue}</div>
-                <div class="event-description">${event.description}</div>
-              </label>
-            `).join('');
-          }
+    const selectedEvents = new Set();
+    let eventCatalog = [];
+    let eventLookup = new Map();
+
+    function groupEventsByType(events) {
+      return events.reduce((acc, event) => {
+        if (!acc[event.type]) {
+          acc[event.type] = [];
         }
+        acc[event.type].push(event);
+        return acc;
+      }, {});
+    }
+
+    function validateSelection(selectedIds) {
+      const uniqueIds = Array.from(new Set(selectedIds));
+
+      if (uniqueIds.length !== selectedIds.length) {
+        return { ok: false, reason: 'Duplicate events cannot be selected.' };
       }
+
+      const counts = {
+        [EVENT_TYPES_ENUM.MULTI_DAY]: 0,
+        [EVENT_TYPES_ENUM.DAY_1_ONLY]: 0,
+        [EVENT_TYPES_ENUM.DAY_2_ONLY]: 0,
+        [EVENT_TYPES_ENUM.OPTIONAL]: 0
+      };
+
+      for (const id of uniqueIds) {
+        const event = eventLookup.get(id);
+        if (!event) {
+          return { ok: false, reason: 'Unknown event selected.' };
+        }
+        counts[event.type] = (counts[event.type] || 0) + 1;
+      }
+
+      if (counts[EVENT_TYPES_ENUM.MULTI_DAY] > 1) {
+        return { ok: false, reason: 'Choose only one multi-day experience.' };
+      }
+
+      if (
+        counts[EVENT_TYPES_ENUM.MULTI_DAY] > 0 &&
+        (counts[EVENT_TYPES_ENUM.DAY_1_ONLY] > 0 || counts[EVENT_TYPES_ENUM.DAY_2_ONLY] > 0)
+      ) {
+        return { ok: false, reason: 'Multi-day events block Day 1 and Day 2 selections.' };
+      }
+
+      if (counts[EVENT_TYPES_ENUM.DAY_1_ONLY] > 1) {
+        return { ok: false, reason: 'Select only one Day 1 event.' };
+      }
+
+      if (counts[EVENT_TYPES_ENUM.DAY_2_ONLY] > 1) {
+        return { ok: false, reason: 'Select only one Day 2 event.' };
+      }
+
+      return { ok: true };
     }
 
-    // Handle event card selection
-    function setupEventSelection() {
-      document.querySelectorAll('.event-card').forEach(card => {
-        card.addEventListener('click', function() {
-          const radio = this.querySelector('input[type="radio"]');
-          const name = radio.name;
-          
-          // Deselect all cards in this slot
-          document.querySelectorAll(`input[name="${name}"]`).forEach(input => {
-            const parentCard = input.closest('.event-card');
-            const parentSkip = input.closest('.skip-slot');
-            if (parentCard) parentCard.classList.remove('selected');
-            if (parentSkip) parentSkip.classList.remove('selected');
-          });
-          
-          // Select this card
-          radio.checked = true;
-          this.classList.add('selected');
-          
-          updateSummary();
-        });
-      });
+    function isEventDisabled(event, selectedIds) {
+      if (event.type === EVENT_TYPES_ENUM.OPTIONAL) {
+        return false;
+      }
 
-      // Handle skip slot buttons
-      document.querySelectorAll('.skip-slot').forEach(skipBtn => {
-        skipBtn.addEventListener('click', function() {
-          const radio = this.querySelector('input[type="radio"]');
-          const name = radio.name;
-          
-          // Deselect all cards in this slot
-          document.querySelectorAll(`input[name="${name}"]`).forEach(input => {
-            const parentCard = input.closest('.event-card');
-            const parentSkip = input.closest('.skip-slot');
-            if (parentCard) parentCard.classList.remove('selected');
-            if (parentSkip) parentSkip.classList.remove('selected');
-          });
-          
-          // Select skip
-          radio.checked = true;
-          this.classList.add('selected');
-          
-          updateSummary();
-        });
-      });
+      if (selectedIds.includes(event.id)) {
+        return false;
+      }
+
+      if (selectedIds.length === 0) {
+        return false;
+      }
+
+      const selectedTypes = selectedIds
+        .map(id => eventLookup.get(id)?.type)
+        .filter(Boolean);
+      const hasMultiDay = selectedTypes.includes(EVENT_TYPES_ENUM.MULTI_DAY);
+      const day1Count = selectedTypes.filter(type => type === EVENT_TYPES_ENUM.DAY_1_ONLY).length;
+      const day2Count = selectedTypes.filter(type => type === EVENT_TYPES_ENUM.DAY_2_ONLY).length;
+
+      if (hasMultiDay) {
+        return true;
+      }
+
+      if (
+        event.type === EVENT_TYPES_ENUM.MULTI_DAY &&
+        (day1Count > 0 || day2Count > 0 || selectedTypes.includes(EVENT_TYPES_ENUM.MULTI_DAY))
+      ) {
+        return true;
+      }
+
+      if (event.type === EVENT_TYPES_ENUM.DAY_1_ONLY && day1Count > 0) {
+        return true;
+      }
+
+      if (event.type === EVENT_TYPES_ENUM.DAY_2_ONLY && day2Count > 0) {
+        return true;
+      }
+
+      return false;
     }
 
-    // Update selection summary
+    function renderEvents() {
+      if (!eventsContainer) return;
+
+      const selectedIds = Array.from(selectedEvents);
+      const grouped = groupEventsByType(eventCatalog);
+      const typeOrder = [
+        EVENT_TYPES_ENUM.MULTI_DAY,
+        EVENT_TYPES_ENUM.DAY_1_ONLY,
+        EVENT_TYPES_ENUM.DAY_2_ONLY,
+        EVENT_TYPES_ENUM.OPTIONAL
+      ].filter(type => grouped[type] && grouped[type].length);
+
+      const html = typeOrder.map(type => {
+        const events = grouped[type];
+        const title = EVENT_TYPE_LABELS[type] || type;
+        let description = '';
+
+        switch (type) {
+          case EVENT_TYPES_ENUM.MULTI_DAY:
+            description = 'Spans both fest days. Choosing this locks every other primary option.';
+            break;
+          case EVENT_TYPES_ENUM.DAY_1_ONLY:
+            description = 'Happens on Day 1. Pick at most one Day 1 experience.';
+            break;
+          case EVENT_TYPES_ENUM.DAY_2_ONLY:
+            description = 'Happens on Day 2. Pick at most one Day 2 experience.';
+            break;
+          case EVENT_TYPES_ENUM.OPTIONAL:
+            description = 'Optional add-on. Pair it with any selection or skip it entirely.';
+            break;
+          default:
+            description = '';
+        }
+
+        const cards = events.map(event => {
+          const selected = selectedEvents.has(event.id);
+          const disabled = !selected && isEventDisabled(event, selectedIds);
+          const scheduleLabel = [
+            event.dayLabel,
+            event.startTime && event.endTime
+              ? `${event.startTime} - ${event.endTime}`
+              : event.startTime || event.endTime || null
+          ].filter(Boolean).join(' · ');
+
+          return `
+            <label class="event-card ${selected ? 'selected' : ''} ${disabled ? 'disabled' : ''}" data-event-id="${event.id}" tabindex="0">
+              <input type="checkbox" ${selected ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
+              <div class="event-card-check"></div>
+              <div class="event-type-badge">${title}</div>
+              <div class="event-name">${event.name}</div>
+              ${event.organizer ? `<div class="event-organizer">${event.organizer}</div>` : event.venue ? `<div class="event-organizer">${event.venue}</div>` : ''}
+              ${scheduleLabel ? `<div class="event-meta">${scheduleLabel}</div>` : ''}
+              ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
+            </label>
+          `;
+        }).join('');
+
+        return `
+          <section class="event-group">
+            <header class="event-group-header">
+              <h3 class="event-group-title">${title}</h3>
+              <p class="event-group-description">${description}</p>
+            </header>
+            <div class="event-group-grid">
+              ${cards}
+            </div>
+          </section>
+        `;
+      }).join('');
+
+      eventsContainer.innerHTML = html;
+
+    }
+
+    function handleEventCardClick(event) {
+      const card = event.target.closest('[data-event-id]');
+      if (!card || card.classList.contains('disabled')) {
+        return;
+      }
+
+      event.preventDefault();
+      const eventId = card.getAttribute('data-event-id');
+      toggleEventSelection(eventId);
+    }
+
+    function handleEventCardKeydown(event) {
+      if (event.key !== 'Enter' && event.key !== ' ') {
+        return;
+      }
+
+      const card = event.target.closest('[data-event-id]');
+      if (!card || card.classList.contains('disabled')) {
+        return;
+      }
+
+      event.preventDefault();
+      const eventId = card.getAttribute('data-event-id');
+      toggleEventSelection(eventId);
+    }
+
     function updateSummary() {
-      const summaryContainer = document.getElementById('selection-summary');
-      const selections = [];
+      const selectedIds = Array.from(selectedEvents);
 
-      for (const day of EVENT_CONFIG.days) {
-        for (const slot of EVENT_CONFIG.timeSlots) {
-          const fieldName = `${day.id}_${slot.id}`;
-          const selectedRadio = document.querySelector(`input[name="${fieldName}"]:checked`);
-          
-          if (selectedRadio && selectedRadio.value) {
-            const eventId = selectedRadio.value;
-            const events = EVENT_CONFIG.events[day.id][slot.id];
-            const event = events.find(e => e.id === eventId);
-            
-            if (event) {
-              selections.push({
-                day: day.name,
-                slot: slot.time,
-                event: event.name
-              });
-            }
-          }
-        }
+      if (selectedIds.length === 0) {
+        summaryContainer.innerHTML = '<div class="summary-empty">No events selected yet</div>';
+        return;
       }
 
-      if (selections.length === 0) {
-        summaryContainer.innerHTML = '<div class="summary-empty">No events selected yet</div>';
-      } else {
-        summaryContainer.innerHTML = selections.map(s => `
+      const rows = selectedIds.map(id => {
+        const event = eventLookup.get(id);
+        if (!event) {
+          return '';
+        }
+        return `
           <div class="summary-item">
-            <span class="summary-day">${s.day}</span>
-            <span class="summary-slot">${s.slot}</span>
-            <span class="summary-event">${s.event}</span>
+            <span class="summary-day">${EVENT_TYPE_LABELS[event.type] || 'Event'}</span>
+            <span class="summary-slot">${event.dayLabel || ''}</span>
+            <span class="summary-event">${event.name}</span>
           </div>
-        `).join('');
+        `;
+      }).join('');
+
+      if (!rows) {
+        summaryContainer.innerHTML = '<div class="summary-empty">No events selected yet</div>';
+        return;
+      }
+
+      const hasPrimary = selectedIds.some(id => {
+        const event = eventLookup.get(id);
+        return event && event.type !== EVENT_TYPES_ENUM.OPTIONAL;
+      });
+
+      summaryContainer.innerHTML = hasPrimary
+        ? rows
+        : `${rows}<div class="summary-empty">Add a primary event to continue.</div>`;
+    }
+
+    function showEventsError(message) {
+      if (eventsErrorEl) {
+        eventsErrorEl.textContent = message || '';
       }
     }
 
-    // Handle day tabs
-    function setupDayTabs() {
-      document.querySelectorAll('.day-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-          const day = this.dataset.day;
-          
-          // Update tab styles
-          document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
-          this.classList.add('active');
-          
-          // Show correct content
-          document.querySelectorAll('.day-content').forEach(c => c.classList.remove('active'));
-          document.getElementById(`${day}-content`).classList.add('active');
-        });
-      });
+    function clearEventsError() {
+      showEventsError('');
+    }
+
+    function toggleEventSelection(eventId) {
+      if (!eventLookup.has(eventId)) {
+        return;
+      }
+
+      if (selectedEvents.has(eventId)) {
+        selectedEvents.delete(eventId);
+        clearEventsError();
+        renderEvents();
+        updateSummary();
+        return;
+      }
+
+      const nextSelection = Array.from(selectedEvents);
+      nextSelection.push(eventId);
+
+      const validation = validateSelection(nextSelection);
+      if (!validation.ok) {
+        showEventsError(validation.reason);
+        return;
+      }
+
+      selectedEvents.add(eventId);
+      clearEventsError();
+      renderEvents();
+      updateSummary();
+    }
+
+    async function loadEvents() {
+      try {
+        const response = await fetch('/api/events', { credentials: 'include' });
+        if (!response.ok) {
+          throw new Error('Failed to load events');
+        }
+        const data = await response.json();
+        eventCatalog = Array.isArray(data.events) ? data.events : [];
+
+        if (data.types) {
+          EVENT_TYPES_ENUM = data.types;
+        }
+
+        eventLookup = new Map(eventCatalog.map(event => [event.id, event]));
+
+        renderEvents();
+        updateSummary();
+      } catch (error) {
+        console.error('Unable to fetch events:', error);
+        showEventsError('Unable to load events. Please refresh the page.');
+      }
     }
 
     async function checkAuth() {
@@ -1195,6 +1304,8 @@
 
         document.getElementById('loading').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
+
+        await loadEvents();
       } catch (error) {
         console.error('Auth check failed:', error);
         window.location.href = '/login.html';
@@ -1208,6 +1319,7 @@
       document.querySelectorAll('.field-input').forEach(el => el.classList.remove('error'));
       document.getElementById('error-message').style.display = 'none';
       document.getElementById('success-message').style.display = 'none';
+      clearEventsError();
 
       const submitBtn = document.getElementById('submit-btn');
       const btnText = document.getElementById('btn-text');
@@ -1217,12 +1329,6 @@
       btnText.textContent = 'Submitting';
       spinner.style.display = 'block';
 
-      // Collect event selections
-      const getEventValue = (name) => {
-        const radio = document.querySelector(`input[name="${name}"]:checked`);
-        return radio && radio.value ? radio.value : null;
-      };
-
       const formData = {
         full_name: document.getElementById('full_name').value.trim(),
         roll_number: document.getElementById('roll_number').value.trim(),
@@ -1230,13 +1336,30 @@
         branch: document.getElementById('branch').value,
         year_of_study: parseInt(document.getElementById('year_of_study').value),
         section: document.getElementById('section').value.trim() || undefined,
-        day1_slot1: getEventValue('day1_slot1'),
-        day1_slot2: getEventValue('day1_slot2'),
-        day1_slot3: getEventValue('day1_slot3'),
-        day2_slot1: getEventValue('day2_slot1'),
-        day2_slot2: getEventValue('day2_slot2'),
-        day2_slot3: getEventValue('day2_slot3')
+        selected_events: Array.from(selectedEvents)
       };
+
+      const selectionCheck = validateSelection(formData.selected_events);
+      if (!selectionCheck.ok) {
+        showEventsError(selectionCheck.reason);
+        submitBtn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Continue to Payment';
+        return;
+      }
+
+      const hasPrimaryEvent = formData.selected_events.some(id => {
+        const event = eventLookup.get(id);
+        return event && event.type !== EVENT_TYPES_ENUM.OPTIONAL;
+      });
+
+      if (!hasPrimaryEvent) {
+        showEventsError('Select at least one primary event. Optional add-ons do not count.');
+        submitBtn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Continue to Payment';
+        return;
+      }
 
       try {
         const response = await fetch('/api/student/form', {
@@ -1254,14 +1377,13 @@
               const field = err.field;
               const errorEl = document.getElementById(`${field}-error`);
               const inputEl = document.getElementById(field);
-              if (errorEl) errorEl.textContent = err.message;
-              if (inputEl) inputEl.classList.add('error');
+              if (field === 'selected_events') {
+                showEventsError(err.message);
+              } else {
+                if (errorEl) errorEl.textContent = err.message;
+                if (inputEl) inputEl.classList.add('error');
+              }
             });
-            
-            // Handle general event errors
-            if (data.errors.some(e => e.message.includes('event'))) {
-              document.getElementById('events-error').textContent = 'Please select at least one event to attend';
-            }
           } else {
             document.getElementById('error-message').textContent = data.error || 'An error occurred';
             document.getElementById('error-message').style.display = 'block';
@@ -1282,10 +1404,12 @@
       }
     });
 
+    if (eventsContainer) {
+      eventsContainer.addEventListener('click', handleEventCardClick);
+      eventsContainer.addEventListener('keydown', handleEventCardKeydown);
+    }
+
     // Initialize
-    populateEvents();
-    setupEventSelection();
-    setupDayTabs();
     checkAuth();
   </script>
 </body>
