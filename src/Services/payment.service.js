@@ -1,6 +1,7 @@
 import { Cashfree, PAYMENT_AMOUNT } from '../config/cashfree.js';
 import db from '../db/mysql.js';
 import crypto from 'crypto';
+import { sendConfirmationForPayment } from './email.service.js';
 
 // Generate unique order ID
 function generateOrderId() {
@@ -173,6 +174,11 @@ export async function verifyPaymentStatus(orderId) {
           `, [payment.id, payment.external_registration_id]);
         }
 
+        // Send confirmation email (async, don't block response)
+        sendConfirmationForPayment(orderId).catch(err => {
+          console.error('Failed to send confirmation email:', err);
+        });
+
         return {
           success: true,
           status: 'SUCCESS',
@@ -285,6 +291,11 @@ export async function handleWebhook(payload, signature) {
             WHERE id = ?
           `, [payment.id, payment.external_registration_id]);
         }
+
+        // Send confirmation email (async, don't block webhook response)
+        sendConfirmationForPayment(orderId).catch(err => {
+          console.error('Failed to send confirmation email from webhook:', err);
+        });
       }
 
       console.log(`✅ Payment successful for order: ${orderId}`);
