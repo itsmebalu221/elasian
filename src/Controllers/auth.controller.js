@@ -48,7 +48,7 @@ export async function firebaseLoginHandler(req, res) {
     let existingForm = null;
     try {
       if (dbUser.id && !dbUser.is_temporary) {
-        if (userType === 'INTERNAL') {
+        if (userType === 'HITAMONLY') {
           // HITAM students - check student_forms table
           existingForm = await getStudentForm(dbUser.id);
           hasSubmittedForm = !!existingForm;
@@ -62,12 +62,17 @@ export async function firebaseLoginHandler(req, res) {
       console.warn('Could not check form status:', formError.message);
     }
 
+    const normalizedDbType =
+      dbUser.user_type === 'INTERNAL' ? 'HITAMONLY' : dbUser.user_type;
+
+    const resolvedUserType = normalizedDbType || userType;
+
     const authUser = {
       id: dbUser.id,
       email,
       name: user.displayName || dbUser.name || email.split('@')[0],
       picture: user.photoURL || dbUser.profile_picture || null,
-      userType: dbUser.user_type || userType,
+      userType: resolvedUserType,
       isVerified: true,
       hasSubmittedForm,
       isTemporary: dbUser.is_temporary || false
@@ -138,12 +143,22 @@ export async function checkAuthStatus(req, res) {
 
     let authUser = sanitizeUserPayload(req.user);
 
+    if (authUser?.userType === 'INTERNAL') {
+      authUser = {
+        ...authUser,
+        userType: 'HITAMONLY'
+      };
+
+      const token = signToken(authUser);
+      res.cookie(getCookieName(), token, getCookieOptions());
+    }
+
     if (isAuthenticated && authUser) {
       try {
         if (authUser.id && !authUser.isTemporary) {
           let existingForm = null;
           
-          if (authUser.userType === 'INTERNAL') {
+          if (authUser.userType === 'HITAMONLY') {
             // HITAM students - check student_forms table
             existingForm = await getStudentForm(authUser.id);
           } else {

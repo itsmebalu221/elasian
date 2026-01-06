@@ -503,7 +503,7 @@
         }
 
         // HITAM internal users should use payment.html
-        if (authData.user.userType === 'INTERNAL') {
+        if (authData.user.userType === 'HITAMONLY') {
           window.location.href = '/payment.html';
           return;
         }

@@ -623,7 +623,7 @@
           const hasForm = serverResult.data.hasSubmittedForm;
           const userType = serverResult.data.userType;
           
-          if (userType === 'INTERNAL') {
+          if (userType === 'HITAMONLY') {
             // HITAM students go to internal form or dashboard
             window.location.href = hasForm ? '/dashboard.html' : '/form.html';
           } else {

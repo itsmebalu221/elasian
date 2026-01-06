@@ -111,7 +111,7 @@ export async function verifyPaymentStatus(orderId) {
 
     const payment = payments[0];
     const isExternal = !!payment.external_registration_id;
-    const context = isExternal ? 'EXTERNAL' : 'INTERNAL';
+    const context = isExternal ? 'EXTERNAL' : 'HITAMONLY';
 
     let registrationCode = null;
     if (payment.form_id) {

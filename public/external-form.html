@@ -1679,7 +1679,7 @@
         }
 
         // Check if internal user trying to access external form
-        if (data.user.userType === 'INTERNAL') {
+        if (data.user.userType === 'HITAMONLY') {
           window.location.href = data.user.hasSubmittedForm ? '/dashboard.html' : '/form.html';
           return false;
         }

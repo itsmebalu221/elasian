@@ -429,7 +429,25 @@
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('order_id');
     const flowTypeParam = urlParams.get('type');
-    let flowContext = (flowTypeParam && flowTypeParam.toLowerCase() === 'external') ? 'EXTERNAL' : 'INTERNAL';
+    let flowContext = (flowTypeParam && flowTypeParam.toLowerCase() === 'external') ? 'EXTERNAL' : 'HITAMONLY';
+    let successRedirectTimeout = null;
+
+    function scheduleDashboardRedirect(delayMs = 4000) {
+      if (successRedirectTimeout) {
+        clearTimeout(successRedirectTimeout);
+      }
+
+      successRedirectTimeout = setTimeout(() => {
+        window.location.href = '/dashboard.html';
+      }, delayMs);
+    }
+
+    function cancelDashboardRedirect() {
+      if (successRedirectTimeout) {
+        clearTimeout(successRedirectTimeout);
+        successRedirectTimeout = null;
+      }
+    }
 
     // Load user info for navbar
     async function loadUserInfo() {
@@ -462,8 +480,8 @@
           flowContext = data.context;
         }
 
-        if (flowContext !== 'INTERNAL' && flowContext !== 'EXTERNAL') {
-          flowContext = 'INTERNAL';
+        if (flowContext !== 'HITAMONLY' && flowContext !== 'EXTERNAL') {
+          flowContext = 'HITAMONLY';
         }
 
         if (data.success && data.status === 'SUCCESS') {
@@ -500,8 +518,8 @@
       const registrationCode = data.registrationCode || null;
 
       message.textContent = isExternal
-        ? 'Your external registration is confirmed. A copy of your receipt and pass instructions has been sent to your email.'
-        : 'Your registration is now complete. You can download your event pass from the dashboard.';
+        ? 'Your external registration is confirmed. A copy of your receipt and pass instructions has been sent to your email. Redirecting you to the dashboard...'
+        : 'Your registration is now complete. You can download your event pass from the dashboard. Redirecting you to the dashboard...';
 
       details.style.display = 'block';
       details.innerHTML = `
@@ -550,9 +568,12 @@
 
       // Show confetti
       createConfetti();
+
+      scheduleDashboardRedirect();
     }
 
     function showFailed(data) {
+      cancelDashboardRedirect();
       const icon = document.getElementById('status-icon');
       const title = document.getElementById('status-title');
       const message = document.getElementById('status-message');
@@ -586,6 +607,7 @@
     }
 
     function showPending(data) {
+      cancelDashboardRedirect();
       const icon = document.getElementById('status-icon');
       const title = document.getElementById('status-title');
       const message = document.getElementById('status-message');
@@ -593,6 +615,7 @@
 
       icon.className = 'status-icon pending';
       icon.innerHTML = `
+      cancelDashboardRedirect();
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>

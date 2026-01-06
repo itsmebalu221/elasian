@@ -1902,7 +1902,7 @@
           return;
         }
 
-        const userType = data.user.userType || 'INTERNAL';
+        const userType = data.user.userType || 'HITAMONLY';
 
         document.getElementById('user-avatar').src = data.user.picture || 'https://via.placeholder.com/40';
         document.getElementById('user-name').textContent = data.user.name;

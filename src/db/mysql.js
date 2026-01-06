@@ -232,17 +232,31 @@ export async function initializeDatabase() {
       ).catch(() => {});
     }
 
-    // Ensure students table has user_type column for INTERNAL/EXTERNAL users
+    // Ensure students table has user_type column with HITAMONLY/EXTERNAL values
     console.log('🔄 Ensuring students table has user_type column...');
     const [userTypeColumn] = await connection.query(
       "SHOW COLUMNS FROM students LIKE 'user_type'"
     );
     if (userTypeColumn.length === 0) {
       await connection.query(
-        "ALTER TABLE students ADD COLUMN user_type ENUM('INTERNAL', 'EXTERNAL') DEFAULT 'INTERNAL' AFTER is_verified"
+        "ALTER TABLE students ADD COLUMN user_type ENUM('HITAMONLY', 'EXTERNAL') DEFAULT 'HITAMONLY' AFTER is_verified"
       );
       console.log('  ✓ Added user_type column to students');
+    } else {
+      await connection.query(
+        "ALTER TABLE students MODIFY COLUMN user_type ENUM('INTERNAL', 'HITAMONLY', 'EXTERNAL') DEFAULT 'INTERNAL'"
+      ).catch(() => {});
     }
+
+    await connection.query(
+      "UPDATE students SET user_type = 'HITAMONLY' WHERE user_type = 'INTERNAL'"
+    ).catch(() => {});
+
+    await connection.query(
+      "ALTER TABLE students MODIFY COLUMN user_type ENUM('HITAMONLY', 'EXTERNAL') DEFAULT 'HITAMONLY'"
+    ).catch((err) => {
+      console.warn('  ⚠️ Could not finalize user_type enum update:', err.message);
+    });
 
     console.log('🔄 Ensuring payments table supports external registrations...');
     await connection.query('ALTER TABLE payments MODIFY COLUMN student_id INT NULL').catch(() => {});
@@ -303,6 +317,15 @@ export async function initializeDatabase() {
 
     // Step 10: Seed events catalog (idempotent)
     console.log('🔄 Seeding events catalog...');
+    
+    // Remove deprecated events that are no longer in the catalog
+    const currentEventIds = EVENT_DEFINITIONS.map(e => e.id);
+    const placeholders = currentEventIds.map(() => '?').join(',');
+    await connection.query(
+      `DELETE FROM events WHERE id NOT IN (${placeholders}) AND id LIKE 'EVT_%'`,
+      currentEventIds
+    );
+    
     for (const event of EVENT_DEFINITIONS) {
       await connection.query(
         `INSERT INTO events (id, name, type, day_label, start_time, end_time, venue, description)

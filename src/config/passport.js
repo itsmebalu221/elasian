@@ -11,7 +11,7 @@ export function isHitamEmail(email) {
 
 // Determine user type based on email
 export function getUserType(email) {
-  return isHitamEmail(email) ? 'INTERNAL' : 'EXTERNAL';
+  return isHitamEmail(email) ? 'HITAMONLY' : 'EXTERNAL';
 }
 
 // Google OAuth configuration
