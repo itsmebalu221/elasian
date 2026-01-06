@@ -455,6 +455,7 @@
   <script>
     let formData = null;
     let paymentSessionId = null;
+    let cashfreeMode = null;
 
     // Check authentication
     async function init() {
@@ -534,6 +535,21 @@
       `;
     }
 
+    function deriveDefaultCashfreeMode() {
+      const host = window.location.hostname;
+      if (host === 'localhost' || host === '127.0.0.1') {
+        return 'sandbox';
+      }
+      return 'production';
+    }
+
+    function getCashfreeMode() {
+      if (cashfreeMode === 'production' || cashfreeMode === 'sandbox') {
+        return cashfreeMode;
+      }
+      return deriveDefaultCashfreeMode();
+    }
+
     async function initiatePayment() {
       const btn = document.getElementById('btn-pay');
       
@@ -564,10 +580,15 @@
         }
 
         paymentSessionId = data.paymentSessionId;
+        if (data.mode === 'production' || data.mode === 'sandbox') {
+          cashfreeMode = data.mode;
+        }
+
+        const mode = getCashfreeMode();
 
         // Initialize Cashfree checkout
         const cashfree = Cashfree({
-          mode: 'sandbox' // Change to 'production' for live
+          mode
         });
 
         const checkoutOptions = {

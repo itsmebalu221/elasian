@@ -487,6 +487,7 @@
   <script>
     let registrationData = null;
     let paymentSessionId = null;
+    let cashfreeMode = null;
 
     // Check authentication and get registration data
     async function init() {
@@ -582,12 +583,19 @@
       `;
     }
 
-    function getCashfreeMode() {
+    function deriveDefaultCashfreeMode() {
       const host = window.location.hostname;
       if (host === 'localhost' || host === '127.0.0.1') {
         return 'sandbox';
       }
       return 'production';
+    }
+
+    function getCashfreeMode() {
+      if (cashfreeMode === 'production' || cashfreeMode === 'sandbox') {
+        return cashfreeMode;
+      }
+      return deriveDefaultCashfreeMode();
     }
 
     async function initiatePayment() {
@@ -627,12 +635,16 @@
         }
 
         paymentSessionId = data.paymentSessionId;
+        if (data.mode === 'production' || data.mode === 'sandbox') {
+          cashfreeMode = data.mode;
+        }
 
-        console.log('Initializing Cashfree checkout with mode:', getCashfreeMode());
+        const mode = getCashfreeMode();
+        console.log('Initializing Cashfree checkout with mode:', mode);
 
         // Initialize Cashfree checkout
         const cashfree = Cashfree({
-          mode: getCashfreeMode()
+          mode
         });
 
         const checkoutOptions = {

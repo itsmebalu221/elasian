@@ -109,6 +109,7 @@ export async function createExternalOrder(req, res) {
           orderId: existingPayment.order_id,
           paymentSessionId: existingPayment.payment_session_id,
           orderAmount: existingPayment.amount,
+          mode: paymentService.getCashfreeMode(),
           message: 'Using existing payment session'
         });
       }

@@ -1,4 +1,4 @@
-import { Cashfree, PAYMENT_AMOUNT } from '../config/cashfree.js';
+import { Cashfree, PAYMENT_AMOUNT, CASHFREE_MODE } from '../config/cashfree.js';
 import db from '../db/mysql.js';
 import crypto from 'crypto';
 import { sendConfirmationForPayment } from './email.service.js';
@@ -85,7 +85,8 @@ export async function createPaymentOrder({
         orderId,
         cfOrderId: response.data.cf_order_id,
         paymentSessionId: response.data.payment_session_id,
-        orderAmount: amount
+        orderAmount: amount,
+        mode: CASHFREE_MODE
       };
     }
 
@@ -94,6 +95,10 @@ export async function createPaymentOrder({
     console.error('Payment order creation error:', error);
     throw error;
   }
+}
+
+export function getCashfreeMode() {
+  return CASHFREE_MODE;
 }
 
 // Verify payment status

@@ -3,9 +3,14 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Determine active Cashfree mode based on configuration
+const CASHFREE_MODE = process.env.CASHFREE_ENV === 'PRODUCTION'
+  ? 'production'
+  : 'sandbox';
+
 // Initialize Cashfree with credentials (v5+ syntax)
-const environment = process.env.CASHFREE_ENV === 'PRODUCTION' 
-  ? CashfreeSDK.PRODUCTION 
+const environment = CASHFREE_MODE === 'production'
+  ? CashfreeSDK.PRODUCTION
   : CashfreeSDK.SANDBOX;
 
 const Cashfree = new CashfreeSDK(
@@ -16,4 +21,4 @@ const Cashfree = new CashfreeSDK(
 
 export const PAYMENT_AMOUNT = 500; // ₹500 for event pass
 
-export { Cashfree };
+export { Cashfree, CASHFREE_MODE };
