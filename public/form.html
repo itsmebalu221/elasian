@@ -929,12 +929,10 @@
                   <option value="ECE">Electronics & Communication (ECE)</option>
                   <option value="EEE">Electrical & Electronics (EEE)</option>
                   <option value="MECH">Mechanical Engineering</option>
-                  <option value="CIVIL">Civil Engineering</option>
-                  <option value="IT">Information Technology (IT)</option>
-                  <option value="AIDS">AI & Data Science (AIDS)</option>
-                  <option value="AIML">AI & Machine Learning (AIML)</option>
                   <option value="CSM">CSE (AI & ML)</option>
                   <option value="CSD">CSE (Data Science)</option>
+                  <option value="CSC">CSE (Cyber Security)</option>
+                  <option value="CSC">CSE (IoT)</option>
                 </select>
                 <div class="field-error" id="branch-error"></div>
               </div>
@@ -1342,7 +1340,7 @@
         });
         const data = await response.json();
 
-        if (!data.isAuthenticated) {
+        if (!data.isAuthenticated || !data.user) {
           window.location.href = '/login.html';
           return;
         }
@@ -1359,10 +1357,14 @@
           return;
         }
 
-        document.getElementById('user-avatar').src = data.user.picture || 'https://via.placeholder.com/40';
-        document.getElementById('user-name').textContent = data.user.name;
-        document.getElementById('user-email').textContent = data.user.email;
-        document.getElementById('full_name').value = data.user.name || '';
+        const userPicture = data.user.picture || 'https://via.placeholder.com/40';
+        const userName = data.user.name || '';
+        const userEmail = data.user.email || '';
+
+        document.getElementById('user-avatar').src = userPicture;
+        document.getElementById('user-name').textContent = userName;
+        document.getElementById('user-email').textContent = userEmail;
+        document.getElementById('full_name').value = userName;
 
         document.getElementById('loading').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';

@@ -19,6 +19,7 @@ export function isAllowedEmail(email) {
 // Find or create user in database with retry logic
 export async function findOrCreateUser(profile) {
   const { uid: firebaseUid, email, displayName, photoURL } = profile;
+  const inferredUserType = isAllowedEmail(email) ? 'HITAMONLY' : 'EXTERNAL';
   
   let lastError = null;
   
@@ -31,27 +32,37 @@ export async function findOrCreateUser(profile) {
       );
 
       if (rows.length > 0) {
+        const currentUser = rows[0];
+        const resolvedType = inferredUserType;
+
         // Update existing user - don't fail if update fails
         try {
           await pool.query(
-            'UPDATE students SET google_id = ?, name = ?, profile_picture = ?, is_verified = TRUE WHERE id = ?',
-            [firebaseUid, displayName || rows[0].name, photoURL || rows[0].profile_picture, rows[0].id]
+            'UPDATE students SET google_id = ?, name = ?, profile_picture = ?, user_type = ?, is_verified = TRUE WHERE id = ?',
+            [
+              firebaseUid,
+              displayName || currentUser.name,
+              photoURL || currentUser.profile_picture,
+              resolvedType,
+              currentUser.id
+            ]
           );
         } catch (updateErr) {
           console.warn('Non-critical: Could not update user profile:', updateErr.message);
         }
-        return { 
-          ...rows[0], 
-          name: displayName || rows[0].name, 
-          profile_picture: photoURL || rows[0].profile_picture, 
-          is_verified: true 
+        return {
+          ...currentUser,
+          name: displayName || currentUser.name,
+          profile_picture: photoURL || currentUser.profile_picture,
+          user_type: resolvedType,
+          is_verified: true
         };
       }
 
       // Create new user
       const [result] = await pool.query(
-        'INSERT INTO students (google_id, email, name, profile_picture, is_verified) VALUES (?, ?, ?, ?, TRUE)',
-        [firebaseUid, email, displayName || 'User', photoURL || null]
+        'INSERT INTO students (google_id, email, name, profile_picture, user_type, is_verified) VALUES (?, ?, ?, ?, ?, TRUE)',
+        [firebaseUid, email, displayName || 'User', photoURL || null, inferredUserType]
       );
 
       return {
@@ -60,6 +71,7 @@ export async function findOrCreateUser(profile) {
         email,
         name: displayName || 'User',
         profile_picture: photoURL,
+        user_type: inferredUserType,
         is_verified: true
       };
     } catch (error) {
@@ -75,7 +87,21 @@ export async function findOrCreateUser(profile) {
             [email]
           );
           if (existing.length > 0) {
-            return existing[0];
+            const existingUser = existing[0];
+            const resolvedType = inferredUserType;
+
+            if (existingUser.user_type !== resolvedType) {
+              try {
+                await pool.query(
+                  'UPDATE students SET user_type = ? WHERE id = ?',
+                  [resolvedType, existingUser.id]
+                );
+              } catch (updateErr) {
+                console.warn('Non-critical: Could not normalize user type:', updateErr.message);
+              }
+            }
+
+            return { ...existingUser, user_type: resolvedType };
           }
         } catch (fetchErr) {
           console.error('Failed to fetch existing user:', fetchErr.message);
@@ -96,6 +122,7 @@ export async function findOrCreateUser(profile) {
     email,
     name: displayName || 'User',
     profile_picture: photoURL,
+    user_type: inferredUserType,
     is_verified: true,
     is_temporary: true
   };

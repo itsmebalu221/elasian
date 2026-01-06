@@ -11,7 +11,7 @@
   <style>
     :root {
       --bg-primary: #0a0a10;
-      --bg-secondary: #12121a;
+      --bg-secondary: #8d8d8d;
       --bg-card: rgba(255, 255, 255, 0.02);
       --glass-border: rgba(255, 255, 255, 0.08);
       --border-subtle: rgba(255, 255, 255, 0.05);
@@ -974,7 +974,7 @@
           <strong>₹700</strong>
         </div>
         <div class="pricing-row" id="sidebar-pricing-addon" style="display: none;">
-          <span>Cultural add-on</span>
+          <span>Sahitya + Prasasti Add-on</span>
           <strong>₹300</strong>
         </div>
         <div class="pricing-total">
@@ -985,8 +985,8 @@
 
       <div class="sidebar-addon">
         <span class="sidebar-addon-badge">✦ Recommended</span>
-        <p class="sidebar-addon-title">Business Canvas Presentation</p>
-        <p class="sidebar-addon-desc">Learn to create and present business model canvases with EDC.</p>
+        <p class="sidebar-addon-title">Sahitya + Prasasti Cultural Access</p>
+        <p class="sidebar-addon-desc">Unlock the Sahitya and Prasasti showcases with this cultural add-on.</p>
         <span class="sidebar-addon-price">+₹300</span>
       </div>
 
@@ -1064,7 +1064,7 @@
                 <strong>₹700</strong>
               </div>
               <div class="pricing-row" id="mobile-pricing-addon" style="display: none;">
-                <span>Cultural add-on</span>
+                <span>Sahitya + Prasasti Add-on</span>
                 <strong>₹300</strong>
               </div>
               <div class="pricing-total">
@@ -1081,7 +1081,7 @@
               <strong>₹700</strong>
             </div>
             <div class="pricing-row" id="pricing-addon" style="display: none;">
-              <span>Business Canvas Add-on</span>
+              <span>Cultural Events Add-on</span>
               <strong>₹300</strong>
             </div>
             <div class="pricing-total">
@@ -1096,8 +1096,8 @@
             <div class="addon-toggle-check"></div>
             <div class="addon-toggle-content">
               <span class="addon-toggle-badge">✦ Recommended</span>
-              <p class="addon-toggle-title">Business Canvas Presentation by EDC</p>
-              <p class="addon-toggle-desc">Learn to create and present compelling business model canvases with the Entrepreneurship Development Cell.</p>
+              <p class="addon-toggle-title">Be part of Sahitya + Prasasti</p>
+              <p class="addon-toggle-desc">Experience the Sahitya and Prasasti cultural celebrations for just ₹300 more.</p>
             </div>
             <span class="addon-toggle-price">+₹300</span>
           </div>
@@ -1241,7 +1241,7 @@
     function validateSelection(selectedIds = []) {
       const normalized = Array.from(new Set((selectedIds || []).filter(value => typeof value === 'string' && value.trim().length > 0)));
 
-      // Allow empty selection for business canvas
+      // Allow empty selection for optional cultural add-on
       if (normalized.length === 0) {
         return { ok: true };
       }
@@ -1379,7 +1379,7 @@
             description = 'Day 2 experiences. Pick at most one from this set.';
             break;
           case EVENT_TYPES_ENUM.OPTIONAL:
-            description = 'Business Canvas Presentation by EDC. Adds ₹300 when selected.';
+            description = 'Sahitya and Prasasti cultural events. Adds ₹300 when selected.';
             break;
           default:
             description = '';
@@ -1489,7 +1489,7 @@
       if (culturalAddOnSelected) {
         addOnRow = `
           <div class="summary-item">
-            <span class="summary-name">Business Canvas Presentation by EDC</span>
+            <span class="summary-name">Sahitya + Prasasti Cultural Access</span>
             <span class="summary-meta">Optional Add-On · +₹300</span>
           </div>
         `;
@@ -1672,7 +1672,7 @@
         });
         const data = await response.json();
 
-        if (!data.isAuthenticated) {
+        if (!data.isAuthenticated || !data.user) {
           // Not logged in - redirect to login
           window.location.href = '/login.html';
           return false;

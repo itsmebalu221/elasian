@@ -499,8 +499,11 @@
           credentials: 'include'
         });
         const data = await response.json();
-        if (data.isAuthenticated) {
-          window.location.href = data.user.hasSubmittedForm ? '/dashboard.html' : '/form.html';
+        if (data.isAuthenticated && data.user) {
+          const target = data.user.hasSubmittedForm
+            ? '/dashboard.html'
+            : (data.user.userType === 'HITAMONLY' ? '/form.html' : '/external-form.html');
+          window.location.href = target;
         }
       } catch (err) {
         console.warn('Auth check failed:', err);

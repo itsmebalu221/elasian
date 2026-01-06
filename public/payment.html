@@ -386,7 +386,7 @@
   </style>
 </head>
 <body>
-  <!-- Fixed Navbar -->
+  
   <nav class="top-navbar">
     <a href="/" class="navbar-brand">elysian<span>'26</span></a>
     <div class="navbar-right">
@@ -456,10 +456,10 @@
     let formData = null;
     let paymentSessionId = null;
 
-    // Check authentication and get form data
+    // Check authentication
     async function init() {
       try {
-        // Check auth status
+        // Check status
         const authRes = await fetch('/api/auth/status', {
           credentials: 'include'
         });
