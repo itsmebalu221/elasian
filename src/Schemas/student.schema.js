@@ -1,7 +1,6 @@
 import { EVENT_DEFINITIONS } from '../config/events.config.js';
 
 const VALID_EVENT_IDS = new Set(EVENT_DEFINITIONS.map(e => e.id));
-const VALID_BRANCHES = ['CSE', 'EEE', 'ECE', 'MECH', 'CSC', 'CSM', 'CSO', 'CSD'];
 
 export function validateStudentForm(data) {
   const errors = [];
@@ -15,10 +14,9 @@ export function validateStudentForm(data) {
     errors.push({ field: 'full_name', message: 'Full name must be at least 2 characters' });
   }
 
-  // branch - convert to uppercase for comparison
-  const branch = data.branch ? data.branch.toUpperCase() : '';
-  if (!branch || !VALID_BRANCHES.includes(branch)) {
-    errors.push({ field: 'branch', message: 'Please select a valid branch' });
+  // branch - just check it exists, accept any value
+  if (!data.branch || typeof data.branch !== 'string' || data.branch.trim().length === 0) {
+    errors.push({ field: 'branch', message: 'Please select a branch' });
   }
 
   // roll_number
@@ -57,7 +55,7 @@ export function validateStudentForm(data) {
     valid: true,
     data: {
       full_name: data.full_name.trim(),
-      branch: data.branch.toUpperCase(),
+      branch: data.branch.trim().toUpperCase(),
       roll_number: data.roll_number.trim(),
       mobile: data.mobile.trim(),
       year_of_study: year,
