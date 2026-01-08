@@ -474,6 +474,21 @@
         const response = await fetch(`/api/payment/verify?orderId=${orderId}`, {
           credentials: 'include'
         });
+        
+        // Handle authentication errors - redirect to login
+        if (response.status === 401) {
+          console.warn('Not authenticated, redirecting to login...');
+          // Store the current URL to redirect back after login
+          sessionStorage.setItem('payment_redirect', window.location.href);
+          window.location.href = '/login.html';
+          return;
+        }
+        
+        if (response.status === 403) {
+          showError('You are not authorized to view this payment. Please login with the correct account.');
+          return;
+        }
+        
         const data = await response.json();
 
         if (data.context) {

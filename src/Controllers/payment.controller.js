@@ -68,18 +68,21 @@ export async function createOrder(req, res) {
 
 export async function verifyPayment(req, res) {
   try {
+    // Require authentication to view payment status
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Authentication required to verify payment' });
+    }
+
     const { orderId } = req.query;
 
     if (!orderId) {
       return res.status(400).json({ error: 'Order ID is required' });
     }
 
-    // Verify ownership if user is authenticated
-    if (req.user?.id) {
-      const ownershipValid = await paymentService.verifyPaymentOwnership(orderId, req.user.id, req.user.email);
-      if (!ownershipValid) {
-        return res.status(403).json({ error: 'You are not authorized to view this payment' });
-      }
+    // Verify the authenticated user owns this payment
+    const ownershipValid = await paymentService.verifyPaymentOwnership(orderId, req.user.id, req.user.email);
+    if (!ownershipValid) {
+      return res.status(403).json({ error: 'You are not authorized to view this payment' });
     }
 
     const result = await paymentService.verifyPaymentStatus(orderId);
@@ -133,11 +136,11 @@ export async function getPaymentStatus(req, res) {
       isPaid,
       payment: payment
         ? {
-            orderId: payment.order_id,
-            status: payment.status,
-            amount: payment.amount,
-            paidAt: payment.paid_at
-          }
+          orderId: payment.order_id,
+          status: payment.status,
+          amount: payment.amount,
+          paidAt: payment.paid_at
+        }
         : null,
       amount: PAYMENT_AMOUNT
     });

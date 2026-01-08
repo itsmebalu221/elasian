@@ -10,9 +10,16 @@ export const studentFormSchema = z.object({
     .max(255, 'Full name must be less than 255 characters'),
   
   branch: z.enum([
-    'CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'IT', 'AIDS', 'AIML', 'CSM', 'CSD'
-  ], { 
-    error: 'Please select a valid branch' 
+    'CSE',
+    'ECE',
+    'EEE',
+    'MECH',
+    'CSM',
+    'CSD',
+    'CSC',
+    'IOT'
+  ], {
+    error: 'Please select a valid branch'
   }),
   
   roll_number: z.string()

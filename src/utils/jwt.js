@@ -27,14 +27,29 @@ export function getCookieName() {
 }
 
 export function getCookieOptions() {
-  const isProduction = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
-  return {
+  const isVercel = !!process.env.VERCEL;
+  const isProduction = process.env.NODE_ENV === 'production' || isVercel;
+  const appUrl = process.env.APP_URL || '';
+  const isLocalhost = appUrl.includes('localhost') || appUrl.includes('127.0.0.1');
+  
+  // For Vercel or production HTTPS, use secure cookies
+  // For localhost, we need secure=false
+  const useSecure = isVercel || (isProduction && !isLocalhost);
+  
+  const options = {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax',
+    secure: useSecure,
+    sameSite: useSecure ? 'none' : 'lax',
     path: '/',
     maxAge: 24 * 60 * 60 // seconds
   };
+  
+  // Log cookie settings on first call in production
+  if (isVercel) {
+    console.log('🍪 Cookie settings:', { secure: options.secure, sameSite: options.sameSite });
+  }
+  
+  return options;
 }
 
 export function sanitizeUserPayload(user) {

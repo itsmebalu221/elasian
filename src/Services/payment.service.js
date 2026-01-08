@@ -24,7 +24,14 @@ export async function createPaymentOrder({
   orderNote
 }) {
   const orderId = generateOrderId();
-  const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+  let baseUrl = process.env.APP_URL || 'http://localhost:3000';
+  
+  // Cashfree production requires HTTPS URLs
+  if (CASHFREE_MODE === 'PRODUCTION' && !baseUrl.startsWith('https://')) {
+    console.error('⚠️ WARNING: Cashfree PRODUCTION mode requires HTTPS URLs!');
+    console.error('   Current APP_URL:', baseUrl);
+    throw new Error('Production Cashfree requires HTTPS. Please update APP_URL in .env to use https://');
+  }
 
   try {
     const orderRequest = {
@@ -93,6 +100,12 @@ export async function createPaymentOrder({
     throw new Error('Failed to create order');
   } catch (error) {
     console.error('Payment order creation error:', error);
+
+    const status = error?.response?.status;
+    if (status === 401) {
+      throw new Error('Cashfree rejected the credentials (401). Verify CASHFREE_APP_ID, CASHFREE_SECRET_KEY, and CASHFREE_ENV.');
+    }
+
     throw error;
   }
 }
@@ -236,22 +249,23 @@ export async function verifyPaymentStatus(orderId) {
 // Handle webhook from Cashfree
 export async function handleWebhook(payload, signature) {
   try {
-    const isProduction = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
-    
-    // Verify webhook signature in production
-    if (isProduction && process.env.CASHFREE_SECRET_KEY) {
-      const timestamp = payload.data?.payment?.payment_time || '';
-      const body = JSON.stringify(payload);
-      
-      const expectedSignature = crypto
-        .createHmac('sha256', process.env.CASHFREE_SECRET_KEY)
-        .update(timestamp + body)
-        .digest('base64');
+    // Always verify webhook signature for security
+    if (!process.env.CASHFREE_SECRET_KEY) {
+      console.error('CASHFREE_SECRET_KEY is not configured - rejecting webhook');
+      throw new Error('Webhook verification not configured');
+    }
 
-      if (signature !== expectedSignature) {
-        console.warn('Webhook signature verification failed');
-        throw new Error('Invalid webhook signature');
-      }
+    const timestamp = payload.data?.payment?.payment_time || '';
+    const body = JSON.stringify(payload);
+    
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.CASHFREE_SECRET_KEY)
+      .update(timestamp + body)
+      .digest('base64');
+
+    if (signature !== expectedSignature) {
+      console.warn('Webhook signature verification failed');
+      throw new Error('Invalid webhook signature');
     }
 
     const eventType = payload.type;

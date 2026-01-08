@@ -1,4 +1,5 @@
 import pool from '../db/mysql.js';
+import crypto from 'crypto';
 import { EVENT_DEFINITIONS, EVENT_TYPES } from '../config/events.config.js';
 
 const EVENT_TYPE_LOOKUP = EVENT_DEFINITIONS.reduce((acc, event) => {
@@ -6,10 +7,10 @@ const EVENT_TYPE_LOOKUP = EVENT_DEFINITIONS.reduce((acc, event) => {
   return acc;
 }, {});
 
-// Generate unique registration ID
+// Generate unique registration ID using cryptographically secure random bytes
 function generateRegistrationId() {
   const year = new Date().getFullYear().toString().slice(-2);
-  const random = Math.floor(100000 + Math.random() * 900000); // 6 digit random
+  const random = crypto.randomBytes(4).toString('hex').toUpperCase(); // 8 hex chars = 4 billion combinations
   return `ELYSIAN${year}${random}`;
 }
 
@@ -25,7 +26,9 @@ export async function submitStudentForm(studentId, formData) {
     selected_events
   } = formData;
 
-  const selectedEventsJson = JSON.stringify(selected_events);
+  // Ensure selected_events is always an array (handles null, undefined, or invalid values)
+  const eventsArray = Array.isArray(selected_events) ? selected_events : [];
+  const selectedEventsJson = JSON.stringify(eventsArray);
 
   const connection = await pool.getConnection();
 
@@ -98,7 +101,7 @@ export async function submitStudentForm(studentId, formData) {
 
     await connection.query('DELETE FROM event_registrations WHERE form_id = ?', [formId]);
 
-    const registrationRows = selected_events.map(eventId => ([
+    const registrationRows = eventsArray.map(eventId => ([
       studentId,
       formId,
       eventId,
