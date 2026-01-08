@@ -128,9 +128,34 @@ export async function createExternalOrder(req, res) {
     return res.json(result);
   } catch (error) {
     console.error('External order error:', error);
+    
+    // Extract detailed error info for debugging
+    let errorDetails = {
+      message: error.message,
+      code: error.code || 'UNKNOWN',
+      name: error.name
+    };
+    
+    // Cashfree API errors have response data
+    if (error.response?.data) {
+      errorDetails.cashfreeError = error.response.data;
+    }
+    
+    // Axios errors have response info
+    if (error.response) {
+      errorDetails.statusCode = error.response.status;
+      errorDetails.statusText = error.response.statusText;
+    }
+    
+    // Stack trace for debugging (only first 500 chars)
+    if (error.stack) {
+      errorDetails.stack = error.stack.substring(0, 500);
+    }
+    
     return res.status(500).json({
       error: 'Failed to create payment order',
-      message: error.message
+      message: error.message,
+      details: errorDetails
     });
   }
 }

@@ -523,10 +523,16 @@
       }
     }
 
-    function showError(message) {
-      document.getElementById('error-container').innerHTML = `
-        <div class="error-message">${message}</div>
-      `;
+    function showError(message, details = null) {
+      let errorHtml = `<div class="error-message">${message}`;
+      if (details) {
+        errorHtml += `<div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 4px; text-align: left; font-size: 0.75rem; word-break: break-all; max-height: 300px; overflow-y: auto;">
+          <strong>Debug Info:</strong><pre style="margin: 8px 0 0 0; white-space: pre-wrap;">${typeof details === 'object' ? JSON.stringify(details, null, 2) : details}</pre>
+        </div>`;
+      }
+      errorHtml += `</div>`;
+      document.getElementById('error-container').innerHTML = errorHtml;
+      console.error('Payment Error:', message, details);
     }
 
     function showInfo(message) {
@@ -576,7 +582,10 @@
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Failed to create order');
+          // Show full error details from server
+          const errorMsg = data.error || 'Failed to create order';
+          showError(errorMsg, data.details || data);
+          throw new Error(errorMsg);
         }
 
         paymentSessionId = data.paymentSessionId;
@@ -600,7 +609,14 @@
 
       } catch (error) {
         console.error('Payment error:', error);
-        showError(error.message || 'Payment failed. Please try again.');
+        // Don't overwrite if we already showed detailed error
+        if (!document.getElementById('error-container').innerHTML.includes('Debug Info')) {
+          showError(error.message || 'Payment failed. Please try again.', {
+            errorName: error.name,
+            errorMessage: error.message,
+            stack: error.stack?.substring(0, 300)
+          });
+        }
         btn.disabled = false;
         btn.innerHTML = `
           <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
