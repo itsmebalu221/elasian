@@ -1,7 +1,7 @@
 import { EVENT_DEFINITIONS } from '../config/events.config.js';
 
 const VALID_EVENT_IDS = new Set(EVENT_DEFINITIONS.map(e => e.id));
-const VALID_BRANCHES = ['CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'IT', 'AIDS', 'AIML', 'CSM', 'CSD'];
+const VALID_BRANCHES = ['CSE', 'EEE', 'ECE', 'MECH', 'CSC', 'CSM', 'CSO', 'CSD'];
 
 export function validateStudentForm(data) {
   const errors = [];
