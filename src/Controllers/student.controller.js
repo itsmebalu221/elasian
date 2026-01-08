@@ -2,6 +2,31 @@ import studentFormSchema from '../Schemas/student.schema.js';
 import { submitStudentForm, getStudentForm } from '../Services/student.service.js';
 import { signToken, getCookieName, getCookieOptions, sanitizeUserPayload } from '../utils/jwt.js';
 
+// Helper to format Zod v4 errors
+function formatZodErrors(zodError) {
+  const errors = [];
+  
+  // Zod v4 uses 'issues' array
+  if (zodError.issues && Array.isArray(zodError.issues)) {
+    for (const issue of zodError.issues) {
+      errors.push({
+        field: issue.path ? issue.path.join('.') : 'unknown',
+        message: issue.message || 'Validation error'
+      });
+    }
+  } else if (zodError.errors && Array.isArray(zodError.errors)) {
+    // Fallback for older format
+    for (const err of zodError.errors) {
+      errors.push({
+        field: err.path ? err.path.join('.') : 'unknown',
+        message: err.message || 'Validation error'
+      });
+    }
+  }
+  
+  return errors.length > 0 ? errors : [{ field: 'form', message: 'Validation failed' }];
+}
+
 export async function submitStudentFormHandler(req, res) {
   try {
     if (!req.user) {
@@ -14,17 +39,20 @@ export async function submitStudentFormHandler(req, res) {
     const user = sanitizeUserPayload(req.user);
     const studentId = user.id;
 
+    console.log('Received form data:', JSON.stringify(req.body, null, 2));
+
     const parsed = studentFormSchema.safeParse(req.body);
 
     if (!parsed.success) {
+      console.log('Validation failed:', JSON.stringify(parsed.error, null, 2));
+      const errors = formatZodErrors(parsed.error);
       return res.status(400).json({
         success: false,
-        errors: parsed.error.errors.map(err => ({
-          field: err.path.join('.'),
-          message: err.message
-        }))
+        errors
       });
     }
+
+    console.log('Parsed data:', JSON.stringify(parsed.data, null, 2));
 
     const result = await submitStudentForm(studentId, parsed.data);
 

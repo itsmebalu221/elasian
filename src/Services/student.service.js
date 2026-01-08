@@ -1,41 +1,58 @@
 import pool from '../db/mysql.js';
 import { EVENT_DEFINITIONS, EVENT_TYPES } from '../config/events.config.js';
 
-const EVENT_TYPE_LOOKUP = EVENT_DEFINITIONS.reduce((acc, event) => {
-  acc[event.id] = event.type;
-  return acc;
-}, {});
+// Build lookup for event types
+const EVENT_TYPE_LOOKUP = {};
+for (const event of EVENT_DEFINITIONS) {
+  EVENT_TYPE_LOOKUP[event.id] = event.type;
+}
 
 // Generate unique registration ID
 function generateRegistrationId() {
   const year = new Date().getFullYear().toString().slice(-2);
-  const random = Math.floor(100000 + Math.random() * 900000); // 6 digit random
+  const random = Math.floor(100000 + Math.random() * 900000);
   return `ELYSIAN${year}${random}`;
 }
 
 // Submit student form to database
 export async function submitStudentForm(studentId, formData) {
+  // Validate input
+  if (!formData || typeof formData !== 'object') {
+    throw new Error('Invalid form data');
+  }
+
   const {
     full_name,
     branch,
     roll_number,
     mobile,
     year_of_study,
-    section,
-    selected_events = []
-  } = formData || {};
+    section
+  } = formData;
 
-  if (!Array.isArray(selected_events) || selected_events.length === 0) {
+  // Handle selected_events safely
+  let selectedEvents = formData.selected_events;
+  
+  if (!selectedEvents) {
+    throw new Error('Please select at least one event');
+  }
+  
+  if (!Array.isArray(selectedEvents)) {
+    throw new Error('Invalid events format');
+  }
+  
+  if (selectedEvents.length === 0) {
     throw new Error('Please select at least one event');
   }
 
-  const selectedEventsJson = JSON.stringify(selected_events);
+  const selectedEventsJson = JSON.stringify(selectedEvents);
 
   const connection = await pool.getConnection();
 
   try {
     await connection.beginTransaction();
 
+    // Check for existing form
     const [existing] = await connection.query(
       'SELECT id, registration_id FROM student_forms WHERE student_id = ?',
       [studentId]
@@ -45,6 +62,7 @@ export async function submitStudentForm(studentId, formData) {
     let registrationId;
 
     if (existing.length > 0) {
+      // Update existing form
       formId = existing[0].id;
       registrationId = existing[0].registration_id;
 
@@ -56,7 +74,8 @@ export async function submitStudentForm(studentId, formData) {
           mobile = ?,
           year_of_study = ?,
           section = ?,
-          selected_events = ?
+          selected_events = ?,
+          updated_at = NOW()
         WHERE student_id = ?`,
         [
           full_name,
@@ -70,6 +89,7 @@ export async function submitStudentForm(studentId, formData) {
         ]
       );
     } else {
+      // Create new form
       registrationId = generateRegistrationId();
 
       const [result] = await connection.query(
@@ -82,9 +102,10 @@ export async function submitStudentForm(studentId, formData) {
           mobile,
           year_of_study,
           section,
-          selected_events
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-        , [
+          selected_events,
+          created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+        [
           studentId,
           registrationId,
           full_name,
@@ -100,16 +121,21 @@ export async function submitStudentForm(studentId, formData) {
       formId = result.insertId;
     }
 
-    await connection.query('DELETE FROM event_registrations WHERE form_id = ?', [formId]);
+    // Clear old event registrations
+    await connection.query(
+      'DELETE FROM event_registrations WHERE form_id = ?',
+      [formId]
+    );
 
-    const registrationRows = selected_events.map(eventId => ([
-      studentId,
-      formId,
-      eventId,
-      EVENT_TYPE_LOOKUP[eventId] || EVENT_TYPES.DAY_1_ONLY
-    ]));
+    // Insert new event registrations
+    if (selectedEvents.length > 0) {
+      const registrationRows = [];
+      
+      for (const eventId of selectedEvents) {
+        const eventType = EVENT_TYPE_LOOKUP[eventId] || EVENT_TYPES.DAY_1_ONLY;
+        registrationRows.push([studentId, formId, eventId, eventType]);
+      }
 
-    if (registrationRows.length > 0) {
       await connection.query(
         `INSERT INTO event_registrations (student_id, form_id, event_id, selection_type)
          VALUES ?`,
@@ -152,8 +178,14 @@ export async function getStudentForm(studentId) {
     return null;
   }
 
-  form.selected_events = form.selected_events ? JSON.parse(form.selected_events) : [];
+  // Parse selected_events JSON
+  try {
+    form.selected_events = form.selected_events ? JSON.parse(form.selected_events) : [];
+  } catch {
+    form.selected_events = [];
+  }
 
+  // Get event registrations
   const [registrations] = await pool.query(
     'SELECT event_id, selection_type FROM event_registrations WHERE form_id = ? ORDER BY id',
     [form.id]

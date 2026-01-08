@@ -12,7 +12,7 @@ export const studentFormSchema = z.object({
   branch: z.enum([
     'CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'IT', 'AIDS', 'AIML', 'CSM', 'CSD'
   ], { 
-    error: 'Please select a valid branch' 
+    message: 'Please select a valid branch' 
   }),
   
   roll_number: z.string()
@@ -34,24 +34,20 @@ export const studentFormSchema = z.object({
 
   selected_events: z.array(z.string().min(1))
     .min(1, 'Please select at least one event to attend')
-    .superRefine((events, ctx) => {
-      if (!events.every(id => VALID_EVENT_IDS.has(id))) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Invalid event selection',
-          path: ['selected_events']
-        });
+    .refine(
+      (events) => events.every(id => VALID_EVENT_IDS.has(id)),
+      { message: 'Invalid event selection' }
+    )
+    .refine(
+      (events) => {
+        const result = validateEventSelections(events);
+        return result.ok;
+      },
+      (events) => {
+        const result = validateEventSelections(events);
+        return { message: result.reason || 'Invalid event selection' };
       }
-    })
-}).superRefine((data, ctx) => {
-  const result = validateEventSelections(data.selected_events);
-  if (!result.ok) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: result.reason,
-      path: ['selected_events']
-    });
-  }
+    )
 });
 
 export default studentFormSchema;
