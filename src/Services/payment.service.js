@@ -1,4 +1,4 @@
-import { Cashfree, PAYMENT_AMOUNT, CASHFREE_MODE } from '../config/cashfree.js';
+import { Cashfree, PAYMENT_AMOUNT, CASHFREE_MODE, createOrderDirect } from '../config/cashfree.js';
 import db from '../db/mysql.js';
 import crypto from 'crypto';
 import { sendConfirmationForPayment } from './email.service.js';
@@ -77,8 +77,8 @@ export async function createPaymentOrder({
 
     console.log('Creating Cashfree order:', JSON.stringify(orderRequest, null, 2));
     
-    // SDK v5 uses PGCreateOrder with "2023-08-01" version
-    const response = await Cashfree.PGCreateOrder("2023-08-01", orderRequest);
+    // Use direct API call instead of SDK (for debugging 401 issues)
+    const response = await createOrderDirect(orderRequest);
 
     console.log('Cashfree response:', JSON.stringify(response.data, null, 2));
 
