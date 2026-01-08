@@ -236,13 +236,36 @@ export async function verifyPaymentStatus(orderId) {
     }
 
     // Fetch latest status from Cashfree via REST API to avoid SDK inconsistencies
-    const cashfreePayments = await fetchCashfreeOrderPayments(orderId);
+    let cashfreePayments = await fetchCashfreeOrderPayments(orderId);
+
+    // Some responses require querying with cf_order_id, especially after redirects
+    if (cashfreePayments.length === 0 && payment.cf_order_id) {
+      try {
+        cashfreePayments = await fetchCashfreeOrderPayments(payment.cf_order_id);
+      } catch (secondaryErr) {
+        console.warn('Secondary Cashfree fetch failed', {
+          orderId,
+          cfOrderId: payment.cf_order_id,
+          error: secondaryErr.message
+        });
+      }
+    }
 
     if (cashfreePayments.length > 0) {
-      const latestPayment = cashfreePayments[0];
-      const paymentMethod = latestPayment.payment_group || latestPayment.payment_method || payment.payment_method || null;
+      // Identify the freshest payment event and specific success/failure entries
+      const sortedPayments = [...cashfreePayments].sort((a, b) => {
+        const timeA = new Date(a.payment_time || a.payment_created_time || a.created_at || 0).getTime();
+        const timeB = new Date(b.payment_time || b.payment_created_time || b.created_at || 0).getTime();
+        return timeB - timeA;
+      });
+
+      const latestPayment = sortedPayments[0];
+      const successfulPayment = sortedPayments.find(p => p.payment_status === 'SUCCESS');
+      const failedPayment = sortedPayments.find(p => p.payment_status === 'FAILED');
+      const paymentForStatus = successfulPayment || failedPayment || latestPayment;
+      const paymentMethod = paymentForStatus.payment_group || paymentForStatus.payment_method || payment.payment_method || null;
       
-      if (latestPayment.payment_status === 'SUCCESS') {
+      if (successfulPayment) {
         // Update database
         await db.query(`
           UPDATE payments 
@@ -252,7 +275,7 @@ export async function verifyPaymentStatus(orderId) {
               paid_at = NOW(),
               updated_at = NOW()
           WHERE order_id = ?
-        `, [latestPayment.cf_payment_id, paymentMethod, orderId]);
+        `, [successfulPayment.cf_payment_id, paymentMethod, orderId]);
 
         if (payment.form_id) {
           await db.query(`
@@ -279,10 +302,10 @@ export async function verifyPaymentStatus(orderId) {
           orderId,
           amount: payment.amount,
           paymentMethod,
-          context,
-          registrationCode
+          registrationCode,
+          context
         };
-      } else if (latestPayment.payment_status === 'FAILED') {
+      } else if (failedPayment) {
         await db.query(`
           UPDATE payments SET status = 'FAILED', updated_at = NOW() WHERE order_id = ?
         `, [orderId]);
@@ -301,7 +324,7 @@ export async function verifyPaymentStatus(orderId) {
           success: false,
           status: 'FAILED',
           orderId,
-          message: latestPayment.payment_message || latestPayment.error_message || 'Payment failed',
+          message: failedPayment.payment_message || failedPayment.error_message || latestPayment.payment_message || latestPayment.error_message || 'Payment failed',
           context,
           registrationCode: null  // Don't reveal on failed payment
         };
@@ -487,14 +510,14 @@ export async function verifyPaymentOwnership(orderId, studentId, email) {
   );
   
   if (payments.length === 0) {
-    return false;
-  }
-  
-  const payment = payments[0];
-  
-  // Check if it's an internal payment
-  if (payment.student_id) {
-    return payment.student_id === studentId;
+        return {
+          success: false,
+          status: 'FAILED',
+          orderId,
+          message: failedPayment.payment_message || failedPayment.error_message || latestPayment.payment_message || latestPayment.error_message || 'Payment failed',
+          context,
+          registrationCode: null
+        };
   }
   
   // Check if it's an external payment
@@ -502,8 +525,8 @@ export async function verifyPaymentOwnership(orderId, studentId, email) {
     const [externals] = await db.query(
       'SELECT email FROM external_registrations WHERE id = ?',
       [payment.external_registration_id]
-    );
-    return externals[0]?.email?.toLowerCase() === email?.toLowerCase();
+      context,
+      registrationCode: null
   }
   
   return false;
