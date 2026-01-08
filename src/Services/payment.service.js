@@ -24,14 +24,28 @@ export async function createPaymentOrder({
   orderNote
 }) {
   const orderId = generateOrderId();
-  const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+  
+  // Determine base URL - prioritize APP_URL env var, then detect from VERCEL_URL, fallback to localhost
+  let baseUrl = process.env.APP_URL;
+  if (!baseUrl) {
+    // For Vercel deployments
+    if (process.env.VERCEL_URL) {
+      baseUrl = `https://${process.env.VERCEL_URL}`;
+    } else if (process.env.NODE_ENV === 'production') {
+      // Hardcoded fallback for production
+      baseUrl = 'https://elysianhitam.com';
+    } else {
+      baseUrl = 'http://localhost:3000';
+    }
+  }
   
   // Debug: Log environment variables
   console.log('Payment Service - Environment Check:', {
     APP_URL: process.env.APP_URL,
+    VERCEL_URL: process.env.VERCEL_URL,
     NODE_ENV: process.env.NODE_ENV,
     CASHFREE_ENV: process.env.CASHFREE_ENV,
-    baseUrl: baseUrl
+    resolvedBaseUrl: baseUrl
   });
 
   try {
@@ -61,7 +75,12 @@ export async function createPaymentOrder({
             : 'Elysian 2026 Payment')
     };
 
-    const response = await Cashfree.PGCreateOrder(orderRequest);
+    console.log('Creating Cashfree order:', JSON.stringify(orderRequest, null, 2));
+    
+    // SDK v5 uses PGCreateOrder with "2023-08-01" version
+    const response = await Cashfree.PGCreateOrder("2023-08-01", orderRequest);
+
+    console.log('Cashfree response:', JSON.stringify(response.data, null, 2));
 
     if (response.data) {
       await db.query(`
@@ -155,8 +174,8 @@ export async function verifyPaymentStatus(orderId) {
       };
     }
 
-    // Fetch latest status from Cashfree
-    const response = await Cashfree.PGOrderFetchPayments(orderId);
+    // Fetch latest status from Cashfree - SDK v5 requires version parameter
+    const response = await Cashfree.PGOrderFetchPayments("2023-08-01", orderId);
     
     if (response.data && response.data.length > 0) {
       const latestPayment = response.data[0];

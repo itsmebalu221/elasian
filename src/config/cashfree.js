@@ -19,16 +19,15 @@ console.log('Cashfree Config:', {
   secretKeyLength: secretKey.length
 });
 
-// Initialize Cashfree with credentials (v5+ syntax)
-const environment = CASHFREE_MODE === 'production'
-  ? CashfreeSDK.PRODUCTION
-  : CashfreeSDK.SANDBOX;
+// Initialize Cashfree SDK v5+ using static configuration
+CashfreeSDK.XClientId = process.env.CASHFREE_APP_ID;
+CashfreeSDK.XClientSecret = process.env.CASHFREE_SECRET_KEY;
+CashfreeSDK.XEnvironment = CASHFREE_MODE === 'production' 
+  ? CashfreeSDK.Environment.PRODUCTION 
+  : CashfreeSDK.Environment.SANDBOX;
 
-const Cashfree = new CashfreeSDK(
-  environment,
-  process.env.CASHFREE_APP_ID,
-  process.env.CASHFREE_SECRET_KEY
-);
+// Export the configured SDK class
+const Cashfree = CashfreeSDK;
 
 export const PAYMENT_AMOUNT = 500; // ₹500 for event pass
 
