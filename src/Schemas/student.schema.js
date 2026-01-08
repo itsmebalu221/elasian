@@ -1,5 +1,6 @@
 import { EVENT_DEFINITIONS } from '../config/events.config.js';
 
+// Force redeploy: 2026-01-08-v2
 const VALID_EVENT_IDS = new Set(EVENT_DEFINITIONS.map(e => e.id));
 
 export function validateStudentForm(data) {
