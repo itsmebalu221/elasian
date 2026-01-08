@@ -23,10 +23,10 @@ export async function submitStudentForm(studentId, formData) {
     mobile,
     year_of_study,
     section,
-    selected_events
+    selected_events = []
   } = formData;
 
-  const selectedEventsJson = JSON.stringify(selected_events);
+  const selectedEventsJson = JSON.stringify(selected_events || []);
 
   const connection = await pool.getConnection();
 
