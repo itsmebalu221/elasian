@@ -1,4 +1,4 @@
-import validateStudentForm from '../Schemas/student.schema.js';
+import validateStudentForm from '../Schemas/studentValidator.js';
 import { submitStudentForm, getStudentForm } from '../Services/student.service.js';
 import { signToken, getCookieName, getCookieOptions, sanitizeUserPayload } from '../utils/jwt.js';
 
