@@ -19,6 +19,6 @@ const Cashfree = new CashfreeSDK(
   process.env.CASHFREE_SECRET_KEY
 );
 
-export const PAYMENT_AMOUNT = 500; // ₹500 for event pass
+export const PAYMENT_AMOUNT = 1; // ₹500 for event pass
 
 export { Cashfree, CASHFREE_MODE };

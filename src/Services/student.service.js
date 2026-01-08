@@ -1,4 +1,5 @@
 import pool from '../db/mysql.js';
+import crypto from 'crypto';
 import { EVENT_DEFINITIONS, EVENT_TYPES } from '../config/events.config.js';
 
 const EVENT_TYPE_LOOKUP = EVENT_DEFINITIONS.reduce((acc, event) => {
@@ -6,10 +7,10 @@ const EVENT_TYPE_LOOKUP = EVENT_DEFINITIONS.reduce((acc, event) => {
   return acc;
 }, {});
 
-// Generate unique registration ID
+// Generate unique registration ID using cryptographically secure random bytes
 function generateRegistrationId() {
   const year = new Date().getFullYear().toString().slice(-2);
-  const random = Math.floor(100000 + Math.random() * 900000); // 6 digit random
+  const random = crypto.randomBytes(4).toString('hex').toUpperCase(); // 8 hex chars = 4 billion combinations
   return `ELYSIAN${year}${random}`;
 }
 

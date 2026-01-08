@@ -12,6 +12,15 @@ export async function submitStudentFormHandler(req, res) {
     }
 
     const user = sanitizeUserPayload(req.user);
+
+    // Block form submission for temporary users (database connection failed during auth)
+    if (user.isTemporary) {
+      return res.status(503).json({
+        success: false,
+        error: 'Service temporarily unavailable. Please try logging in again.'
+      });
+    }
+
     const studentId = user.id;
 
     const parsed = studentFormSchema.safeParse(req.body);

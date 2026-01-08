@@ -236,22 +236,23 @@ export async function verifyPaymentStatus(orderId) {
 // Handle webhook from Cashfree
 export async function handleWebhook(payload, signature) {
   try {
-    const isProduction = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
-    
-    // Verify webhook signature in production
-    if (isProduction && process.env.CASHFREE_SECRET_KEY) {
-      const timestamp = payload.data?.payment?.payment_time || '';
-      const body = JSON.stringify(payload);
-      
-      const expectedSignature = crypto
-        .createHmac('sha256', process.env.CASHFREE_SECRET_KEY)
-        .update(timestamp + body)
-        .digest('base64');
+    // Always verify webhook signature for security
+    if (!process.env.CASHFREE_SECRET_KEY) {
+      console.error('CASHFREE_SECRET_KEY is not configured - rejecting webhook');
+      throw new Error('Webhook verification not configured');
+    }
 
-      if (signature !== expectedSignature) {
-        console.warn('Webhook signature verification failed');
-        throw new Error('Invalid webhook signature');
-      }
+    const timestamp = payload.data?.payment?.payment_time || '';
+    const body = JSON.stringify(payload);
+    
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.CASHFREE_SECRET_KEY)
+      .update(timestamp + body)
+      .digest('base64');
+
+    if (signature !== expectedSignature) {
+      console.warn('Webhook signature verification failed');
+      throw new Error('Invalid webhook signature');
     }
 
     const eventType = payload.type;
