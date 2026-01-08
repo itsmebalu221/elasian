@@ -4,6 +4,7 @@ import db from '../db/mysql.js';
 export const EXTERNAL_BASE_AMOUNT = 700;
 export const EXTERNAL_ADD_ON_AMOUNT = 300;
 const MAX_SELECTED_EVENTS = 2;
+const CULTURAL_EVENT_ID = 'EVT_CULTURAL_SAHITYA_PRASASTI';
 
 function generateExternalRegistrationId() {
   const year = new Date().getFullYear().toString().slice(-2);
@@ -11,13 +12,18 @@ function generateExternalRegistrationId() {
   return `ELYSIANX${year}${random}`;
 }
 
-function normalizeSelectedEvents(selected = []) {
+function sanitizeEventIds(selected = []) {
   if (!Array.isArray(selected)) {
-    return null;
+    return [];
   }
   const trimmed = selected
     .filter(eventId => typeof eventId === 'string' && eventId.trim().length > 0)
     .slice(0, MAX_SELECTED_EVENTS);
+  return trimmed;
+}
+
+function normalizeSelectedEvents(selected = []) {
+  const trimmed = sanitizeEventIds(selected);
   return trimmed.length > 0 ? JSON.stringify(trimmed) : null;
 }
 
@@ -34,9 +40,11 @@ export async function createExternalRegistration(payload) {
     selected_events = []
   } = payload;
 
-  const addOnSelected = Boolean(add_on_selected);
+  const sanitizedEvents = sanitizeEventIds(selected_events);
+  const hasCulturalEvent = sanitizedEvents.includes(CULTURAL_EVENT_ID);
+  const addOnSelected = Boolean(add_on_selected || hasCulturalEvent);
   const totalAmount = EXTERNAL_BASE_AMOUNT + (addOnSelected ? EXTERNAL_ADD_ON_AMOUNT : 0);
-  const selectedEventsJson = normalizeSelectedEvents(selected_events);
+  const selectedEventsJson = sanitizedEvents.length > 0 ? JSON.stringify(sanitizedEvents) : null;
 
   const [existingRows] = await db.query(
     'SELECT * FROM external_registrations WHERE identity_number = ?',
@@ -54,8 +62,11 @@ export async function createExternalRegistration(payload) {
       };
     }
 
-    const updateAddOnSelected = Boolean(add_on_selected);
+    const updateSanitizedEvents = sanitizeEventIds(selected_events);
+    const updateHasCulturalEvent = updateSanitizedEvents.includes(CULTURAL_EVENT_ID);
+    const updateAddOnSelected = Boolean(add_on_selected || updateHasCulturalEvent);
     const updateTotalAmount = EXTERNAL_BASE_AMOUNT + (updateAddOnSelected ? EXTERNAL_ADD_ON_AMOUNT : 0);
+    const updateEventsJson = updateSanitizedEvents.length > 0 ? JSON.stringify(updateSanitizedEvents) : null;
 
     await db.query(
       `UPDATE external_registrations
@@ -79,7 +90,7 @@ export async function createExternalRegistration(payload) {
         year_of_study,
         updateAddOnSelected,
         updateTotalAmount,
-        selectedEventsJson,
+        updateEventsJson,
         existing.id
       ]
     );

@@ -918,18 +918,39 @@
           <div class="form-section">
             <div class="section-label">Academic Information</div>
 
-            <div class="field">
-              <label class="field-label" for="year_of_study">
-                Year <span class="required">*</span>
-              </label>
-              <select id="year_of_study" name="year_of_study" class="field-input" required>
-                <option value="">Select year</option>
-                <option value="1">First Year</option>
-                <option value="2">Second Year</option>
-                <option value="3">Third Year</option>
-                <option value="4">Fourth Year</option>
-              </select>
-              <div class="field-error" id="year_of_study-error"></div>
+            <div class="field-row">
+              <div class="field">
+                <label class="field-label" for="branch">
+                  Branch <span class="required">*</span>
+                </label>
+                <select id="branch" name="branch" class="field-input" required>
+                  <option value="">Select branch</option>
+                  <option value="CSE">CSE</option>
+                  <option value="EEE">EEE</option>
+                  <option value="ECE">ECE</option>
+                  <option value="MECH">MECH</option>
+                  <option value="CSC">CSC</option>
+                  <option value="CSD">CSD</option>
+                  <option value="CSO">CSO</option>
+                  <option value="CSM">CSM</option>
+                  <option value="ITP">ITP</option>
+                </select>
+                <div class="field-error" id="branch-error"></div>
+              </div>
+
+              <div class="field">
+                <label class="field-label" for="year_of_study">
+                  Year <span class="required">*</span>
+                </label>
+                <select id="year_of_study" name="year_of_study" class="field-input" required>
+                  <option value="">Select year</option>
+                  <option value="1">First Year</option>
+                  <option value="2">Second Year</option>
+                  <option value="3">Third Year</option>
+                  <option value="4">Fourth Year</option>
+                </select>
+                <div class="field-error" id="year_of_study-error"></div>
+              </div>
             </div>
           </div>
 
@@ -991,7 +1012,8 @@
   </div>
 
   <script>
-    const DEFAULT_BRANCH = 'CSE';
+    const BRANCH_OPTIONS = ['CSE', 'EEE', 'ECE', 'MECH', 'CSC', 'CSD', 'CSO', 'CSM', 'ITP'];
+    const DEFAULT_BRANCH = BRANCH_OPTIONS[0];
     const eventsContainer = document.getElementById('event-groups');
     const eventsErrorEl = document.getElementById('events-error');
     const summaryContainer = document.getElementById('selection-summary');
@@ -1340,6 +1362,10 @@
         document.getElementById('user-name').textContent = userName;
         document.getElementById('user-email').textContent = userEmail;
         document.getElementById('full_name').value = userName;
+        const branchSelectEl = document.getElementById('branch');
+        if (branchSelectEl) {
+          branchSelectEl.value = DEFAULT_BRANCH;
+        }
 
         document.getElementById('loading').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
@@ -1368,9 +1394,24 @@
       btnText.textContent = 'Submitting';
       spinner.style.display = 'block';
 
+      const branchSelect = document.getElementById('branch');
+      const branchValue = branchSelect.value.trim().toUpperCase();
+
+      if (!BRANCH_OPTIONS.includes(branchValue)) {
+        const branchErrorEl = document.getElementById('branch-error');
+        if (branchErrorEl) {
+          branchErrorEl.textContent = 'Select a valid branch.';
+        }
+        branchSelect.classList.add('error');
+        submitBtn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Continue to Payment';
+        return;
+      }
+
       const formData = {
         full_name: document.getElementById('full_name').value.trim(),
-        branch: DEFAULT_BRANCH,
+        branch: branchValue,
         roll_number: document.getElementById('roll_number').value.trim(),
         mobile: document.getElementById('mobile').value.trim(),
         year_of_study: parseInt(document.getElementById('year_of_study').value),

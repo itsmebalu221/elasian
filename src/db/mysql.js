@@ -5,6 +5,8 @@ import { EVENT_DEFINITIONS } from '../config/events.config.js';
 dotenv.config();
 
 const DB_NAME = process.env.DB_NAME || 'student_forms';
+const BRANCH_OPTIONS = ['CSE', 'EEE', 'ECE', 'MECH', 'CSC', 'CSD', 'CSO', 'CSM', 'ITP'];
+const DEFAULT_BRANCH = BRANCH_OPTIONS[0];
 
 // Create MySQL connection pool WITHOUT database first (for creating DB)
 const poolConfig = {
@@ -233,10 +235,19 @@ export async function initializeDatabase() {
     }
 
     console.log('🔄 Normalizing student form branch and section data...');
+    const branchPlaceholders = BRANCH_OPTIONS.map(() => '?').join(',');
+    const branchParams = [DEFAULT_BRANCH, ...BRANCH_OPTIONS];
     await connection.query(
-      "UPDATE student_forms SET branch = 'CSE' WHERE branch IS NULL OR branch <> 'CSE'"
+      `UPDATE student_forms SET branch = ?
+       WHERE branch IS NULL OR branch = '' OR UPPER(branch) NOT IN (${branchPlaceholders})`,
+      branchParams
     ).catch((err) => {
       console.warn('  ⚠️ Could not normalize branch values:', err.message);
+    });
+    await connection.query(
+      'UPDATE student_forms SET branch = UPPER(branch) WHERE branch IS NOT NULL'
+    ).catch((err) => {
+      console.warn('  ⚠️ Could not standardize branch casing:', err.message);
     });
     await connection.query(
       'UPDATE student_forms SET section = NULL WHERE section IS NOT NULL'

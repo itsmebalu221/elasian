@@ -1,6 +1,8 @@
 import { EVENT_DEFINITIONS } from '../config/events.config.js';
 
-const DEFAULT_BRANCH = 'CSE';
+const BRANCH_OPTIONS = ['CSE', 'EEE', 'ECE', 'MECH', 'CSC', 'CSD', 'CSO', 'CSM', 'ITP'];
+const VALID_BRANCHES = new Set(BRANCH_OPTIONS);
+const DEFAULT_BRANCH = BRANCH_OPTIONS[0];
 // Force redeploy: 2026-01-08-v2
 const VALID_EVENT_IDS = new Set(EVENT_DEFINITIONS.map(e => e.id));
 
@@ -16,8 +18,17 @@ export function validateStudentForm(data) {
     errors.push({ field: 'full_name', message: 'Full name must be at least 2 characters' });
   }
 
-  // branch defaults to CSE irrespective of user input
-  const normalizedBranch = DEFAULT_BRANCH;
+  let normalizedBranch = DEFAULT_BRANCH;
+  if (!data.branch || typeof data.branch !== 'string' || data.branch.trim().length === 0) {
+    errors.push({ field: 'branch', message: 'Please select your branch' });
+  } else {
+    const branchValue = data.branch.trim().toUpperCase();
+    if (!VALID_BRANCHES.has(branchValue)) {
+      errors.push({ field: 'branch', message: 'Invalid branch selected' });
+    } else {
+      normalizedBranch = branchValue;
+    }
+  }
 
   // roll_number
   if (!data.roll_number || typeof data.roll_number !== 'string' || data.roll_number.length < 5) {

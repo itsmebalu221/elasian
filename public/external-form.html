@@ -1121,6 +1121,7 @@
   <script>
     const EXTERNAL_BASE_AMOUNT = 700;
     const EXTERNAL_ADD_ON_AMOUNT = 300;
+    const CULTURAL_EVENT_ID = 'EVT_CULTURAL_SAHITYA_PRASASTI';
 
     const formEl = document.getElementById('external-form');
     const eventsContainer = document.getElementById('event-groups');
@@ -1158,6 +1159,18 @@
     let activeRegistration = null;
     let culturalAddOnSelected = false;
 
+    function syncCulturalToggleUI() {
+      const toggle = document.getElementById('addon-toggle');
+      if (!toggle) {
+        return;
+      }
+      if (selectedEvents.has(CULTURAL_EVENT_ID)) {
+        toggle.classList.add('selected');
+      } else {
+        toggle.classList.remove('selected');
+      }
+    }
+
     function resetMessage() {
       messageBox.className = 'message-box';
       messageBox.style.display = 'none';
@@ -1186,8 +1199,8 @@
     }
 
     function updatePricing() {
-      // Cultural add-on toggle solely controls the extra fee
-      const hasAddOn = culturalAddOnSelected;
+      const hasAddOn = selectedEvents.has(CULTURAL_EVENT_ID);
+      culturalAddOnSelected = hasAddOn;
       const total = EXTERNAL_BASE_AMOUNT + (hasAddOn ? EXTERNAL_ADD_ON_AMOUNT : 0);
       const totalText = `₹${total}`;
 
@@ -1201,19 +1214,12 @@
       if (mobilePricingAddon) mobilePricingAddon.style.display = hasAddOn ? 'flex' : 'none';
       if (mobilePricingTotal) mobilePricingTotal.textContent = totalText;
 
+      syncCulturalToggleUI();
       return hasAddOn;
     }
 
     function toggleCulturalAddOn() {
-      culturalAddOnSelected = !culturalAddOnSelected;
-      const toggle = document.getElementById('addon-toggle');
-      if (culturalAddOnSelected) {
-        toggle.classList.add('selected');
-      } else {
-        toggle.classList.remove('selected');
-      }
-      updatePricing();
-      updateSummary();
+      toggleEventSelection(CULTURAL_EVENT_ID);
     }
 
     function getCashfreeMode() {
@@ -1479,20 +1485,7 @@
           </div>
         `;
       }).join('');
-
-      // Show add-on in summary if selected via toggle
-      let addOnRow = '';
-      if (culturalAddOnSelected) {
-        addOnRow = `
-          <div class="summary-item">
-            <span class="summary-name">Sahitya + Prasasti Cultural Access</span>
-            <span class="summary-meta">Optional Add-On · +₹300</span>
-          </div>
-        `;
-      }
-
-      const allContent = addOnRow + rows;
-      summaryContainer.innerHTML = allContent || '<div class="summary-empty">No selections yet — you can decide at the fest</div>';
+      summaryContainer.innerHTML = rows || '<div class="summary-empty">No selections yet — you can decide at the fest</div>';
     }
 
     function toggleEventSelection(eventId) {
@@ -1502,6 +1495,7 @@
 
       if (selectedEvents.has(eventId)) {
         selectedEvents.delete(eventId);
+        culturalAddOnSelected = selectedEvents.has(CULTURAL_EVENT_ID);
         clearEventsError();
         renderEvents();
         updateSummary();
@@ -1519,6 +1513,7 @@
 
       selectedEvents.add(eventId);
       clearEventsError();
+      culturalAddOnSelected = selectedEvents.has(CULTURAL_EVENT_ID);
       renderEvents();
       updateSummary();
     }
@@ -1590,7 +1585,7 @@
         return;
       }
 
-      const addOnSelected = culturalAddOnSelected;
+      const addOnSelected = selectedEvents.has(CULTURAL_EVENT_ID);
 
       const payload = {
         full_name: formData.get('full_name').trim(),
