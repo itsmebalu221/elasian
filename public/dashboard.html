@@ -1461,10 +1461,6 @@
               <div class="data-label">Year</div>
               <div class="data-value" id="display-year">—</div>
             </div>
-            <div class="data-item">
-              <div class="data-label">Section</div>
-              <div class="data-value" id="display-section">—</div>
-            </div>
           </div>
         </div>
 
@@ -1517,10 +1513,6 @@
             <div class="pass-info-item">
               <span class="pass-info-label">Year</span>
               <span class="pass-info-value" id="print-year">—</span>
-            </div>
-            <div class="pass-info-item">
-              <span class="pass-info-label">Section</span>
-              <span class="pass-info-value" id="print-section">—</span>
             </div>
             <div class="pass-info-item">
               <span class="pass-info-label">Mobile</span>
@@ -1955,18 +1947,11 @@
           document.getElementById('display-mobile').textContent = form.mobile || '—';
           document.getElementById('display-branch').textContent = form.branch || '—';
           document.getElementById('display-year').textContent = yearLabels[form.year_of_study] || '—';
-          document.getElementById('display-section').textContent = form.section || '—';
 
           // Populate QR section info
           document.getElementById('qr-display-name').textContent = form.full_name || '—';
           document.getElementById('qr-display-roll').textContent = form.roll_number || '—';
           document.getElementById('qr-display-branch').textContent = form.branch || '—';
-
-          // Handle empty optional fields
-          if (!form.section) {
-            document.getElementById('display-section').classList.add('empty');
-            document.getElementById('display-section').textContent = 'Not specified';
-          }
 
           // Display registered events
           displayEvents(form);
@@ -2042,14 +2027,11 @@
 
       // Update labels for external users
       const rollLabel = document.querySelector('[for="display-roll"], .data-item:has(#display-roll) .data-label');
-      const branchLabel = document.querySelector('[for="display-branch"], .data-item:has(#display-branch) .data-label');
-      const sectionLabel = document.querySelector('[for="display-section"], .data-item:has(#display-section) .data-label');
       
       // Update data labels for external context
       document.querySelectorAll('.data-label').forEach(label => {
         if (label.textContent.trim() === 'Roll Number') label.textContent = 'ID Number';
         if (label.textContent.trim() === 'Branch') label.textContent = 'Institution';
-        if (label.textContent.trim() === 'Section') label.textContent = 'Department';
       });
 
       // Update QR section labels
@@ -2064,7 +2046,6 @@
       document.getElementById('display-mobile').textContent = registration.mobile || '—';
       document.getElementById('display-branch').textContent = registration.institution || '—';
       document.getElementById('display-year').textContent = yearLabels[registration.year_of_study] || '—';
-      document.getElementById('display-section').textContent = registration.department || '—';
 
       // Update QR section info
       document.getElementById('qr-display-name').textContent = registration.full_name || '—';
@@ -2209,7 +2190,6 @@
       document.getElementById('print-roll').textContent = registration.identity_number || '—';
       document.getElementById('print-branch').textContent = registration.institution || '—';
       document.getElementById('print-year').textContent = yearLabels[registration.year_of_study] || '—';
-      document.getElementById('print-section').textContent = registration.department || 'N/A';
       document.getElementById('print-mobile').textContent = registration.mobile || '—';
       document.getElementById('print-email').textContent = registration.email || document.getElementById('display-email').textContent || '—';
 
@@ -2217,7 +2197,6 @@
       document.querySelectorAll('.pass-info-label').forEach(label => {
         if (label.textContent.trim() === 'Roll Number') label.textContent = 'ID Number';
         if (label.textContent.trim() === 'Branch') label.textContent = 'Institution';
-        if (label.textContent.trim() === 'Section') label.textContent = 'Department';
       });
 
       // Current date
@@ -2327,7 +2306,6 @@
       document.getElementById('print-roll').textContent = form.roll_number || '—';
       document.getElementById('print-branch').textContent = form.branch || '—';
       document.getElementById('print-year').textContent = yearLabels[form.year_of_study] || '—';
-      document.getElementById('print-section').textContent = form.section || 'N/A';
       document.getElementById('print-mobile').textContent = form.mobile || '—';
       document.getElementById('print-email').textContent = document.getElementById('display-email').textContent || '—';
       

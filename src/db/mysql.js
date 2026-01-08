@@ -232,6 +232,18 @@ export async function initializeDatabase() {
       ).catch(() => {});
     }
 
+    console.log('🔄 Normalizing student form branch and section data...');
+    await connection.query(
+      "UPDATE student_forms SET branch = 'CSE' WHERE branch IS NULL OR branch <> 'CSE'"
+    ).catch((err) => {
+      console.warn('  ⚠️ Could not normalize branch values:', err.message);
+    });
+    await connection.query(
+      'UPDATE student_forms SET section = NULL WHERE section IS NOT NULL'
+    ).catch((err) => {
+      console.warn('  ⚠️ Could not clear legacy section values:', err.message);
+    });
+
     // Ensure students table has user_type column with HITAMONLY/EXTERNAL values
     console.log('🔄 Ensuring students table has user_type column...');
     const [userTypeColumn] = await connection.query(
