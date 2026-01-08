@@ -25,6 +25,14 @@ export async function createPaymentOrder({
 }) {
   const orderId = generateOrderId();
   const baseUrl = process.env.APP_URL || 'http://localhost:3000';
+  
+  // Debug: Log environment variables
+  console.log('Payment Service - Environment Check:', {
+    APP_URL: process.env.APP_URL,
+    NODE_ENV: process.env.NODE_ENV,
+    CASHFREE_ENV: process.env.CASHFREE_ENV,
+    baseUrl: baseUrl
+  });
 
   try {
     const orderRequest = {
