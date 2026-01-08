@@ -920,24 +920,6 @@
 
             <div class="field-row">
               <div class="field">
-                <label class="field-label" for="branch">
-                  Branch <span class="required">*</span>
-                </label>
-                <select id="branch" name="branch" class="field-input" required>
-                  <option value="">Select branch</option>
-                  <option value="CSE">CSE</option>
-                  <option value="ECE">ECE</option>
-                  <option value="EEE">EEE</option>
-                  <option value="MECH">MECH</option>
-                  <option value="CSC">CSC</option>
-                  <option value="CSM">CSM</option>
-                  <option value="CSO">CSO</option>
-                  <option value="CSD">CSD</option>
-                </select>
-                <div class="field-error" id="branch-error"></div>
-              </div>
-
-              <div class="field">
                 <label class="field-label" for="year_of_study">
                   Year <span class="required">*</span>
                 </label>
@@ -950,12 +932,12 @@
                 </select>
                 <div class="field-error" id="year_of_study-error"></div>
               </div>
-            </div>
 
-            <div class="field">
-              <label class="field-label" for="section">Section</label>
-              <input type="text" id="section" name="section" class="field-input" placeholder="e.g., A, B, C">
-              <div class="field-error" id="section-error"></div>
+              <div class="field">
+                <label class="field-label" for="section">Section</label>
+                <input type="text" id="section" name="section" class="field-input" placeholder="e.g., A, B, C">
+                <div class="field-error" id="section-error"></div>
+              </div>
             </div>
           </div>
 
@@ -1397,7 +1379,6 @@
         full_name: document.getElementById('full_name').value.trim(),
         roll_number: document.getElementById('roll_number').value.trim(),
         mobile: document.getElementById('mobile').value.trim(),
-        branch: document.getElementById('branch').value,
         year_of_study: parseInt(document.getElementById('year_of_study').value),
         section: document.getElementById('section').value.trim() || undefined,
         selected_events: Array.from(selectedEvents)

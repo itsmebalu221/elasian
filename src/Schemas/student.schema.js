@@ -15,6 +15,11 @@ export function validateStudentForm(data) {
     errors.push({ field: 'full_name', message: 'Full name must be at least 2 characters' });
   }
 
+  // branch - just check it exists, accept any value
+  if (!data.branch || typeof data.branch !== 'string' || data.branch.trim().length === 0) {
+    errors.push({ field: 'branch', message: 'Please select a branch' });
+  }
+
   // roll_number
   if (!data.roll_number || typeof data.roll_number !== 'string' || data.roll_number.length < 5) {
     errors.push({ field: 'roll_number', message: 'Roll number must be at least 5 characters' });
@@ -51,6 +56,7 @@ export function validateStudentForm(data) {
     valid: true,
     data: {
       full_name: data.full_name.trim(),
+      branch: data.branch.trim().toUpperCase(),
       roll_number: data.roll_number.trim(),
       mobile: data.mobile.trim(),
       year_of_study: year,

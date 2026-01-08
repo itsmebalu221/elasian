@@ -15,7 +15,7 @@ function generateRegistrationId() {
 export async function submitStudentForm(studentId, formData) {
   const {
     full_name,
-    branch,
+
     roll_number,
     mobile,
     year_of_study,
@@ -43,19 +43,19 @@ export async function submitStudentForm(studentId, formData) {
 
       await connection.query(
         `UPDATE student_forms SET 
-          full_name = ?, branch = ?, roll_number = ?, mobile = ?,
+          full_name = ?, roll_number = ?, mobile = ?,
           year_of_study = ?, section = ?, selected_events = ?, updated_at = NOW()
         WHERE student_id = ?`,
-        [full_name, branch, roll_number, mobile, year_of_study, section, selectedEventsJson, studentId]
+        [full_name, roll_number, mobile, year_of_study, section, selectedEventsJson, studentId]
       );
     } else {
       registrationId = generateRegistrationId();
 
       const [result] = await connection.query(
         `INSERT INTO student_forms 
-          (student_id, registration_id, full_name, branch, roll_number, mobile, year_of_study, section, selected_events, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-        [studentId, registrationId, full_name, branch, roll_number, mobile, year_of_study, section, selectedEventsJson]
+          (student_id, registration_id, full_name, roll_number, mobile, year_of_study, section, selected_events, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+        [studentId, registrationId, full_name, roll_number, mobile, year_of_study, section, selectedEventsJson]
       );
 
       formId = result.insertId;
