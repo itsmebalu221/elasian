@@ -26,13 +26,13 @@ console.log('Cashfree Config:', {
 
 // Direct API call function (bypassing SDK for debugging)
 export async function createOrderDirect(orderData) {
-  const baseUrl = CASHFREE_MODE === 'production' 
-    ? 'https://api.cashfree.com/pg' 
+  const baseUrl = CASHFREE_MODE === 'production'
+    ? 'https://api.cashfree.com/pg'
     : 'https://sandbox.cashfree.com/pg';
-  
+
   console.log('Making direct API call to:', baseUrl + '/orders');
   console.log('Using App ID:', appId.substring(0, 10) + '...');
-  
+
   const response = await fetch(`${baseUrl}/orders`, {
     method: 'POST',
     headers: {
@@ -43,21 +43,34 @@ export async function createOrderDirect(orderData) {
     },
     body: JSON.stringify(orderData)
   });
-  
-  const data = await response.json();
-  
+
+  // Attempt to read body safely even on 401
+  let textBody = '';
+  try {
+    textBody = await response.text();
+  } catch (_) {
+    textBody = '';
+  }
+
+  let jsonBody = null;
+  try {
+    jsonBody = textBody ? JSON.parse(textBody) : null;
+  } catch (e) {
+    jsonBody = { parseError: e.message, raw: textBody };
+  }
+
   if (!response.ok) {
     console.error('Cashfree API Error:', {
       status: response.status,
       statusText: response.statusText,
-      body: data
+      body: jsonBody || textBody
     });
-    const error = new Error(data.message || `Request failed with status ${response.status}`);
-    error.response = { status: response.status, data };
+    const error = new Error((jsonBody && jsonBody.message) || `Request failed with status ${response.status}`);
+    error.response = { status: response.status, data: jsonBody || textBody };
     throw error;
   }
-  
-  return { data };
+
+  return { data: jsonBody };
 }
 
 // Initialize Cashfree SDK v5+ using static configuration
