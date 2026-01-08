@@ -31,7 +31,7 @@ export function getCookieOptions() {
   return {
     httpOnly: true,
     secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax',
+    sameSite: 'lax',  // Use 'lax' to allow cookies on redirect from payment gateway
     path: '/',
     maxAge: 24 * 60 * 60 // seconds
   };
