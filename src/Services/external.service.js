@@ -3,6 +3,7 @@ import db from '../db/mysql.js';
 
 export const EXTERNAL_BASE_AMOUNT = 700;
 export const EXTERNAL_ADD_ON_AMOUNT = 300;
+const PREMIUM_EVENT_IDS = new Set(['prasasti', 'sahitya']);
 const MAX_SELECTED_EVENTS = 2;
 
 function generateExternalRegistrationId() {
@@ -31,10 +32,12 @@ export async function createExternalRegistration(payload) {
     year_of_study,
     identity_number,
     add_on_selected = false,
-    selected_events
+    selected_events = []
   } = payload;
 
-  const addOnSelected = Boolean(add_on_selected);
+  const normalizedSelectedEvents = Array.isArray(selected_events) ? selected_events : [];
+  const hasPremiumSelection = normalizedSelectedEvents.some(eventId => PREMIUM_EVENT_IDS.has(eventId));
+  const addOnSelected = Boolean(add_on_selected && hasPremiumSelection);
   const totalAmount = EXTERNAL_BASE_AMOUNT + (addOnSelected ? EXTERNAL_ADD_ON_AMOUNT : 0);
   const selectedEventsJson = normalizeSelectedEvents(selected_events);
 
@@ -53,6 +56,11 @@ export async function createExternalRegistration(payload) {
         isPaid: true
       };
     }
+
+    const updateSelectedEvents = Array.isArray(selected_events) ? selected_events : [];
+    const updateHasPremiumSelection = updateSelectedEvents.some(eventId => PREMIUM_EVENT_IDS.has(eventId));
+    const updateAddOnSelected = Boolean(add_on_selected && updateHasPremiumSelection);
+    const updateTotalAmount = EXTERNAL_BASE_AMOUNT + (updateAddOnSelected ? EXTERNAL_ADD_ON_AMOUNT : 0);
 
     await db.query(
       `UPDATE external_registrations
@@ -74,8 +82,8 @@ export async function createExternalRegistration(payload) {
         institution,
         department,
         year_of_study,
-        addOnSelected,
-        totalAmount,
+        updateAddOnSelected,
+        updateTotalAmount,
         selectedEventsJson,
         existing.id
       ]
