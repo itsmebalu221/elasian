@@ -1014,6 +1014,7 @@
   <script>
     const BRANCH_OPTIONS = ['CSE', 'EEE', 'ECE', 'MECH', 'CSC', 'CSD', 'CSO', 'CSM', 'ITP'];
     const DEFAULT_BRANCH = BRANCH_OPTIONS[0];
+    const BLOCKED_EVENT_IDS = new Set(['EVT_CULTURAL_SAHITYA_PRASASTI']);
     const eventsContainer = document.getElementById('event-groups');
     const eventsErrorEl = document.getElementById('events-error');
     const summaryContainer = document.getElementById('selection-summary');
@@ -1314,7 +1315,7 @@
           throw new Error('Failed to load events');
         }
         const data = await response.json();
-        eventCatalog = Array.isArray(data.events) ? data.events : [];
+        eventCatalog = Array.isArray(data.events) ? data.events.filter(event => !BLOCKED_EVENT_IDS.has(event.id)) : [];
 
         if (data.types) {
           EVENT_TYPES_ENUM = data.types;

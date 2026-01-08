@@ -2,6 +2,8 @@ import validateStudentForm from '../Schemas/studentValidator.js';
 import { submitStudentForm, getStudentForm } from '../Services/student.service.js';
 import { signToken, getCookieName, getCookieOptions, sanitizeUserPayload } from '../utils/jwt.js';
 
+const CULTURAL_EVENT_ID = 'EVT_CULTURAL_SAHITYA_PRASASTI';
+
 export async function submitStudentFormHandler(req, res) {
   try {
     if (!req.user) {
@@ -27,7 +29,22 @@ export async function submitStudentFormHandler(req, res) {
       });
     }
 
-    const result = await submitStudentForm(studentId, validation.data);
+    const filteredEvents =
+      user.userType === 'HITAMONLY'
+        ? validation.data.selected_events.filter(eventId => eventId !== CULTURAL_EVENT_ID)
+        : validation.data.selected_events;
+
+    if (filteredEvents.length === 0) {
+      return res.status(400).json({
+        success: false,
+        errors: [{ field: 'selected_events', message: 'Select an eligible event to continue.' }]
+      });
+    }
+
+    const result = await submitStudentForm(studentId, {
+      ...validation.data,
+      selected_events: filteredEvents
+    });
 
     const updatedUser = {
       ...user,
