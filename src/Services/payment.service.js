@@ -1,4 +1,4 @@
-import { Cashfree, PAYMENT_AMOUNT, CASHFREE_MODE, createOrderDirect } from '../config/cashfree.js';
+import { PAYMENT_AMOUNT, CASHFREE_MODE, createOrderDirect } from '../config/cashfree.js';
 import db from '../db/mysql.js';
 import crypto from 'crypto';
 import { sendConfirmationForPayment } from './email.service.js';
@@ -8,6 +8,67 @@ function generateOrderId() {
   const timestamp = Date.now().toString(36);
   const random = crypto.randomBytes(4).toString('hex');
   return `ELY26_${timestamp}_${random}`.toUpperCase();
+}
+
+const CASHFREE_API_BASE = CASHFREE_MODE === 'production'
+  ? 'https://api.cashfree.com/pg'
+  : 'https://sandbox.cashfree.com/pg';
+
+async function fetchCashfreeOrderPayments(orderId) {
+  const response = await fetch(`${CASHFREE_API_BASE}/orders/${orderId}/payments`, {
+    method: 'GET',
+    headers: {
+      'x-api-version': '2023-08-01',
+      'x-client-id': process.env.CASHFREE_APP_ID || '',
+      'x-client-secret': process.env.CASHFREE_SECRET_KEY || ''
+    }
+  });
+
+  let rawText = '';
+  try {
+    rawText = await response.text();
+  } catch (err) {
+    rawText = '';
+  }
+
+  let parsedBody;
+  if (rawText) {
+    try {
+      parsedBody = JSON.parse(rawText);
+    } catch (err) {
+      parsedBody = { parseError: err.message, raw: rawText };
+    }
+  }
+
+  if (!response.ok) {
+    const error = new Error('Failed to fetch payment status from Cashfree');
+    error.response = {
+      status: response.status,
+      data: parsedBody || rawText
+    };
+    throw error;
+  }
+
+  console.log('Cashfree payment fetch', {
+    orderId,
+    status: response.status,
+    bodyType: parsedBody ? typeof parsedBody : 'empty',
+    hasPaymentsArray: Array.isArray(parsedBody?.payments) || Array.isArray(parsedBody)
+  });
+
+  if (Array.isArray(parsedBody)) {
+    return parsedBody;
+  }
+
+  if (parsedBody && Array.isArray(parsedBody.data)) {
+    return parsedBody.data;
+  }
+
+  if (parsedBody && Array.isArray(parsedBody.payments)) {
+    return parsedBody.payments;
+  }
+
+  return [];
 }
 
 // Create payment order
@@ -174,11 +235,12 @@ export async function verifyPaymentStatus(orderId) {
       };
     }
 
-    // Fetch latest status from Cashfree - SDK v5 requires version parameter
-    const response = await Cashfree.PGOrderFetchPayments("2023-08-01", orderId);
-    
-    if (response.data && response.data.length > 0) {
-      const latestPayment = response.data[0];
+    // Fetch latest status from Cashfree via REST API to avoid SDK inconsistencies
+    const payments = await fetchCashfreeOrderPayments(orderId);
+
+    if (payments.length > 0) {
+      const latestPayment = payments[0];
+      const paymentMethod = latestPayment.payment_group || latestPayment.payment_method || payment.payment_method || null;
       
       if (latestPayment.payment_status === 'SUCCESS') {
         // Update database
@@ -190,7 +252,7 @@ export async function verifyPaymentStatus(orderId) {
               paid_at = NOW(),
               updated_at = NOW()
           WHERE order_id = ?
-        `, [latestPayment.cf_payment_id, latestPayment.payment_group, orderId]);
+        `, [latestPayment.cf_payment_id, paymentMethod, orderId]);
 
         if (payment.form_id) {
           await db.query(`
@@ -216,7 +278,7 @@ export async function verifyPaymentStatus(orderId) {
           status: 'SUCCESS',
           orderId,
           amount: payment.amount,
-          paymentMethod: latestPayment.payment_group,
+          paymentMethod,
           context,
           registrationCode
         };
@@ -239,7 +301,7 @@ export async function verifyPaymentStatus(orderId) {
           success: false,
           status: 'FAILED',
           orderId,
-          message: latestPayment.payment_message || 'Payment failed',
+          message: latestPayment.payment_message || latestPayment.error_message || 'Payment failed',
           context,
           registrationCode: null  // Don't reveal on failed payment
         };
@@ -300,7 +362,7 @@ export async function handleWebhook(payload, signature) {
             paid_at = NOW(),
             updated_at = NOW()
         WHERE order_id = ?
-      `, [paymentData?.cf_payment_id, paymentData?.payment_group, orderId]);
+      `, [paymentData?.cf_payment_id, paymentData?.payment_group || paymentData?.payment_method || null, orderId]);
 
       const [payments] = await db.query(
         'SELECT form_id, external_registration_id, id FROM payments WHERE order_id = ?',
