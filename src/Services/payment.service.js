@@ -510,14 +510,14 @@ export async function verifyPaymentOwnership(orderId, studentId, email) {
   );
   
   if (payments.length === 0) {
-        return {
-          success: false,
-          status: 'FAILED',
-          orderId,
-          message: failedPayment.payment_message || failedPayment.error_message || latestPayment.payment_message || latestPayment.error_message || 'Payment failed',
-          context,
-          registrationCode: null
-        };
+    return false;
+  }
+  
+  const payment = payments[0];
+  
+  // Check if it's an internal payment
+  if (payment.student_id) {
+    return payment.student_id === studentId;
   }
   
   // Check if it's an external payment
@@ -525,8 +525,8 @@ export async function verifyPaymentOwnership(orderId, studentId, email) {
     const [externals] = await db.query(
       'SELECT email FROM external_registrations WHERE id = ?',
       [payment.external_registration_id]
-      context,
-      registrationCode: null
+    );
+    return externals[0]?.email?.toLowerCase() === email?.toLowerCase();
   }
   
   return false;
