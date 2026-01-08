@@ -76,9 +76,10 @@ export async function createOrderDirect(orderData) {
 // Initialize Cashfree SDK v5+ using static configuration
 CashfreeSDK.XClientId = process.env.CASHFREE_APP_ID;
 CashfreeSDK.XClientSecret = process.env.CASHFREE_SECRET_KEY;
-CashfreeSDK.XEnvironment = CASHFREE_MODE === 'production' 
-  ? CashfreeSDK.Environment.PRODUCTION 
-  : CashfreeSDK.Environment.SANDBOX;
+// Some builds do not expose Environment; use string fallback
+CashfreeSDK.XEnvironment = CASHFREE_MODE === 'production'
+  ? (CashfreeSDK.Environment?.PRODUCTION || 'PRODUCTION')
+  : (CashfreeSDK.Environment?.SANDBOX || 'SANDBOX');
 
 // Export the configured SDK class
 const Cashfree = CashfreeSDK;
