@@ -26,24 +26,24 @@ export const EVENT_DEFINITIONS = [
     id: 'EVT_RESOURCE_TECH',
     name: 'Resource Tech',
     organizer: 'IUCEE-EWB (INNOFIESTA)',
-    type: EVENT_TYPES.MULTI_DAY,
-    dayLabel: 'Day 1 + Day 2',
+    type: EVENT_TYPES.DAY_1_ONLY,
+    dayLabel: 'Day 1',
     description: 'Parallel innovation sprint exploring sustainable resource technologies.'
   },
   {
     id: 'EVT_INSIGHT_DASH',
     name: 'InsightDash',
     organizer: 'IUCEE-EWB (INNOFIESTA)',
-    type: EVENT_TYPES.MULTI_DAY,
-    dayLabel: 'Day 1 + Day 2',
+    type: EVENT_TYPES.DAY_1_ONLY,
+    dayLabel: 'Day 1',
     description: 'Data-driven challenge to surface insights that matter for communities.'
   },
   {
     id: 'EVT_REVERSE_ENGINEERING',
     name: 'Reverse Engineering & Innovation Challenge',
     organizer: 'IUCEE-EWB (INNOFIESTA)',
-    type: EVENT_TYPES.MULTI_DAY,
-    dayLabel: 'Day 1 + Day 2',
+    type: EVENT_TYPES.DAY_2_ONLY,
+    dayLabel: 'Day 2',
     description: 'Hands-on teardown marathon to re-imagine products with smarter solutions.'
   },
   {
@@ -58,8 +58,8 @@ export const EVENT_DEFINITIONS = [
     id: 'EVT_EMOJI_DECODING',
     name: 'Emoji Decoding & Keyboard War',
     organizer: 'CSI & Coding Club',
-    type: EVENT_TYPES.DAY_2_ONLY,
-    dayLabel: 'Day 2',
+    type: EVENT_TYPES.DAY_1_ONLY,
+    dayLabel: 'Day 1',
     description: 'Fast-paced cryptic emoji puzzles paired with real-time typing battles.'
   },
   {
@@ -74,7 +74,7 @@ export const EVENT_DEFINITIONS = [
     id: 'EVT_NCET_CONFERENCE',
     name: 'NCET — National Conference on Emerging Technologies',
     organizer: 'IEOM & ISAMPE',
-    type: EVENT_TYPES.MULTI_DAY,
+    type: EVENT_TYPES.OPTIONAL,
     dayLabel: 'Day 1 + Day 2',
     description: 'Flagship conference spotlighting the latest advances in emerging tech domains.'
   },
@@ -82,17 +82,9 @@ export const EVENT_DEFINITIONS = [
     id: 'EVT_BUSINESS_CANVAS',
     name: 'Business Canvas Presentation',
     organizer: 'EDC',
-    type: EVENT_TYPES.OPTIONAL,
-    dayLabel: 'Optional Add-on',
+    type: EVENT_TYPES.MULTI_DAY,
+    dayLabel: 'Day 1 + Day 2',
     description: 'Learn to create and present compelling business model canvases with the Entrepreneurship Development Cell.'
-  },
-  {
-    id: 'EVT_CULTURAL_SAHITYA_PRASASTI',
-    name: 'Sahitya + Prasasti Cultural Access',
-    organizer: 'Cultural Committee',
-    type: EVENT_TYPES.OPTIONAL,
-    dayLabel: 'Cultural Add-on',
-    description: 'Exclusive access to the Sahitya literature showcase and Prasasti cultural celebrations.'
   }
 ];
 

@@ -9,17 +9,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-primary: #0a0a0f;
-      --bg-secondary: #12121a;
-      --bg-card: #16161f;
-      --border: rgba(255, 255, 255, 0.08);
-      --text-primary: #ffffff;
-      --text-secondary: #e0e0e0;
-      --text-muted: #888;
-      --accent: #6b8cce;
-      --accent-hover: #7a9bdd;
-      --gradient-start: #6b8cce;
-      --gradient-end: #5a7bc0;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --bg-card: #ffffff;
+      --border: rgba(15, 23, 42, 0.1);
+      --text-primary: #0d1320;
+      --text-secondary: #171313;
+      --text-muted: #64748b;
+      --accent: #1f4499;
+      --accent-hover: #2a5abf;
+      --gradient-start: #1f4499;
+      --gradient-end: #3b6ef5;
     }
 
     * {
@@ -34,7 +34,7 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--bg-primary);
+      background: #ffffff;
       color: var(--text-primary);
       line-height: 1.6;
       min-height: 100vh;
@@ -49,7 +49,7 @@
       width: 100%;
       z-index: 1000;
       padding: 1rem 2rem;
-      background: rgba(10, 10, 15, 0.95);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
       display: flex;
@@ -161,6 +161,34 @@
       z-index: 1;
     }
 
+    .hero-logo-cluster {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-logo {
+      max-width: 140px;
+      width: 100%;
+      height: auto;
+    }
+
+    .hero-logo-secondary {
+      max-width: 105px;
+    }
+
+    .event-image {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      object-fit: cover;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+    }
+
     .hero-date {
       display: inline-block;
       padding: 0.5rem 1.5rem;
@@ -184,7 +212,7 @@
     }
 
     .hero-title span {
-      background: linear-gradient(135deg, #fff 0%, #6b8cce 100%);
+      background: linear-gradient(135deg, #0f0d0d 0%, #6b8cce 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -319,6 +347,9 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 1.5rem;
+      justify-items: center;
+      max-width: 1100px;
+      margin: 0 auto;
     }
 
     .event-card {
@@ -328,6 +359,8 @@
       transition: all 0.3s;
       position: relative;
       overflow: hidden;
+      width: 100%;
+      max-width: 380px;
     }
 
     .event-card::before {
@@ -602,7 +635,6 @@
     <a href="#" class="navbar-brand">elysian<span>'26</span></a>
     <div class="nav-links">
       <a href="#events">Events</a>
-      <a href="#schedule">Schedule</a>
       <a class="btn-nav-register" href="/login.html">Register Now</a>
     </div>
   </nav>
@@ -610,6 +642,10 @@
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-content">
+      <div class="hero-logo-cluster">
+        <img src="/assets/elysian-logo.PNG" alt="Elysian festival mark" class="hero-logo">
+        <img src="/assets/25-Y.PNG" alt="25 years emblem" class="hero-logo hero-logo-secondary">
+      </div>
       <div class="hero-date">January 24-31, 2026</div>
       <h1 class="hero-title"><span>Elysian 2026</span></h1>
       <p class="hero-subtitle">
@@ -660,6 +696,7 @@
 
     <div class="events-grid">
       <div class="event-card">
+        <img src="/assets/sangram.jpeg" alt="Sangram tournament action" class="event-image">
         <div class="event-icon">🏅</div>
         <div class="event-category">Sports</div>
         <h3 class="event-name">Sangram</h3>
@@ -671,6 +708,7 @@
       </div>
 
       <div class="event-card">
+        <img src="/assets/sahitya.jpeg" alt="Sahithya cultural performances" class="event-image">
         <div class="event-icon">📚</div>
         <div class="event-category">Literary & Cultural</div>
         <h3 class="event-name">Sahithya</h3>
@@ -682,6 +720,7 @@
       </div>
 
       <div class="event-card">
+        <img src="/assets/esparto.jpeg" alt="Esparto technical showcase" class="event-image">
         <div class="event-icon">⚙️</div>
         <div class="event-category">Technical</div>
         <h3 class="event-name">Esparto</h3>
@@ -693,17 +732,7 @@
       </div>
 
       <div class="event-card">
-        <div class="event-icon">📡</div>
-        <div class="event-category">Conference</div>
-        <h3 class="event-name">NCET 2026</h3>
-        <p class="event-desc">Day-long discourse on emerging technologies led by researchers and industry experts across two focused conference days.</p>
-        <div class="event-meta">
-          <span class="event-meta-item">📅 Jan 28-29</span>
-          <span class="event-meta-item">👥 Academic Delegations</span>
-        </div>
-      </div>
-
-      <div class="event-card">
+        <img src="/assets/prasasti.jpeg" alt="Prasasthi honors night" class="event-image">
         <div class="event-icon">🏆</div>
         <div class="event-category">Honors</div>
         <h3 class="event-name">Prasasthi</h3>
@@ -715,6 +744,7 @@
       </div>
 
       <div class="event-card">
+        <img src="/assets/bliss.jpeg" alt="Bliss festival finale" class="event-image">
         <div class="event-icon">🎶</div>
         <div class="event-category">Festival Finale</div>
         <h3 class="event-name">Bliss</h3>
@@ -722,185 +752,6 @@
         <div class="event-meta">
           <span class="event-meta-item">📅 Jan 31</span>
           <span class="event-meta-item">👥 Full Campus</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Schedule Section -->
-  <section class="schedule-section" id="schedule">
-    <div class="schedule-container">
-      <div class="section-header">
-        <div class="section-label">Plan Your Day</div>
-        <h2 class="section-title">Event Schedule</h2>
-        <p class="section-desc">Eight immersive days of sport, culture, and technology with parallel experiences across campus</p>
-      </div>
-
-      <div class="schedule-days">
-        <div class="schedule-day">
-          <div class="day-header">
-            <h3 class="day-title">Sangram Opening Day</h3>
-            <span class="day-date">January 24, 2026</span>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">All Day</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Athletics Heats</span>
-              <span class="slot-event-tag">Team Sport Qualifiers</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="schedule-day">
-          <div class="day-header">
-            <h3 class="day-title">Sangram League Play</h3>
-            <span class="day-date">January 26, 2026</span>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">All Day</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Indoor Arenas</span>
-              <span class="slot-event-tag">Outdoor Courts</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="schedule-day">
-          <div class="day-header">
-            <h3 class="day-title">Sangram Finals & Sahithya</h3>
-            <span class="day-date">January 27, 2026</span>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">Morning</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Championship Matches</span>
-              <span class="slot-event-tag">Medal Ceremonies</span>
-            </div>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">4:00 PM – 8:00 PM</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Sahithya Performances</span>
-              <span class="slot-event-tag">Literary Awards</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="schedule-day">
-          <div class="day-header">
-            <h3 class="day-title">Esparto · Day 1</h3>
-            <span class="day-date">January 28, 2026</span>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">9:30 AM – 4:30 PM</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Workshop on Edge AI (Day 1)</span>
-              <span class="slot-event-tag">GEN AI Hackathon (Day 1)</span>
-            </div>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">10:00 AM – 2:30 PM</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Business Canvas Presentation</span>
-              <span class="slot-event-tag">NCET Sessions (Day 1)</span>
-            </div>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">11:00 AM – 1:30 PM</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Code Debugging — Bug Bounty Hunt</span>
-            </div>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">11:00 AM – 4:15 PM</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Data to Dash</span>
-            </div>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">1:00 PM – 4:30 PM</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Resource Tech</span>
-            </div>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">2:30 PM – 4:00 PM</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Keyboard Wars</span>
-            </div>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">Online</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">UI/UX VibeCoding Website Design (Open Challenge)</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="schedule-day">
-          <div class="day-header">
-            <h3 class="day-title">Esparto · Day 2</h3>
-            <span class="day-date">January 29, 2026</span>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">9:30 AM – 4:30 PM</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Workshop on Edge AI (Day 2)</span>
-              <span class="slot-event-tag">NCET Sessions (Day 2)</span>
-            </div>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">9:30 AM – 4:00 PM</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">GEN AI Hackathon (Day 2)</span>
-            </div>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">9:30 AM – 3:30 PM</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Reverse Engineering & Innovation Challenge</span>
-            </div>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">10:00 AM – 2:30 PM</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Circuit Debugging Competition</span>
-            </div>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">Online</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">UI/UX VibeCoding Website Design (Open Challenge)</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="schedule-day">
-          <div class="day-header">
-            <h3 class="day-title">Prasasthi Honors Night</h3>
-            <span class="day-date">January 30, 2026</span>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">6:00 PM – 9:00 PM</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Awards Ceremony</span>
-              <span class="slot-event-tag">Celebratory Dinner</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="schedule-day">
-          <div class="day-header">
-            <h3 class="day-title">Bliss Finale</h3>
-            <span class="day-date">January 31, 2026</span>
-          </div>
-          <div class="time-slot">
-            <div class="slot-time">6:00 PM – Late</div>
-            <div class="slot-events">
-              <span class="slot-event-tag">Live Bands</span>
-              <span class="slot-event-tag">DJ Showcase</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -931,7 +782,6 @@
       </div>
       <div class="footer-links">
         <a href="#events">Events</a>
-        <a href="#schedule">Schedule</a>
         <a href="/login.html">Register</a>
       </div>
       <p class="footer-text">© 2026 ROYAL EDUCATIONAL SOCIETY. All rights reserved.</p>
