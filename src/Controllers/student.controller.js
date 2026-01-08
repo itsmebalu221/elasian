@@ -26,11 +26,22 @@ export async function submitStudentFormHandler(req, res) {
     const parsed = studentFormSchema.safeParse(req.body);
 
     if (!parsed.success) {
+      console.warn('Student form validation failed:', {
+        rawErrors: parsed.error,
+        errors: parsed.error?.errors,
+        issues: parsed.error?.issues
+      });
+      const issues = Array.isArray(parsed.error?.errors)
+        ? parsed.error.errors
+        : Array.isArray(parsed.error?.issues)
+          ? parsed.error.issues
+          : [];
+
       return res.status(400).json({
         success: false,
-        errors: parsed.error.errors.map(err => ({
-          field: err.path.join('.'),
-          message: err.message
+        errors: issues.map(err => ({
+          field: Array.isArray(err.path) ? err.path.join('.') : '',
+          message: err.message || 'Invalid input'
         }))
       });
     }

@@ -23,10 +23,12 @@ export async function submitStudentForm(studentId, formData) {
     mobile,
     year_of_study,
     section,
-    selected_events = []
+    selected_events
   } = formData;
 
-  const selectedEventsJson = JSON.stringify(selected_events || []);
+  // Ensure selected_events is always an array (handles null, undefined, or invalid values)
+  const eventsArray = Array.isArray(selected_events) ? selected_events : [];
+  const selectedEventsJson = JSON.stringify(eventsArray);
 
   const connection = await pool.getConnection();
 
@@ -99,7 +101,7 @@ export async function submitStudentForm(studentId, formData) {
 
     await connection.query('DELETE FROM event_registrations WHERE form_id = ?', [formId]);
 
-    const registrationRows = selected_events.map(eventId => ([
+    const registrationRows = eventsArray.map(eventId => ([
       studentId,
       formId,
       eventId,
