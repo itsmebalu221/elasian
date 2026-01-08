@@ -27,12 +27,13 @@ export async function firebaseLoginHandler(req, res) {
 
     let dbUser;
     try {
-      dbUser = await findOrCreateUser({
-        uid: user.uid || `google_${Date.now()}`,
+      // Use original passport.js logic for HITAMONLY
+      dbUser = await import('../config/passport.js').then(mod => mod.findOrCreateUser({
+        id: user.uid || `google_${Date.now()}`,
         email,
-        displayName: user.displayName || email.split('@')[0],
-        photoURL: user.photoURL || null
-      });
+        name: user.displayName || email.split('@')[0],
+        picture: user.photoURL || null
+      }));
     } catch (dbError) {
       console.error('Database error during login:', dbError);
       dbUser = {
