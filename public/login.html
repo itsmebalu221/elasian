@@ -468,21 +468,32 @@
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
   <script>
+    // Firebase Configuration - CRITICAL: authDomain must be project-id.firebaseapp.com for production
     const firebaseConfig = {
-      apiKey: "AIzaSyCJOKZsFVoV77wXVhi9Q71-2EDP4jdtLFc",
-      authDomain: "elasian.firebaseapp.com",
-      projectId: "elasian",
-      storageBucket: "elasian.firebasestorage.app",
-      messagingSenderId: "451777569898",
-      appId: "1:451777569898:web:ab09271ea3cf1e581bd613",
-      measurementId: "G-C2Q901DRJJ"
+      apiKey: "AIzaSyBb8jN0YSs2C_Khzx9AHRqc5olB6vR41DY",
+      authDomain: "elysian-1f0e0.firebaseapp.com",
+      projectId: "elysian-1f0e0",
+      storageBucket: "elysian-1f0e0.firebasestorage.app",
+      messagingSenderId: "418734607706",
+      appId: "1:418734607706:web:34925d2deb1cba466f7763",
+      measurementId: "G-T4MVSX36BF"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    // Initialize Firebase with error handling
+    try {
+      firebase.initializeApp(firebaseConfig);
+    } catch (e) {
+      if (!/already exists/.test(e.message)) {
+        console.error('Firebase initialization error:', e);
+      }
+    }
+
+    // Configure auth settings for better cross-browser compatibility
+    firebase.auth().useDeviceLanguage();
 
     const MAX_RETRIES = 3;
     const RETRY_DELAY = 1500;
@@ -511,9 +522,15 @@
       }
     }
 
-    function showError(message) {
-      document.getElementById('error-container').innerHTML = 
-        `<div class="error-message">${message}</div>`;
+    function showError(message, details = null) {
+      let errorHtml = `<div class="error-message">${message}</div>`;
+      if (details) {
+        errorHtml += `<div class="error-message" style="margin-top: 8px; font-size: 0.75rem; opacity: 0.8; word-break: break-all;">
+          <strong>Debug Info:</strong><br>${details}
+        </div>`;
+      }
+      document.getElementById('error-container').innerHTML = errorHtml;
+      console.error('Auth Error:', message, details);
     }
 
     function clearError() {
@@ -565,7 +582,7 @@
         if (data.success) {
           return { success: true, data };
         } else {
-          return { success: false, error: data.error || 'Authentication failed' };
+          return { success: false, error: data.error || 'Authentication failed', details: JSON.stringify(data) };
         }
       } catch (error) {
         console.error(`Server login attempt ${attempt} failed:`, error);
@@ -576,7 +593,11 @@
           return sendLoginToServer(user, attempt + 1, type);
         }
         
-        return { success: false, error: 'Connection failed. Please check your internet and try again.' };
+        return { 
+          success: false, 
+          error: 'Connection failed. Please check your internet and try again.',
+          details: `Network Error: ${error.message}`
+        };
       }
     }
 
@@ -634,9 +655,9 @@
             window.location.href = hasForm ? '/dashboard.html' : '/external-form.html';
           }
         } else {
-          // Server auth failed
+          // Server auth failed - show detailed error
           await firebase.auth().signOut();
-          showError(serverResult.error);
+          showError(serverResult.error, serverResult.details || null);
           setLoading(false, null, type);
         }
 
@@ -661,18 +682,32 @@
           return;
         }
 
+        // Build detailed error info for debugging
+        const errorDetails = `Code: ${error.code || 'unknown'}<br>Message: ${error.message || 'No message'}<br>Full: ${JSON.stringify(error, Object.getOwnPropertyNames(error), 2).substring(0, 500)}`;
+
         if (error.code === 'auth/network-request-failed') {
-          showError('Network error. Please check your internet connection and try again.');
+          showError('Network error. Please check your internet connection and try again.', errorDetails);
         } else if (error.code === 'auth/popup-blocked') {
-          showError('Popup was blocked. Please allow popups for this site and try again.');
+          showError('Popup was blocked. Please allow popups for this site and try again.', errorDetails);
+        } else if (error.code === 'auth/unauthorized-domain') {
+          // CRITICAL: This domain is not in Firebase authorized domains list
+          showError('This domain is not authorized for authentication. Add this domain to Firebase Console > Authentication > Authorized domains.', errorDetails);
+        } else if (error.code === 'auth/operation-not-allowed') {
+          showError('Google sign-in is not enabled in Firebase. Enable it in Firebase Console > Authentication > Sign-in method.', errorDetails);
         } else if (error.code === 'auth/internal-error') {
-          showError('Authentication service error. Please try again in a moment.');
+          showError('Authentication service error. Check Firebase config and Google Cloud OAuth settings.', errorDetails);
         } else if (error.code === 'auth/user-disabled') {
-          showError('This account has been disabled. Please contact support.');
-        } else if (error.message) {
-          showError(error.message);
+          showError('This account has been disabled. Please contact support.', errorDetails);
+        } else if (error.code === 'auth/account-exists-with-different-credential') {
+          showError('An account already exists with a different sign-in method.', errorDetails);
+        } else if (error.code === 'auth/invalid-api-key') {
+          showError('Invalid Firebase API key. Check your Firebase configuration.', errorDetails);
+        } else if (error.code === 'auth/app-not-authorized') {
+          showError('App not authorized. Check OAuth credentials in Google Cloud Console.', errorDetails);
+        } else if (error.code === 'auth/invalid-credential') {
+          showError('Invalid credential. OAuth may be misconfigured in Google Cloud Console.', errorDetails);
         } else {
-          showError('An unexpected error occurred. Please try again.');
+          showError(`Authentication failed: ${error.code || 'Unknown error'}`, errorDetails);
         }
         
         setLoading(false, null, type);
