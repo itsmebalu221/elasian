@@ -1403,6 +1403,8 @@
         selected_events: Array.from(selectedEvents)
       };
 
+      console.log('Submitting formData:', formData);
+
       const selectionCheck = validateSelection(formData.selected_events);
       if (!selectionCheck.ok) {
         showEventsError(selectionCheck.reason);

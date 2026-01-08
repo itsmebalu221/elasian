@@ -15,8 +15,9 @@ export function validateStudentForm(data) {
     errors.push({ field: 'full_name', message: 'Full name must be at least 2 characters' });
   }
 
-  // branch
-  if (!data.branch || !VALID_BRANCHES.includes(data.branch)) {
+  // branch - convert to uppercase for comparison
+  const branch = data.branch ? data.branch.toUpperCase() : '';
+  if (!branch || !VALID_BRANCHES.includes(branch)) {
     errors.push({ field: 'branch', message: 'Please select a valid branch' });
   }
 
@@ -56,7 +57,7 @@ export function validateStudentForm(data) {
     valid: true,
     data: {
       full_name: data.full_name.trim(),
-      branch: data.branch,
+      branch: data.branch.toUpperCase(),
       roll_number: data.roll_number.trim(),
       mobile: data.mobile.trim(),
       year_of_study: year,
