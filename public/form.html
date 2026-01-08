@@ -1436,8 +1436,8 @@
         const data = await response.json();
 
         if (!response.ok) {
-          if (data.errors) {
-            data.errors.forEach(err => {
+          if (data.errors && Array.isArray(data.errors)) {
+            for (const err of data.errors) {
               const field = err.field;
               const errorEl = document.getElementById(`${field}-error`);
               const inputEl = document.getElementById(field);
@@ -1447,7 +1447,7 @@
                 if (errorEl) errorEl.textContent = err.message;
                 if (inputEl) inputEl.classList.add('error');
               }
-            });
+            }
           } else {
             document.getElementById('error-message').textContent = data.error || 'An error occurred';
             document.getElementById('error-message').style.display = 'block';
