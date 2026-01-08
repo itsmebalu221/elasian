@@ -14,7 +14,11 @@ export async function submitStudentFormHandler(req, res) {
     const user = sanitizeUserPayload(req.user);
     const studentId = user.id;
 
+    console.log('Received body:', JSON.stringify(req.body));
+
     const validation = validateStudentForm(req.body);
+
+    console.log('Validation result:', JSON.stringify(validation));
 
     if (!validation.valid) {
       return res.status(400).json({
