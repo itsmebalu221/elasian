@@ -1186,12 +1186,8 @@
     }
 
     function updatePricing() {
-      // Check both the toggle and any optional events selected
-      const hasOptionalEvent = Array.from(selectedEvents).some(id => {
-        const event = eventLookup.get(id);
-        return event && event.type === EVENT_TYPES_ENUM.OPTIONAL;
-      });
-      const hasAddOn = culturalAddOnSelected || hasOptionalEvent;
+      // Cultural add-on toggle solely controls the extra fee
+      const hasAddOn = culturalAddOnSelected;
       const total = EXTERNAL_BASE_AMOUNT + (hasAddOn ? EXTERNAL_ADD_ON_AMOUNT : 0);
       const totalText = `₹${total}`;
 
@@ -1594,10 +1590,7 @@
         return;
       }
 
-      const addOnSelected = culturalAddOnSelected || Array.from(selectedEvents).some(id => {
-        const event = eventLookup.get(id);
-        return event && event.type === EVENT_TYPES_ENUM.OPTIONAL;
-      });
+      const addOnSelected = culturalAddOnSelected;
 
       const payload = {
         full_name: formData.get('full_name').trim(),
