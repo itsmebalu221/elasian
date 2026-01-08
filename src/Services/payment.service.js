@@ -236,10 +236,10 @@ export async function verifyPaymentStatus(orderId) {
     }
 
     // Fetch latest status from Cashfree via REST API to avoid SDK inconsistencies
-    const payments = await fetchCashfreeOrderPayments(orderId);
+    const cashfreePayments = await fetchCashfreeOrderPayments(orderId);
 
-    if (payments.length > 0) {
-      const latestPayment = payments[0];
+    if (cashfreePayments.length > 0) {
+      const latestPayment = cashfreePayments[0];
       const paymentMethod = latestPayment.payment_group || latestPayment.payment_method || payment.payment_method || null;
       
       if (latestPayment.payment_status === 'SUCCESS') {
