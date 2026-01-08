@@ -22,8 +22,12 @@ export async function submitStudentForm(studentId, formData) {
     mobile,
     year_of_study,
     section,
-    selected_events
-  } = formData;
+    selected_events = []
+  } = formData || {};
+
+  if (!Array.isArray(selected_events) || selected_events.length === 0) {
+    throw new Error('Please select at least one event');
+  }
 
   const selectedEventsJson = JSON.stringify(selected_events);
 
