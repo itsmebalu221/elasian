@@ -85,6 +85,14 @@ export const EVENT_DEFINITIONS = [
     type: EVENT_TYPES.OPTIONAL,
     dayLabel: 'Day 1 + Day 2',
     description: 'Learn to create and present compelling business model canvases with the Entrepreneurship Development Cell.'
+  },
+  {
+    id: 'EVT_CULTURAL_SAHITYA_PRASASTI',
+    name: 'Sahitya + Prasasti Cultural Access',
+    organizer: 'Cultural Committee',
+    type: EVENT_TYPES.OPTIONAL,
+    dayLabel: 'Cultural Add-on',
+    description: 'Exclusive access to the Sahitya literature showcase and Prasasti cultural celebrations.'
   }
 ];
 

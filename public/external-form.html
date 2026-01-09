@@ -1485,7 +1485,20 @@
           </div>
         `;
       }).join('');
-      summaryContainer.innerHTML = rows || '<div class="summary-empty">No selections yet — you can decide at the fest</div>';
+
+      // Show add-on in summary if selected via toggle
+      let addOnRow = '';
+      if (culturalAddOnSelected) {
+        addOnRow = `
+          <div class="summary-item">
+            <span class="summary-name">Sahitya + Prasasti Cultural Access</span>
+            <span class="summary-meta">Optional Add-On · +₹300</span>
+          </div>
+        `;
+      }
+
+      const allContent = addOnRow + rows;
+      summaryContainer.innerHTML = allContent || '<div class="summary-empty">No selections yet — you can decide at the fest</div>';
     }
 
     function toggleEventSelection(eventId) {
