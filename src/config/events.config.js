@@ -19,7 +19,7 @@ export const EVENT_DEFINITIONS = [
     name: 'Vibe Coding Challenge',
     organizer: 'Coding Club',
     type: EVENT_TYPES.MULTI_DAY,
-    dayLabel: 'Day 1 + Day 2 [ Online ]',
+    dayLabel: 'Day 1 + Day 2 [ Online Event ]',
     description: 'Design the vibe. Code the experience. Deliver UI/UX that actually makes sense.'
   },
   {
