@@ -11,7 +11,7 @@ export const EVENT_DEFINITIONS = [
     name: 'Workshop on Edge AI',
     organizer: 'IEEE & IETE',
     type: EVENT_TYPES.MULTI_DAY,
-    dayLabel: 'Day 1 + Day 2',
+    dayLabel: '2 Days Event, Time : 9:30 AM - 4:30 PM',
     description: 'Deep dive into building and deploying intelligence on the edge across both fest days.'
   },
   {
@@ -27,7 +27,7 @@ export const EVENT_DEFINITIONS = [
     name: 'Circuit Debugging Competition',
     organizer: 'IEEE & IETE',
     type: EVENT_TYPES.DAY_2_ONLY,
-    dayLabel: 'Day 2',
+    dayLabel: '2nd Day Event, Time : 10:00 AM - 2:30 PM',
     description: 'Hands-on race to diagnose and repair intricate hardware faults.'
   },
   {
@@ -35,7 +35,7 @@ export const EVENT_DEFINITIONS = [
     name: 'Resource Tech',
     organizer: 'IUCEE-EWB (INNOFIESTA)',
     type: EVENT_TYPES.DAY_1_ONLY,
-    dayLabel: 'Day 1',
+    dayLabel: '1st Day Event, Time : 1:00 PM - 4:30 PM',
     description: 'Parallel innovation sprint exploring sustainable resource technologies.'
   },
   {
@@ -43,7 +43,7 @@ export const EVENT_DEFINITIONS = [
     name: 'InsightDash',
     organizer: 'IUCEE-EWB (INNOFIESTA)',
     type: EVENT_TYPES.DAY_1_ONLY,
-    dayLabel: 'Day 1',
+    dayLabel: '1st Day Event, Time : 11:00 AM - 4:00 PM',
     description: 'Data-driven challenge to surface insights that matter for communities.'
   },
   {
@@ -51,7 +51,7 @@ export const EVENT_DEFINITIONS = [
     name: 'Reverse Engineering & Innovation Challenge',
     organizer: 'IUCEE-EWB (INNOFIESTA)',
     type: EVENT_TYPES.DAY_2_ONLY,
-    dayLabel: 'Day 2',
+    dayLabel: '2nd Day Event, Time : 9:30 AM - 3:30 PM',
     description: 'Hands-on teardown marathon to re-imagine products with smarter solutions.'
   },
   {
@@ -59,7 +59,7 @@ export const EVENT_DEFINITIONS = [
     name: 'Code Debugging — Bug Bounty Hunt',
     organizer: 'CSI & Coding Club',
     type: EVENT_TYPES.DAY_1_ONLY,
-    dayLabel: 'Day 1',
+    dayLabel: '1st Day Event, Time : 11:00 AM - 1:30 PM',
     description: 'Competitive debugging gauntlet to squash vulnerabilities under time pressure.'
   },
   {
@@ -67,7 +67,7 @@ export const EVENT_DEFINITIONS = [
     name: 'Keyboard War',
     organizer: 'CSI & Coding Club',
     type: EVENT_TYPES.DAY_1_ONLY,
-    dayLabel: 'Day 1',
+    dayLabel: '1st Day Event, Time : 2:30 PM - 4:00 PM',
     description: 'Fast-paced real-time typing battles.'
   },
   {
@@ -75,15 +75,15 @@ export const EVENT_DEFINITIONS = [
     name: 'GEN AI Hackathon',
     organizer: 'GDG & HHC',
     type: EVENT_TYPES.MULTI_DAY,
-    dayLabel: 'Day 1 + Day 2',
+    dayLabel: '2 Days Event, Time : 9:30 AM - 4:00 PM',
     description: 'Two-day buildathon focused on generative AI breakthroughs.'
   },
   {
     id: 'EVT_BUSINESS_CANVAS',
     name: 'Business Canvas Presentation',
     organizer: 'EDC',
-    type: EVENT_TYPES.OPTIONAL,
-    dayLabel: 'Day 1 + Day 2',
+    type: EVENT_TYPES.DAY_1_ONLY,
+    dayLabel: '1st Day Event, Time : 10:00 AM - 2:00 PM',
     description: 'Learn to create and present compelling business model canvases with the Entrepreneurship Development Cell.'
   },
   {
