@@ -15,6 +15,14 @@ export const EVENT_DEFINITIONS = [
     description: 'Deep dive into building and deploying intelligence on the edge across both fest days.'
   },
   {
+    id: 'EVT_VIBE_CODE',
+    name: 'Vibe Coding Challenge',
+    organizer: 'Coding Club',
+    type: EVENT_TYPES.MULTI_DAY,
+    dayLabel: 'Day 1 + Day 2 [ Online ]',
+    description: 'Design the vibe. Code the experience. Deliver UI/UX that actually makes sense.'
+  },
+  {
     id: 'EVT_CIRCUIT_DEBUG',
     name: 'Circuit Debugging Competition',
     organizer: 'IEEE & IETE',
@@ -55,12 +63,12 @@ export const EVENT_DEFINITIONS = [
     description: 'Competitive debugging gauntlet to squash vulnerabilities under time pressure.'
   },
   {
-    id: 'EVT_EMOJI_DECODING',
-    name: 'Emoji Decoding & Keyboard War',
+    id: 'EVT_KEYBOARD_WAR',
+    name: 'Keyboard War',
     organizer: 'CSI & Coding Club',
     type: EVENT_TYPES.DAY_1_ONLY,
     dayLabel: 'Day 1',
-    description: 'Fast-paced cryptic emoji puzzles paired with real-time typing battles.'
+    description: 'Fast-paced real-time typing battles.'
   },
   {
     id: 'EVT_GEN_AI_HACK',
@@ -71,18 +79,10 @@ export const EVENT_DEFINITIONS = [
     description: 'Two-day buildathon focused on generative AI breakthroughs.'
   },
   {
-    id: 'EVT_NCET_CONFERENCE',
-    name: 'NCET — National Conference on Emerging Technologies',
-    organizer: 'IEOM & ISAMPE',
-    type: EVENT_TYPES.OPTIONAL,
-    dayLabel: 'Day 1 + Day 2',
-    description: 'Flagship conference spotlighting the latest advances in emerging tech domains.'
-  },
-  {
     id: 'EVT_BUSINESS_CANVAS',
     name: 'Business Canvas Presentation',
     organizer: 'EDC',
-    type: EVENT_TYPES.MULTI_DAY,
+    type: EVENT_TYPES.OPTIONAL,
     dayLabel: 'Day 1 + Day 2',
     description: 'Learn to create and present compelling business model canvases with the Entrepreneurship Development Cell.'
   }
