@@ -10,19 +10,19 @@
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
   <style>
     :root {
-      --bg-primary: #0a0a10;
-      --bg-secondary: #8d8d8d;
-      --bg-card: rgba(255, 255, 255, 0.02);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --border-subtle: rgba(255, 255, 255, 0.05);
-      --accent: #6b8cce;
-      --accent-soft: rgba(107, 140, 206, 0.12);
-      --accent-strong: rgba(107, 140, 206, 0.25);
-      --success: #22c55e;
-      --error: #ef4444;
-      --text-primary: #ffffff;
-      --text-secondary: #d6d6dc;
-      --text-muted: #8c8ca0;
+      --bg-primary: #f4f6fb;
+      --bg-secondary: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.88);
+      --glass-border: rgba(33, 77, 141, 0.12);
+      --border-subtle: rgba(33, 77, 141, 0.08);
+      --accent: #3565d8;
+      --accent-soft: rgba(53, 101, 216, 0.12);
+      --accent-strong: rgba(53, 101, 216, 0.2);
+      --success: #2f9d62;
+      --error: #d16a6a;
+      --text-primary: #1f2433;
+      --text-secondary: #46536a;
+      --text-muted: #6d7485;
     }
 
     * {
@@ -33,7 +33,7 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background: radial-gradient(circle at top, rgba(107, 140, 206, 0.18) 0%, transparent 35%), var(--bg-primary);
+      background: radial-gradient(circle at top, rgba(53, 101, 216, 0.12) 0%, transparent 45%), var(--bg-primary);
       color: var(--text-primary);
       min-height: 100vh;
       padding: 0;
@@ -53,9 +53,10 @@
       align-items: center;
       justify-content: space-between;
       padding: 0.875rem 2rem;
-      background: rgba(10, 10, 16, 0.95);
-      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border-subtle);
+      box-shadow: 0 12px 30px rgba(27, 55, 116, 0.08);
     }
 
     @media (max-width: 640px) {
@@ -166,14 +167,93 @@
     .page-wrapper {
       flex: 1;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 5rem 1.5rem 3rem;
+      gap: 2.5rem;
+      padding: 5.5rem 1.5rem 3.5rem;
     }
 
     @media (max-width: 640px) {
       .page-wrapper {
-        padding: 4.5rem 1rem 2rem;
+        padding: 5rem 1rem 2.5rem;
+        gap: 2rem;
+      }
+    }
+
+    .registration-hero {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2.5rem;
+      padding: 2.75rem 3rem;
+      border-radius: 32px;
+      background: linear-gradient(135deg, rgba(53, 101, 216, 0.16), rgba(255, 255, 255, 0.7));
+      border: 1px solid rgba(53, 101, 216, 0.18);
+      box-shadow: 0 28px 50px rgba(23, 49, 105, 0.18);
+    }
+
+    .registration-hero-copy {
+      max-width: 460px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .registration-hero-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .registration-hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.75rem;
+      font-weight: 600;
+      line-height: 1.1;
+      color: var(--text-primary);
+    }
+
+    .registration-hero-text {
+      font-size: 0.98rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .registration-hero-media {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .registration-hero-media img {
+      width: 100%;
+      max-width: 340px;
+      border-radius: 20px;
+      box-shadow: 0 22px 38px rgba(18, 41, 96, 0.22);
+      object-fit: cover;
+    }
+
+    @media (max-width: 900px) {
+      .registration-hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 2.25rem;
+      }
+
+      .registration-hero-copy {
+        align-items: center;
+      }
+
+      .registration-hero-media {
+        justify-content: center;
+      }
+
+      .registration-hero-media img {
+        max-width: 280px;
       }
     }
 
@@ -310,7 +390,7 @@
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: #86efac;
+      color: #000000;
       background: rgba(34, 197, 94, 0.25);
       padding: 0.2rem 0.5rem;
       margin-bottom: 0.6rem;
@@ -333,15 +413,17 @@
     .sidebar-addon-price {
       font-size: 1rem;
       font-weight: 700;
-      color: #86efac;
+      color: #114021;
     }
 
     .addon-promo {
-      border: 1px solid rgba(34, 197, 94, 0.35);
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(34, 197, 94, 0.04) 100%);
+      border: 1px solid rgba(53, 101, 216, 0.28);
+      background: linear-gradient(135deg, rgba(53, 101, 216, 0.16) 0%, rgba(53, 101, 216, 0.06) 100%);
       padding: 1.25rem 1.5rem;
       display: grid;
       gap: 0.75rem;
+      border-radius: 18px;
+      box-shadow: 0 16px 30px rgba(32, 61, 124, 0.16);
     }
 
     .addon-promo-badge {
@@ -352,11 +434,12 @@
       font-weight: 600;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #86efac;
-      background: rgba(34, 197, 94, 0.2);
-      border: 1px solid rgba(34, 197, 94, 0.4);
+      color: var(--accent);
+      background: rgba(53, 101, 216, 0.18);
+      border: 1px solid rgba(53, 101, 216, 0.35);
       padding: 0.25rem 0.6rem;
       width: fit-content;
+      border-radius: 999px;
     }
 
     .addon-promo-title {
@@ -383,7 +466,7 @@
     .addon-promo-amount {
       font-size: 1.25rem;
       font-weight: 700;
-      color: #86efac;
+      color: var(--accent);
     }
 
     .addon-promo-note {
@@ -392,15 +475,15 @@
     }
 
     .addon-toggle {
-      padding: 1rem 1.25rem;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.06) 0%, rgba(34, 197, 94, 0.02) 100%);
-      border-radius: 4px;
+      padding: 1.1rem 1.35rem;
+      border: 1.5px solid rgba(23, 49, 105, 0.12);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(243, 247, 255, 0.95) 100%);
+      border-radius: 18px;
       cursor: pointer;
-      transition: border-color 0.2s ease, background-color 0.2s ease;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
       display: flex;
       align-items: flex-start;
-      gap: 0.875rem;
+      gap: 1rem;
     }
 
     @media (max-width: 900px) {
@@ -411,44 +494,49 @@
     }
 
     .addon-toggle:hover {
-      border-color: rgba(34, 197, 94, 0.45);
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.04) 100%);
+      border-color: rgba(53, 101, 216, 0.4);
+      box-shadow: 0 18px 32px rgba(27, 55, 116, 0.16);
+      transform: translateY(-2px);
     }
 
     .addon-toggle.selected {
-      border-color: rgba(34, 197, 94, 0.55);
-      background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.06) 100%);
+      border-color: rgba(53, 101, 216, 0.65);
+      background: linear-gradient(135deg, rgba(233, 239, 255, 0.9) 0%, rgba(247, 250, 255, 0.9) 100%);
+      box-shadow: 0 20px 38px rgba(27, 55, 116, 0.2);
     }
 
     .addon-toggle-check {
-      width: 20px;
-      height: 20px;
-      border: 2px solid rgba(34, 197, 94, 0.45);
+      width: 22px;
+      height: 22px;
+      border: 2px solid rgba(23, 49, 105, 0.35);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
       margin-top: 0.1rem;
+      background: #ffffff;
       transition: border-color 0.2s ease, background-color 0.2s ease;
-    }
-
-    .addon-toggle.selected .addon-toggle-check {
-      border-color: #22c55e;
-      background: #22c55e;
     }
 
     .addon-toggle-check::after {
       content: '';
-      width: 8px;
-      height: 8px;
-      background: transparent;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
-      transition: background-color 0.2s ease;
+      background: transparent;
+      transform: scale(0);
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .addon-toggle.selected .addon-toggle-check {
+      border-color: rgba(53, 101, 216, 0.8);
+      background: rgba(53, 101, 216, 0.12);
     }
 
     .addon-toggle.selected .addon-toggle-check::after {
-      background: white;
+      background: rgba(53, 101, 216, 0.95);
+      transform: scale(1);
     }
 
     .addon-toggle-content {
@@ -477,7 +565,7 @@
       font-weight: 600;
       letter-spacing: 0.1em;
       text-transform: uppercase;
-      color: #86efac;
+      color: #101010;
       background: rgba(34, 197, 94, 0.25);
       padding: 0.15rem 0.45rem;
       margin-bottom: 0.4rem;
@@ -486,7 +574,7 @@
     .addon-toggle-title {
       font-size: 0.875rem;
       font-weight: 600;
-      color: var(--text-primary);
+      color: #101010;
       margin-bottom: 0.25rem;
     }
 
@@ -510,7 +598,7 @@
     .addon-toggle-price {
       font-size: 1rem;
       font-weight: 700;
-      color: #86efac;
+      color: var(--accent);
       flex-shrink: 0;
     }
 
@@ -528,7 +616,8 @@
       display: flex;
       flex-direction: column;
       gap: 2rem;
-      border-radius: 4px;
+      border-radius: 20px;
+      box-shadow: 0 24px 45px rgba(27, 55, 116, 0.15);
     }
 
     @media (max-width: 900px) {
@@ -591,9 +680,10 @@
 
     .event-group {
       padding: 1.5rem;
-      background: rgba(255, 255, 255, 0.025);
+      background: var(--bg-secondary);
       border: 1px solid var(--border-subtle);
-      border-radius: 4px;
+      border-radius: 8px;
+      box-shadow: 0 12px 30px rgba(28, 55, 115, 0.08);
     }
 
     .event-group-header {
@@ -631,13 +721,13 @@
     .event-card {
       position: relative;
       padding: 1rem;
-      background: rgba(10, 10, 16, 0.6);
+      background: var(--bg-primary);
       border: 1px solid var(--border-subtle);
-      border-radius: 4px;
+      border-radius: 10px;
       display: grid;
       gap: 0.375rem;
       cursor: pointer;
-      transition: border-color 0.2s ease, background-color 0.2s ease;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
       outline: none;
     }
 
@@ -648,13 +738,15 @@
     }
 
     .event-card:hover {
-      border-color: rgba(168, 169, 173, 0.3);
-      background: rgba(15, 15, 22, 0.8);
+      border-color: rgba(53, 101, 216, 0.35);
+      background: var(--bg-secondary);
+      box-shadow: 0 14px 22px rgba(32, 61, 124, 0.12);
     }
 
     .event-card.selected {
       border-color: var(--accent);
-      background: rgba(107, 140, 206, 0.15);
+      background: rgba(53, 101, 216, 0.1);
+      box-shadow: 0 16px 26px rgba(32, 61, 124, 0.18);
     }
 
     .event-card.disabled {
@@ -669,7 +761,7 @@
       right: 1rem;
       width: 18px;
       height: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(53, 101, 216, 0.25);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -749,9 +841,10 @@
     .selection-summary {
       margin-top: 1.5rem;
       padding: 1.5rem;
-      background: rgba(255, 255, 255, 0.025);
+      background: var(--bg-secondary);
       border: 1px solid var(--border-subtle);
-      border-radius: 4px;
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(28, 55, 115, 0.08);
     }
 
     .summary-title {
@@ -774,8 +867,8 @@
       align-items: flex-start;
       gap: 1rem;
       padding: 0.75rem;
-      background: rgba(10, 10, 16, 0.5);
-      border-radius: 4px;
+      background: var(--bg-primary);
+      border-radius: 10px;
     }
 
     .summary-item .summary-name {
@@ -813,18 +906,24 @@
 
     input, select, textarea {
       padding: 0.85rem 1rem;
-      background: rgba(255, 255, 255, 0.04);
+      background: var(--bg-secondary);
       border: 1px solid var(--border-subtle);
       color: var(--text-primary);
       font-family: 'Inter', sans-serif;
       font-size: 0.9rem;
-      transition: border 0.2s ease;
+      transition: border 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--text-muted);
     }
 
     input:focus, select:focus, textarea:focus {
       outline: none;
-      border-color: var(--accent);
-      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(53, 101, 216, 0.55);
+      background: rgba(53, 101, 216, 0.08);
+      box-shadow: 0 0 0 4px rgba(53, 101, 216, 0.12);
     }
 
     .checkbox-row {
@@ -897,26 +996,28 @@
       color: var(--text-primary);
     }
 
+    .message-box {
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-secondary);
+      padding: 1.25rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      display: none;
+      border-radius: 12px;
+      box-shadow: 0 12px 28px rgba(28, 55, 115, 0.08);
+    }
+
+    .message-box.success {
+      border-color: rgba(47, 157, 98, 0.35);
+      background: rgba(47, 157, 98, 0.12);
+      color: #236c48;
+    }
+
     .message-box.error {
-      border-color: rgba(239, 68, 68, 0.4);
-      background: rgba(239, 68, 68, 0.12);
-      color: var(--text-primary);
+      border-color: rgba(209, 106, 106, 0.35);
+      background: rgba(209, 106, 106, 0.12);
+      color: #8a3d3d;
     }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.35rem 0.6rem;
-      border: 1px solid rgba(34, 197, 94, 0.4);
-      background: rgba(34, 197, 94, 0.15);
-      color: #bbf7d0;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .link-row {
       font-size: 0.85rem;
       color: var(--text-muted);
       text-align: center;
@@ -960,6 +1061,16 @@
   </nav>
 
   <div class="page-wrapper">
+    <div class="registration-hero">
+      <div class="registration-hero-copy">
+        <span class="registration-hero-eyebrow">Guests & Delegations</span>
+        <h2 class="registration-hero-title">Join HITAM for Elysian '26</h2>
+        <p class="registration-hero-text">Register your crew, pick curated add-ons, and stay informed as we unlock the complete cultural and technical lineup throughout the festival week.</p>
+      </div>
+      <div class="registration-hero-media">
+        <img src="/assets/hitam-abt.jpg" alt="Visitors exploring the HITAM campus during Elysian">
+      </div>
+    </div>
   <div class="page">
     <!-- Sidebar (Desktop Only) -->
     <aside class="sidebar">
@@ -1734,8 +1845,8 @@
     initPage();
   </script>
 
-  <footer style="background: rgba(10, 10, 15, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 1.5rem; text-align: center;">
-    <p style="margin: 0; color: #888; font-size: 0.75rem;">© 2026 ROYAL EDUCATIONAL SOCIETY. All rights reserved.</p>
+  <footer style="background: #f8fafc; border-top: 1px solid rgba(148, 163, 184, 0.35); padding: 1.75rem; text-align: center;">
+    <p style="margin: 0; color: #64748b; font-size: 0.8rem;">© 2026 ROYAL EDUCATIONAL SOCIETY. All rights reserved.</p>
   </footer>
 </body>
 </html>

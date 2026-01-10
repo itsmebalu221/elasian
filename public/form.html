@@ -9,22 +9,22 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-primary: #141416;
-      --bg-secondary: #1a1a1d;
-      --bg-elevated: #202024;
-      --silver: #a8a9ad;
-      --silver-muted: #6b6c70;
-      --silver-bright: #c4c5c9;
-      --text-primary: #e8e8e9;
-      --text-secondary: #94949a;
-      --text-muted: #5a5a60;
-      --border: rgba(168, 169, 173, 0.12);
-      --glass: rgba(255, 255, 255, 0.02);
-      --glass-border: rgba(168, 169, 173, 0.08);
-      --success: #7a9e7a;
-      --error: #c47a7a;
-      --accent: #6b8cce;
-      --accent-muted: rgba(107, 140, 206, 0.15);
+      --bg-primary: #f4f6fb;
+      --bg-secondary: #ffffff;
+      --bg-elevated: #ffffff;
+      --silver: #3b4f73;
+      --silver-muted: #5f6c82;
+      --silver-bright: #9aabc7;
+      --text-primary: #1f2433;
+      --text-secondary: #48556b;
+      --text-muted: #6d7485;
+      --border: rgba(33, 77, 141, 0.12);
+      --glass: rgba(255, 255, 255, 0.75);
+      --glass-border: rgba(33, 77, 141, 0.08);
+      --success: #2f9d62;
+      --error: #d16a6a;
+      --accent: #3565d8;
+      --accent-muted: rgba(53, 101, 216, 0.12);
     }
 
     * {
@@ -47,7 +47,7 @@
     body {
       font-family: 'Inter', -apple-system, sans-serif;
       font-weight: 400;
-      background-color: var(--bg-primary);
+      background: radial-gradient(ellipse at top, rgba(53, 101, 216, 0.08) 0%, transparent 50%), var(--bg-primary);
       color: var(--text-primary);
       line-height: 1.6;
       letter-spacing: -0.01em;
@@ -79,9 +79,10 @@
       align-items: center;
       justify-content: space-between;
       padding: 0.875rem 2rem;
-      background: rgba(20, 20, 22, 0.95);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
+      box-shadow: 0 12px 30px rgba(17, 38, 90, 0.06);
     }
 
     @media (max-width: 640px) {
@@ -210,6 +211,82 @@
       font-size: 0.875rem;
       font-weight: 300;
       color: var(--text-secondary);
+    }
+
+    .page-hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+      padding: 2.5rem;
+      margin-bottom: 2.5rem;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(53, 101, 216, 0.12), rgba(255, 255, 255, 0.6));
+      border: 1px solid rgba(53, 101, 216, 0.15);
+      box-shadow: 0 20px 45px rgba(32, 61, 124, 0.12);
+    }
+
+    .page-hero-copy {
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .page-hero-eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      font-size: 0.7rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .page-hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+
+    .page-hero-text {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .page-hero-media {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .page-hero-media img {
+      width: 100%;
+      max-width: 320px;
+      border-radius: 18px;
+      box-shadow: 0 18px 35px rgba(18, 34, 67, 0.18);
+      object-fit: cover;
+    }
+
+    @media (max-width: 860px) {
+      .page-hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .page-hero-copy {
+        align-items: center;
+      }
+
+      .page-hero-media {
+        justify-content: center;
+      }
+
+      .page-hero-media img {
+        max-width: 260px;
+      }
     }
 
     /* Form Sections */
@@ -881,6 +958,17 @@
         </div>
         <div id="error-message" class="message message-error" style="display: none;"></div>
 
+        <div class="page-hero">
+          <div class="page-hero-copy">
+            <span class="page-hero-eyebrow">HITAM Students</span>
+            <h2 class="page-hero-title">Secure Your All-Access Festival Pass</h2>
+            <p class="page-hero-text">Complete the registration form to unlock Elysian experiences across campus. Your pass keeps every curated workshop, performance, and competition at your fingertips.</p>
+          </div>
+          <div class="page-hero-media">
+            <img src="/assets/sangram.jpeg" alt="Students celebrating during Elysian events">
+          </div>
+        </div>
+
         <!-- Form -->
         <form id="student-form">
           <!-- Personal Information -->
@@ -979,7 +1067,7 @@
               <div class="payment-info-title">Registration Fee</div>
             </div>
             <div class="payment-info-amount">
-              <span class="payment-amount-value">₹500</span>
+              <span class="payment-amount-value">₹600</span>
               <span class="payment-amount-label">One-time fee</span>
             </div>
             <div class="payment-info-details">

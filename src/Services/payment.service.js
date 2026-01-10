@@ -14,6 +14,22 @@ const CASHFREE_API_BASE = CASHFREE_MODE === 'production'
   ? 'https://api.cashfree.com/pg'
   : 'https://sandbox.cashfree.com/pg';
 
+const CASHFREE_SUCCESS_STATUSES = new Set(['SUCCESS', 'COMPLETED', 'PAID', 'CAPTURED']);
+const CASHFREE_FAILURE_STATUSES = new Set(['FAILED', 'CANCELLED', 'USER_DROPPED', 'TIMED_OUT']);
+
+function normalizeCashfreeStatus(status) {
+  return (status || '').toString().trim().toUpperCase();
+}
+
+function classifyCashfreePayment(entry = {}) {
+  const normalizedStatus = normalizeCashfreeStatus(entry.payment_status || entry.status);
+  return {
+    normalizedStatus,
+    isSuccess: CASHFREE_SUCCESS_STATUSES.has(normalizedStatus),
+    isFailure: CASHFREE_FAILURE_STATUSES.has(normalizedStatus)
+  };
+}
+
 async function fetchCashfreeOrderPayments(orderId) {
   const response = await fetch(`${CASHFREE_API_BASE}/orders/${orderId}/payments`, {
     method: 'GET',
@@ -259,13 +275,32 @@ export async function verifyPaymentStatus(orderId) {
         return timeB - timeA;
       });
 
-      const latestPayment = sortedPayments[0];
-      const successfulPayment = sortedPayments.find(p => p.payment_status === 'SUCCESS');
-      const failedPayment = sortedPayments.find(p => p.payment_status === 'FAILED');
-      const paymentForStatus = successfulPayment || failedPayment || latestPayment;
-      const paymentMethod = paymentForStatus.payment_group || paymentForStatus.payment_method || payment.payment_method || null;
+      const decoratedPayments = sortedPayments.map(entry => ({
+        entry,
+        classification: classifyCashfreePayment(entry)
+      }));
+
+      const latestPayment = decoratedPayments[0]?.entry || null;
+      const successfulPaymentWrapper = decoratedPayments.find(item => item.classification.isSuccess);
+      const failedPaymentWrapper = decoratedPayments.find(item => item.classification.isFailure);
+      const paymentForStatus = successfulPaymentWrapper?.entry
+        || failedPaymentWrapper?.entry
+        || latestPayment
+        || {};
+      const paymentMethod = paymentForStatus.payment_group
+        || paymentForStatus.payment_method
+        || paymentForStatus.instrument_type
+        || payment.payment_method
+        || null;
       
-      if (successfulPayment) {
+      if (successfulPaymentWrapper?.entry) {
+        const successfulPayment = successfulPaymentWrapper.entry;
+        const resolvedPaymentId = successfulPayment.cf_payment_id
+          || successfulPayment.payment_id
+          || latestPayment?.cf_payment_id
+          || latestPayment?.payment_id
+          || payment.cf_payment_id
+          || null;
         // Update database
         await db.query(`
           UPDATE payments 
@@ -275,7 +310,7 @@ export async function verifyPaymentStatus(orderId) {
               paid_at = NOW(),
               updated_at = NOW()
           WHERE order_id = ?
-        `, [successfulPayment.cf_payment_id, paymentMethod, orderId]);
+        `, [resolvedPaymentId, paymentMethod, orderId]);
 
         if (payment.form_id) {
           await db.query(`
@@ -305,7 +340,9 @@ export async function verifyPaymentStatus(orderId) {
           registrationCode,
           context
         };
-      } else if (failedPayment) {
+      } else if (failedPaymentWrapper?.entry) {
+        const failedPayment = failedPaymentWrapper.entry;
+        const failedClassification = failedPaymentWrapper.classification;
         await db.query(`
           UPDATE payments SET status = 'FAILED', updated_at = NOW() WHERE order_id = ?
         `, [orderId]);
@@ -324,7 +361,11 @@ export async function verifyPaymentStatus(orderId) {
           success: false,
           status: 'FAILED',
           orderId,
-          message: failedPayment.payment_message || failedPayment.error_message || latestPayment.payment_message || latestPayment.error_message || 'Payment failed',
+          message: failedPayment.payment_message
+            || failedPayment.error_message
+            || latestPayment?.payment_message
+            || latestPayment?.error_message
+            || `Payment failed with status ${failedClassification?.normalizedStatus || 'UNKNOWN'}`,
           context,
           registrationCode: null  // Don't reveal on failed payment
         };
