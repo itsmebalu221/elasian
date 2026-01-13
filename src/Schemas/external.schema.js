@@ -21,7 +21,9 @@ export const externalRegistrationSchema = z.object({
     .min(4, 'Identity number must be at least 4 characters')
     .max(100, 'Identity number must be less than 100 characters'),
   add_on_selected: z.boolean().optional(),
-  selected_events: z.array(z.string().min(1)).max(2).optional()
+  selected_events: z.array(z.string().min(1))
+    .min(1, 'Select at least one event')
+    .max(2, 'You can select up to two events')
 });
 
 export default externalRegistrationSchema;

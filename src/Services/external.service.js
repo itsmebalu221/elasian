@@ -1,8 +1,8 @@
 import crypto from 'crypto';
 import db from '../db/mysql.js';
 
-export const EXTERNAL_BASE_AMOUNT = 700;
-export const EXTERNAL_ADD_ON_AMOUNT = 300;
+export const EXTERNAL_BASE_AMOUNT = 500;
+export const EXTERNAL_ADD_ON_AMOUNT = 500;
 const MAX_SELECTED_EVENTS = 2;
 const CULTURAL_EVENT_ID = 'EVT_CULTURAL_SAHITYA_PRASASTI';
 

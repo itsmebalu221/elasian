@@ -1078,15 +1078,15 @@
       <div class="pricing-box" id="sidebar-pricing">
         <div class="pricing-row">
           <span>Esparto pass</span>
-          <strong>₹700</strong>
+          <strong>₹500</strong>
         </div>
         <div class="pricing-row" id="sidebar-pricing-addon" style="display: none;">
           <span>Sahitya + Prasasti Add-on</span>
-          <strong>₹300</strong>
+          <strong>₹500</strong>
         </div>
         <div class="pricing-total">
           <span>Total</span>
-          <strong id="sidebar-pricing-total">₹700</strong>
+          <strong id="sidebar-pricing-total">₹500</strong>
         </div>
       </div>
 
@@ -1094,7 +1094,7 @@
         <span class="sidebar-addon-badge">✦ Recommended</span>
         <p class="sidebar-addon-title">Sahitya + Prasasti Cultural Access</p>
         <p class="sidebar-addon-desc">Unlock the Sahitya and Prasasti showcases with this cultural add-on.</p>
-        <span class="sidebar-addon-price">+₹300</span>
+        <span class="sidebar-addon-price">+₹500</span>
       </div>
 
       <div class="support-copy">
@@ -1150,8 +1150,8 @@
           </div>
 
           <div class="form-section">
-            <div class="section-label">Event Selection (Optional)</div>
-            <p class="event-hint">Select events you'd like to attend, or skip this section if you prefer to decide later at the fest.</p>
+            <div class="section-label">Event Selection (Required)</div>
+            <p class="event-hint">Select at least one event to continue with registration. You can still update your choices later.</p>
             <div class="event-groups" id="event-groups"></div>
             <div class="field-error" id="events-error"></div>
           </div>
@@ -1159,7 +1159,7 @@
           <div class="selection-summary">
             <div class="summary-title">Your Selection</div>
             <div class="summary-list" id="selection-summary">
-              <div class="summary-empty">No selections yet — you can decide at the fest</div>
+              <div class="summary-empty">Select at least one event to continue</div>
             </div>
           </div>
 
@@ -1168,15 +1168,15 @@
             <div class="pricing-box" id="mobile-pricing-box">
               <div class="pricing-row">
                 <span>Esparto pass</span>
-                <strong>₹700</strong>
+                <strong>₹500</strong>
               </div>
               <div class="pricing-row" id="mobile-pricing-addon" style="display: none;">
                 <span>Sahitya + Prasasti Add-on</span>
-                <strong>₹300</strong>
+                <strong>₹500</strong>
               </div>
               <div class="pricing-total">
                 <span>Total payable</span>
-                <strong id="mobile-pricing-total">₹700</strong>
+                <strong id="mobile-pricing-total">₹500</strong>
               </div>
             </div>
           </div>
@@ -1185,15 +1185,15 @@
           <div class="pricing-box desktop-only" id="pricing-box" style="margin-top: 1.5rem;">
             <div class="pricing-row">
               <span>Esparto pass</span>
-              <strong>₹700</strong>
+              <strong>₹500</strong>
             </div>
             <div class="pricing-row" id="pricing-addon" style="display: none;">
               <span>Cultural Events Add-on</span>
-              <strong>₹300</strong>
+              <strong>₹500</strong>
             </div>
             <div class="pricing-total">
               <span>Total payable</span>
-              <strong id="pricing-total">₹700</strong>
+              <strong id="pricing-total">₹500</strong>
             </div>
           </div>
 
@@ -1204,9 +1204,9 @@
             <div class="addon-toggle-content">
               <span class="addon-toggle-badge">✦ Recommended</span>
               <p class="addon-toggle-title">Be part of Sahitya + Prasasti</p>
-              <p class="addon-toggle-desc">Experience the Sahitya and Prasasti cultural celebrations for just ₹300 more.</p>
+              <p class="addon-toggle-desc">Experience the Sahitya and Prasasti cultural celebrations for just ₹500 more.</p>
             </div>
-            <span class="addon-toggle-price">+₹300</span>
+            <span class="addon-toggle-price">+₹500</span>
           </div>
 
           <div class="form-actions" style="margin-top: 1.5rem;">
@@ -1226,8 +1226,8 @@
   </div> <!-- End page-wrapper -->
 
   <script>
-    const EXTERNAL_BASE_AMOUNT = 700;
-    const EXTERNAL_ADD_ON_AMOUNT = 300;
+    const EXTERNAL_BASE_AMOUNT = 500;
+    const EXTERNAL_ADD_ON_AMOUNT = 500;
     const CULTURAL_EVENT_ID = 'EVT_CULTURAL_SAHITYA_PRASASTI';
 
     const formEl = document.getElementById('external-form');
@@ -1350,9 +1350,8 @@
     function validateSelection(selectedIds = []) {
       const normalized = Array.from(new Set((selectedIds || []).filter(value => typeof value === 'string' && value.trim().length > 0)));
 
-      // Allow empty selection for optional cultural add-on
       if (normalized.length === 0) {
-        return { ok: true };
+        return { ok: false, reason: 'Select at least one event to continue.' };
       }
 
       if (normalized.length !== (selectedIds || []).filter(Boolean).length) {
@@ -1488,7 +1487,7 @@
             description = 'Day 2 experiences. Pick at most one from this set.';
             break;
           case EVENT_TYPES_ENUM.OPTIONAL:
-            description = 'Sahitya and Prasasti cultural events. Adds ₹300 when selected.';
+            description = 'Sahitya and Prasasti cultural events. Adds ₹500 when selected.';
             break;
           default:
             description = '';
@@ -1570,7 +1569,7 @@
       const selectedIds = Array.from(selectedEvents);
 
       if (selectedIds.length === 0) {
-        summaryContainer.innerHTML = '<div class="summary-empty">No events selected yet</div>';
+        summaryContainer.innerHTML = '<div class="summary-empty">Select at least one event to continue</div>';
         return;
       }
 
@@ -1599,13 +1598,13 @@
         addOnRow = `
           <div class="summary-item">
             <span class="summary-name">Sahitya + Prasasti Cultural Access</span>
-            <span class="summary-meta">Optional Add-On · +₹300</span>
+            <span class="summary-meta">Optional Add-On · +₹500</span>
           </div>
         `;
       }
 
       const allContent = addOnRow + rows;
-      summaryContainer.innerHTML = allContent || '<div class="summary-empty">No selections yet — you can decide at the fest</div>';
+      summaryContainer.innerHTML = allContent || '<div class="summary-empty">Select at least one event to continue</div>';
     }
 
     function toggleEventSelection(eventId) {
@@ -1616,7 +1615,11 @@
       if (selectedEvents.has(eventId)) {
         selectedEvents.delete(eventId);
         culturalAddOnSelected = selectedEvents.has(CULTURAL_EVENT_ID);
-        clearEventsError();
+        if (selectedEvents.size === 0) {
+          showEventsError('Select at least one event to continue.');
+        } else {
+          clearEventsError();
+        }
         renderEvents();
         updateSummary();
         return;

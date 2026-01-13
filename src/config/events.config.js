@@ -80,11 +80,11 @@ export const EVENT_DEFINITIONS = [
   },
   {
     id: 'EVT_BUSINESS_CANVAS',
-    name: 'Business Canvas Presentation',
+    name: 'Marketing Madness - Sell the Unsellable',
     organizer: 'EDC',
     type: EVENT_TYPES.DAY_1_ONLY,
     dayLabel: '1st Day Event, Time : 10:00 AM - 2:00 PM',
-    description: 'Learn to create and present compelling business model canvases with the Entrepreneurship Development Cell.'
+    description: "Creative marketing challenge to pitch unconventional products."
   },
   {
     id: 'EVT_CULTURAL_SAHITYA_PRASASTI',
