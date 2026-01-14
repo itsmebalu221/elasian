@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard — Elysian</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap"
+    rel="stylesheet">
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
   <style>
     :root {
@@ -33,7 +36,8 @@
       box-sizing: border-box;
     }
 
-    html, body {
+    html,
+    body {
       height: 100%;
       width: 100%;
     }
@@ -202,6 +206,7 @@
       :root {
         --page-margin: 1.5rem;
       }
+
       .page {
         border-left: none;
         border-right: none;
@@ -215,6 +220,7 @@
       :root {
         --page-margin: 1rem;
       }
+
       .page {
         padding-top: 4rem;
         border-radius: 20px;
@@ -474,6 +480,7 @@
     }
 
     @media (max-width: 576px) {
+
       .data-grid .data-item:nth-child(odd),
       .data-grid .data-item:nth-child(even) {
         padding: 0.875rem 0;
@@ -623,7 +630,9 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     .loading-text {
@@ -810,7 +819,7 @@
         align-items: flex-start;
         gap: 0.75rem;
       }
-      
+
       .btn-download {
         width: 100%;
       }
@@ -1075,7 +1084,8 @@
         margin: 0;
       }
 
-      html, body {
+      html,
+      body {
         background: #f5fbf4 !important;
         color: #1f2a21 !important;
         font-size: 12pt;
@@ -1596,13 +1606,16 @@
     }
   </style>
 </head>
+
 <body>
   <!-- Fixed Navbar -->
   <nav class="top-navbar">
     <a href="/" class="navbar-brand">Elysian<span>'26</span></a>
     <div class="navbar-right">
       <div class="user-block">
-        <img id="user-avatar" class="user-avatar" src="" alt="">
+        <img id="user-avatar" class="user-avatar"
+          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23ddd'/%3E%3Ccircle cx='16' cy='12' r='5' fill='%23999'/%3E%3Cpath d='M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10' fill='%23999'/%3E%3C/svg%3E"
+          alt="">
         <div class="user-meta">
           <span class="user-name" id="user-name"></span>
           <span class="user-email" id="user-email"></span>
@@ -1636,7 +1649,7 @@
           <div class="payment-info">
             <div class="payment-icon" id="payment-icon">
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div class="payment-text">
@@ -1664,8 +1677,10 @@
                 <span class="reg-id-value" id="display-reg-id">—</span>
               </div>
               <button class="btn-download" id="download-pass-btn" onclick="printPass()">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                  stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
                 Download Pass
               </button>
@@ -1686,7 +1701,8 @@
             </div>
             <div class="qr-instructions">
               <span class="qr-instructions-icon">ℹ️</span>
-              <span class="qr-instructions-text" id="qr-instructions-text">Pay ₹600 to unlock your digital event pass QR code</span>
+              <span class="qr-instructions-text" id="qr-instructions-text">Pay ₹600 to unlock your digital event pass QR
+                code</span>
             </div>
           </div>
         </div>
@@ -1800,7 +1816,8 @@
 
       <div class="pass-footer">
         <div class="pass-footer-note">
-          Please carry this pass and a valid ID proof for entry. Report to the venue 10 minutes before the scheduled time.
+          Please carry this pass and a valid ID proof for entry. Report to the venue 10 minutes before the scheduled
+          time.
         </div>
         <div class="pass-footer-meta">
           <div>Generated: <span id="print-date">—</span></div>
@@ -2164,11 +2181,11 @@
           credentials: 'include'
         });
         const data = await response.json();
-        
+
         const paymentBanner = document.getElementById('payment-banner');
         const downloadBtn = document.getElementById('download-pass-btn');
         const isPaid = !!data.isPaid;
-        
+
         if (isPaid) {
           // User has paid - show success banner and enable download
           paymentBanner.classList.remove('pending');
@@ -2180,7 +2197,7 @@
               <div class="payment-subtitle">Your event pass is confirmed</div>
             </div>
           `;
-          
+
           // Enable download button
           if (downloadBtn) {
             downloadBtn.style.opacity = '1';
@@ -2199,7 +2216,7 @@
             </div>
             <a href="/payment.html" class="btn-pay-now">Pay ₹600</a>
           `;
-          
+
           // Disable download button
           if (downloadBtn) {
             downloadBtn.style.opacity = '0.5';
@@ -2207,7 +2224,7 @@
             downloadBtn.title = 'Complete payment to download pass';
           }
         }
-        
+
         paymentBanner.style.display = 'flex';
         return { isPaid, raw: data };
       } catch (error) {
@@ -2232,7 +2249,7 @@
 
         const userType = data.user.userType || 'HITAMONLY';
 
-        document.getElementById('user-avatar').src = data.user.picture || 'https://via.placeholder.com/40';
+        document.getElementById('user-avatar').src = data.user.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name || 'U')}&background=3565d8&color=fff`;
         document.getElementById('user-name').textContent = data.user.name;
         document.getElementById('user-email').textContent = data.user.email;
         document.getElementById('display-email').textContent = data.user.email;
@@ -2258,7 +2275,7 @@
 
         if (formData.success && formData.data) {
           const form = formData.data;
-          
+
           // Check payment status
           const paymentStatus = await checkPaymentStatus(form.id);
           const hasPaid = !!paymentStatus?.isPaid;
@@ -2297,10 +2314,10 @@
 
           if (form.created_at) {
             const date = new Date(form.created_at);
-            document.getElementById('submission-date').textContent = 
-              `Submitted ${date.toLocaleDateString('en-GB', { 
-                day: 'numeric', 
-                month: 'long', 
+            document.getElementById('submission-date').textContent =
+              `Submitted ${date.toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'long',
                 year: 'numeric'
               })}`;
           }
@@ -2345,7 +2362,7 @@
 
       const hasPaid = registration.payment_status === 'PAID';
       const amount = registration.total_amount || 700;
-      
+
       // Update registration ID display
       const regIdElement = document.getElementById('display-reg-id');
       if (regIdElement) {
@@ -2363,7 +2380,7 @@
 
       // Update labels for external users
       const rollLabel = document.querySelector('[for="display-roll"], .data-item:has(#display-roll) .data-label');
-      
+
       // Update data labels for external context
       document.querySelectorAll('.data-label').forEach(label => {
         if (label.textContent.trim() === 'Roll Number') label.textContent = 'ID Number';
@@ -2397,10 +2414,10 @@
       // Show payment status
       if (registration.created_at) {
         const date = new Date(registration.created_at);
-        document.getElementById('submission-date').textContent = 
-          `Submitted ${date.toLocaleDateString('en-GB', { 
-            day: 'numeric', 
-            month: 'long', 
+        document.getElementById('submission-date').textContent =
+          `Submitted ${date.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
             year: 'numeric'
           })}`;
       }
@@ -2458,7 +2475,7 @@
             </div>
           </div>
         `;
-        
+
         // Enable download button
         if (downloadBtn) {
           downloadBtn.style.opacity = '1';
@@ -2483,7 +2500,7 @@
           </div>
           <a href="/external-payment.html" class="btn-pay-now">Pay ₹${amount} Now</a>
         `;
-        
+
         // Disable download button
         if (downloadBtn) {
           downloadBtn.style.opacity = '0.5';
@@ -2521,7 +2538,7 @@
           printRegIdEl.classList.add('locked');
         }
       }
-      
+
       document.getElementById('print-name').textContent = registration.full_name || '—';
       document.getElementById('print-roll').textContent = registration.identity_number || '—';
       document.getElementById('print-branch').textContent = registration.institution || '—';
@@ -2568,15 +2585,16 @@
               </thead>
               <tbody>
                 ${events.map(event => {
-                  const schedule = formatScheduleDetails(event) || 'Schedule TBA';
-                  const organizer = event.organizer || '—';
-                  return `
+          const schedule = formatScheduleDetails(event) || 'Schedule TBA';
+          const organizer = event.organizer || '—';
+          return `
                   <tr>
                     <td class="pass-event-time">${escapeHtml(schedule)}</td>
                     <td class="pass-event-name">${escapeHtml(event.name)}</td>
                     <td class="pass-event-venue">${escapeHtml(organizer)}</td>
                   </tr>
-                `; }).join('')}
+                `;
+        }).join('')}
               </tbody>
             </table>
           </div>
@@ -2626,7 +2644,7 @@
         `);
         printQrImg.src = `data:image/svg+xml,${placeholderSvg}`;
       }
-      
+
       // Basic Info
       const printRegIdEl = document.getElementById('print-reg-id');
       if (printRegIdEl) {
@@ -2644,7 +2662,7 @@
       document.getElementById('print-year').textContent = yearLabels[form.year_of_study] || '—';
       document.getElementById('print-mobile').textContent = form.mobile || '—';
       document.getElementById('print-email').textContent = document.getElementById('display-email').textContent || '—';
-      
+
       // Current date
       document.getElementById('print-date').textContent = new Date().toLocaleDateString('en-GB', {
         day: 'numeric',
@@ -2677,19 +2695,20 @@
               </thead>
               <tbody>
                 ${events.map(event => {
-                  const schedule = formatScheduleDetails(event) || 'Schedule TBA';
-                  const organizer = event.organizer || '—';
-                  const safeSchedule = escapeHtml(schedule);
-                  const safeName = escapeHtml(event.name);
-                  const safeOrganizer = escapeHtml(organizer);
+          const schedule = formatScheduleDetails(event) || 'Schedule TBA';
+          const organizer = event.organizer || '—';
+          const safeSchedule = escapeHtml(schedule);
+          const safeName = escapeHtml(event.name);
+          const safeOrganizer = escapeHtml(organizer);
 
-                  return `
+          return `
                   <tr>
                     <td class="pass-event-time">${safeSchedule}</td>
                     <td class="pass-event-name">${safeName}</td>
                     <td class="pass-event-venue">${safeOrganizer}</td>
                   </tr>
-                `; }).join('')}
+                `;
+        }).join('')}
               </tbody>
             </table>
           </div>
@@ -2739,8 +2758,10 @@
     loadDashboard();
   </script>
 
-  <footer style="background: rgba(10, 10, 15, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 1.5rem; text-align: center;">
+  <footer
+    style="background: rgba(10, 10, 15, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 1.5rem; text-align: center;">
     <p style="margin: 0; color: #888; font-size: 0.75rem;">© 2026 ROYAL EDUCATIONAL SOCIETY. All rights reserved.</p>
   </footer>
 </body>
+
 </html>

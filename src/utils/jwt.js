@@ -37,6 +37,17 @@ export function getCookieOptions() {
   };
 }
 
+// For clearing cookies - Express 5 doesn't want maxAge
+export function getClearCookieOptions() {
+  const isProduction = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'lax',
+    path: '/'
+  };
+}
+
 export function sanitizeUserPayload(user) {
   if (!user) {
     return null;

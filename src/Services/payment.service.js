@@ -1,7 +1,7 @@
 import { PAYMENT_AMOUNT, CASHFREE_MODE, createOrderDirect } from '../config/cashfree.js';
 import db from '../db/mysql.js';
 import crypto from 'crypto';
-import { sendConfirmationForPayment } from './email.service.js';
+import { sendConfirmationForPayment, sendButterflyConfirmationEmails } from './email.service.js';
 
 // Generate unique order ID
 function generateOrderId() {
@@ -92,6 +92,7 @@ export async function createPaymentOrder({
   studentId = null,
   formId = null,
   externalRegistrationId = null,
+  butterflyRegistrationId = null,
   customerName,
   customerEmail,
   customerPhone,
@@ -101,7 +102,7 @@ export async function createPaymentOrder({
   orderNote
 }) {
   const orderId = generateOrderId();
-  
+
   // Determine base URL - prioritize APP_URL env var, then detect from VERCEL_URL, fallback to localhost
   let baseUrl = process.env.APP_URL;
   if (!baseUrl) {
@@ -115,7 +116,13 @@ export async function createPaymentOrder({
       baseUrl = 'http://localhost:3000';
     }
   }
-  
+
+  // Fix common misconfiguration: localhost should use http, not https
+  if (baseUrl && baseUrl.includes('localhost') && baseUrl.startsWith('https://')) {
+    console.warn('⚠️ APP_URL uses https for localhost - switching to http');
+    baseUrl = baseUrl.replace('https://', 'http://');
+  }
+
   // Debug: Log environment variables
   console.log('Payment Service - Environment Check:', {
     APP_URL: process.env.APP_URL,
@@ -135,7 +142,9 @@ export async function createPaymentOrder({
           ? `STU_${studentId}`
           : externalRegistrationId
             ? `EXT_${externalRegistrationId}`
-            : `GUEST_${Date.now()}`,
+            : butterflyRegistrationId
+              ? `BTF_${butterflyRegistrationId}`
+              : `GUEST_${Date.now()}`,
         customer_name: customerName,
         customer_email: customerEmail,
         customer_phone: customerPhone
@@ -149,11 +158,13 @@ export async function createPaymentOrder({
           ? `Elysian 2026 Event Pass - Form ID: ${formId}`
           : externalRegistrationId
             ? `Elysian 2026 External Pass - Registration ID: ${externalRegistrationId}`
-            : 'Elysian 2026 Payment')
+            : butterflyRegistrationId
+              ? `Butterfly Offer - Registration ID: ${butterflyRegistrationId}`
+              : 'Elysian 2026 Payment')
     };
 
     console.log('Creating Cashfree order:', JSON.stringify(orderRequest, null, 2));
-    
+
     // Use direct API call instead of SDK (for debugging 401 issues)
     const response = await createOrderDirect(orderRequest);
 
@@ -166,23 +177,25 @@ export async function createPaymentOrder({
           student_id,
           form_id,
           external_registration_id,
+          butterfly_registration_id,
           amount,
           status,
           cf_order_id,
           payment_session_id,
           created_at
         )
-        VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?, NOW())
+        VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?, ?, NOW())
       `,
-      [
-        orderId,
-        studentId,
-        formId,
-        externalRegistrationId,
-        amount,
-        response.data.cf_order_id,
-        response.data.payment_session_id
-      ]);
+        [
+          orderId,
+          studentId,
+          formId,
+          externalRegistrationId,
+          butterflyRegistrationId,
+          amount,
+          response.data.cf_order_id,
+          response.data.payment_session_id
+        ]);
 
       return {
         success: true,
@@ -220,7 +233,8 @@ export async function verifyPaymentStatus(orderId) {
 
     const payment = payments[0];
     const isExternal = !!payment.external_registration_id;
-    const context = isExternal ? 'EXTERNAL' : 'HITAMONLY';
+    const isButterfly = !!payment.butterfly_registration_id;
+    const context = isButterfly ? 'BUTTERFLY' : (isExternal ? 'EXTERNAL' : 'HITAMONLY');
 
     let registrationCode = null;
     if (payment.form_id) {
@@ -235,6 +249,12 @@ export async function verifyPaymentStatus(orderId) {
         [payment.external_registration_id]
       );
       registrationCode = externals[0]?.registration_id || null;
+    } else if (isButterfly) {
+      const [butterflies] = await db.query(
+        'SELECT registration_id FROM butterfly_registrations WHERE id = ?',
+        [payment.butterfly_registration_id]
+      );
+      registrationCode = butterflies[0]?.registration_id || null;
     }
 
     // If already successful, return cached status
@@ -292,7 +312,7 @@ export async function verifyPaymentStatus(orderId) {
         || paymentForStatus.instrument_type
         || payment.payment_method
         || null;
-      
+
       if (successfulPaymentWrapper?.entry) {
         const successfulPayment = successfulPaymentWrapper.entry;
         const resolvedPaymentId = successfulPayment.cf_payment_id
@@ -324,12 +344,30 @@ export async function verifyPaymentStatus(orderId) {
             SET payment_status = 'PAID', payment_id = ?, updated_at = NOW()
             WHERE id = ?
           `, [payment.id, payment.external_registration_id]);
+        } else if (isButterfly) {
+          console.log('🦋 Updating butterfly registration to PAID:', {
+            paymentId: payment.id,
+            butterflyRegistrationId: payment.butterfly_registration_id
+          });
+          await db.query(`
+            UPDATE butterfly_registrations
+            SET payment_status = 'PAID', payment_id = ?, updated_at = NOW()
+            WHERE id = ?
+          `, [payment.id, payment.butterfly_registration_id]);
+          console.log('🦋 Butterfly registration updated to PAID successfully');
+
+          // Send butterfly confirmation emails to all 4 students (async)
+          sendButterflyConfirmationEmails(payment.butterfly_registration_id).catch(err => {
+            console.error('Failed to send butterfly confirmation emails:', err);
+          });
         }
 
-        // Send confirmation email (async, don't block response)
-        sendConfirmationForPayment(orderId).catch(err => {
-          console.error('Failed to send confirmation email:', err);
-        });
+        // Send confirmation email for non-butterfly registrations (async, don't block response)
+        if (!isButterfly) {
+          sendConfirmationForPayment(orderId).catch(err => {
+            console.error('Failed to send confirmation email:', err);
+          });
+        }
 
         return {
           success: true,
@@ -355,6 +393,10 @@ export async function verifyPaymentStatus(orderId) {
           await db.query(`
             UPDATE external_registrations SET payment_status = 'FAILED', updated_at = NOW() WHERE id = ?
           `, [payment.external_registration_id]);
+        } else if (isButterfly) {
+          await db.query(`
+            UPDATE butterfly_registrations SET payment_status = 'FAILED', updated_at = NOW() WHERE id = ?
+          `, [payment.butterfly_registration_id]);
         }
 
         return {
@@ -390,12 +432,12 @@ export async function verifyPaymentStatus(orderId) {
 export async function handleWebhook(payload, signature) {
   try {
     const isProduction = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
-    
+
     // Verify webhook signature in production
     if (isProduction && process.env.CASHFREE_SECRET_KEY) {
       const timestamp = payload.data?.payment?.payment_time || '';
       const body = JSON.stringify(payload);
-      
+
       const expectedSignature = crypto
         .createHmac('sha256', process.env.CASHFREE_SECRET_KEY)
         .update(timestamp + body)
@@ -480,7 +522,7 @@ export async function handleWebhook(payload, signature) {
           `, [payment.external_registration_id]);
         }
       }
-      
+
       console.log(`❌ Payment failed for order: ${orderId}`);
     }
 
@@ -531,36 +573,36 @@ export async function verifyFormOwnership(formId, studentId) {
     'SELECT id, student_id FROM student_forms WHERE id = ?',
     [formId]
   );
-  
+
   if (forms.length === 0) {
     return { valid: false, reason: 'Form not found' };
   }
-  
+
   if (forms[0].student_id !== studentId) {
     return { valid: false, reason: 'Form belongs to another user' };
   }
-  
+
   return { valid: true };
 }
 
-// Verify that a payment belongs to a specific user (by student_id or email for external)
+// Verify that a payment belongs to a specific user (by student_id, email for external, or email for butterfly)
 export async function verifyPaymentOwnership(orderId, studentId, email) {
   const [payments] = await db.query(
-    'SELECT student_id, external_registration_id FROM payments WHERE order_id = ?',
+    'SELECT student_id, external_registration_id, butterfly_registration_id FROM payments WHERE order_id = ?',
     [orderId]
   );
-  
+
   if (payments.length === 0) {
     return false;
   }
-  
+
   const payment = payments[0];
-  
+
   // Check if it's an internal payment
   if (payment.student_id) {
     return payment.student_id === studentId;
   }
-  
+
   // Check if it's an external payment
   if (payment.external_registration_id && email) {
     const [externals] = await db.query(
@@ -569,6 +611,32 @@ export async function verifyPaymentOwnership(orderId, studentId, email) {
     );
     return externals[0]?.email?.toLowerCase() === email?.toLowerCase();
   }
-  
+
+  // Check if it's a butterfly payment
+  if (payment.butterfly_registration_id && email) {
+    const [butterflies] = await db.query(
+      'SELECT primary_email FROM butterfly_registrations WHERE id = ?',
+      [payment.butterfly_registration_id]
+    );
+    return butterflies[0]?.primary_email?.toLowerCase() === email?.toLowerCase();
+  }
+
   return false;
+}
+
+// Butterfly registration payment helpers
+export async function getPaymentByButterflyRegistrationId(butterflyRegistrationId) {
+  const [payments] = await db.query(
+    'SELECT * FROM payments WHERE butterfly_registration_id = ? ORDER BY created_at DESC LIMIT 1',
+    [butterflyRegistrationId]
+  );
+  return payments[0] || null;
+}
+
+export async function isButterflyRegistrationPaid(butterflyRegistrationId) {
+  const [rows] = await db.query(
+    'SELECT payment_status FROM butterfly_registrations WHERE id = ?',
+    [butterflyRegistrationId]
+  );
+  return rows[0]?.payment_status === 'PAID';
 }

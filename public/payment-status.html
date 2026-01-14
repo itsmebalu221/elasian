@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Payment Status - Elysian 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
   <style>
     :root {
       --bg-primary: #f5fbf4;
@@ -260,9 +263,17 @@
       margin-bottom: 0.75rem;
     }
 
-    .status-title.success { color: var(--success); }
-    .status-title.failed { color: var(--error); }
-    .status-title.pending { color: var(--warning); }
+    .status-title.success {
+      color: var(--success);
+    }
+
+    .status-title.failed {
+      color: var(--error);
+    }
+
+    .status-title.pending {
+      color: var(--warning);
+    }
 
     .status-message {
       font-size: 0.9375rem;
@@ -361,7 +372,9 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     .confetti {
@@ -389,6 +402,7 @@
         top: -10%;
         transform: rotate(0deg);
       }
+
       100% {
         opacity: 0;
         top: 100%;
@@ -407,13 +421,16 @@
     }
   </style>
 </head>
+
 <body>
   <!-- Fixed Navbar -->
   <nav class="top-navbar">
     <a href="/" class="navbar-brand">Elysian<span>'26</span></a>
     <div class="navbar-right">
       <div class="user-block">
-        <img id="user-avatar" class="user-avatar" src="" alt="">
+        <img id="user-avatar" class="user-avatar"
+          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23ddd'/%3E%3Ccircle cx='16' cy='12' r='5' fill='%23999'/%3E%3Cpath d='M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10' fill='%23999'/%3E%3C/svg%3E"
+          alt="">
         <div class="user-meta">
           <span class="user-name" id="user-name"></span>
           <span class="user-email" id="user-email"></span>
@@ -424,17 +441,17 @@
   </nav>
 
   <div class="page-content">
-  <div class="status-container">
-    <div class="status-card" id="status-card">
-      <div class="status-icon loading" id="status-icon">
-        <div class="loading-spinner"></div>
+    <div class="status-container">
+      <div class="status-card" id="status-card">
+        <div class="status-icon loading" id="status-icon">
+          <div class="loading-spinner"></div>
+        </div>
+        <h1 class="status-title" id="status-title">Verifying Payment</h1>
+        <p class="status-message" id="status-message">Please wait while we confirm your payment...</p>
+        <div class="payment-details" id="payment-details" style="display: none;"></div>
+        <div id="action-buttons"></div>
       </div>
-      <h1 class="status-title" id="status-title">Verifying Payment</h1>
-      <p class="status-message" id="status-message">Please wait while we confirm your payment...</p>
-      <div class="payment-details" id="payment-details" style="display: none;"></div>
-      <div id="action-buttons"></div>
     </div>
-  </div>
   </div>
 
   <div class="confetti" id="confetti"></div>
@@ -444,7 +461,12 @@
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('order_id');
     const flowTypeParam = urlParams.get('type');
-    let flowContext = (flowTypeParam && flowTypeParam.toLowerCase() === 'external') ? 'EXTERNAL' : 'HITAMONLY';
+    let flowContext = 'HITAMONLY';
+    if (flowTypeParam) {
+      const type = flowTypeParam.toLowerCase();
+      if (type === 'external') flowContext = 'EXTERNAL';
+      else if (type === 'butterfly') flowContext = 'BUTTERFLY';
+    }
     let successRedirectTimeout = null;
 
     function scheduleDashboardRedirect(delayMs = 4000) {
@@ -452,8 +474,9 @@
         clearTimeout(successRedirectTimeout);
       }
 
+      const redirectUrl = flowContext === 'BUTTERFLY' ? '/butterfly-form.html' : '/dashboard.html';
       successRedirectTimeout = setTimeout(() => {
-        window.location.href = '/dashboard.html';
+        window.location.href = redirectUrl;
       }, delayMs);
     }
 
@@ -470,7 +493,7 @@
         const authRes = await fetch('/api/auth/status', { credentials: 'include' });
         const authData = await authRes.json();
         if (authData.isAuthenticated && authData.user) {
-          document.getElementById('user-avatar').src = authData.user.picture || '';
+          document.getElementById('user-avatar').src = authData.user.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(authData.user.name || 'U')}&background=4db03c&color=fff`;
           document.getElementById('user-name').textContent = authData.user.name || '';
           document.getElementById('user-email').textContent = authData.user.email || '';
         }
@@ -495,7 +518,7 @@
           flowContext = data.context;
         }
 
-        if (flowContext !== 'HITAMONLY' && flowContext !== 'EXTERNAL') {
+        if (!['HITAMONLY', 'EXTERNAL', 'BUTTERFLY'].includes(flowContext)) {
           flowContext = 'HITAMONLY';
         }
 
@@ -530,11 +553,16 @@
       title.textContent = 'Payment Successful!';
 
       const isExternal = flowContext === 'EXTERNAL';
+      const isButterfly = flowContext === 'BUTTERFLY';
       const registrationCode = data.registrationCode || null;
 
-      message.textContent = isExternal
-        ? 'Your external registration is confirmed. A copy of your receipt and pass instructions has been sent to your email. Redirecting you to the dashboard...'
-        : 'Your registration is now complete. You can download your event pass from the dashboard. Redirecting you to the dashboard...';
+      if (isButterfly) {
+        message.textContent = 'Your Butterfly Offer registration is confirmed! Redirecting you to view your QR codes...';
+      } else if (isExternal) {
+        message.textContent = 'Your external registration is confirmed. A copy of your receipt and pass instructions has been sent to your email. Redirecting you to the dashboard...';
+      } else {
+        message.textContent = 'Your registration is now complete. You can download your event pass from the dashboard. Redirecting you to the dashboard...';
+      }
 
       details.style.display = 'block';
       details.innerHTML = `
@@ -560,7 +588,16 @@
         ` : ''}
       `;
 
-      if (isExternal) {
+      if (isButterfly) {
+        buttons.innerHTML = `
+          <a href="/butterfly-form.html" class="btn-primary">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L20 7"/>
+            </svg>
+            View QR Codes
+          </a>
+        `;
+      } else if (isExternal) {
         buttons.innerHTML = `
           <a href="/dashboard.html" class="btn-primary">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -602,13 +639,19 @@
       `;
 
       const isExternal = flowContext === 'EXTERNAL';
+      const isButterfly = flowContext === 'BUTTERFLY';
 
       title.className = 'status-title failed';
       title.textContent = 'Payment Failed';
 
       message.textContent = data.message || 'Your payment could not be processed. Please try again.';
 
-      if (isExternal) {
+      if (isButterfly) {
+        buttons.innerHTML = `
+          <a href="/butterfly-form.html" class="btn-primary">Try Payment Again</a>
+          <a href="/" class="btn-secondary">Back to Home</a>
+        `;
+      } else if (isExternal) {
         buttons.innerHTML = `
           <a href="/external-payment.html" class="btn-primary">Try Payment Again</a>
           <a href="/dashboard.html" class="btn-secondary">Go to Dashboard</a>
@@ -639,12 +682,22 @@
       title.textContent = 'Payment Pending';
 
       const isExternal = flowContext === 'EXTERNAL';
+      const isButterfly = flowContext === 'BUTTERFLY';
 
-      message.textContent = isExternal
-        ? 'Your payment is being processed. You can safely close this page and revisit the external portal with your registration ID.'
-        : 'Your payment is being processed. This may take a few minutes. Please check back later.';
+      if (isButterfly) {
+        message.textContent = 'Your payment is being processed. Please wait a moment and check again.';
+      } else if (isExternal) {
+        message.textContent = 'Your payment is being processed. You can safely close this page and revisit the external portal with your registration ID.';
+      } else {
+        message.textContent = 'Your payment is being processed. This may take a few minutes. Please check back later.';
+      }
 
-      if (isExternal) {
+      if (isButterfly) {
+        buttons.innerHTML = `
+          <button onclick="verifyPayment()" class="btn-primary">Check Again</button>
+          <a href="/butterfly-form.html" class="btn-secondary">Return to Form</a>
+        `;
+      } else if (isExternal) {
         buttons.innerHTML = `
           <button onclick="verifyPayment()" class="btn-primary">Check Again</button>
           <a href="/external-form.html" class="btn-secondary">Return to External Portal</a>
@@ -683,7 +736,7 @@
     function createConfetti() {
       const container = document.getElementById('confetti');
       const colors = ['#FF6B9D', '#9B5DE5', '#00BBF9', '#00F5D4', '#FEE440', '#FF9F1C'];
-      
+
       for (let i = 0; i < 50; i++) {
         const piece = document.createElement('div');
         piece.className = 'confetti-piece';
@@ -705,8 +758,10 @@
     verifyPayment();
   </script>
 
-  <footer style="background: rgba(10, 10, 15, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 1.5rem; text-align: center;">
+  <footer
+    style="background: rgba(10, 10, 15, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 1.5rem; text-align: center;">
     <p style="margin: 0; color: #888; font-size: 0.75rem;">© 2026 ROYAL EDUCATIONAL SOCIETY. All rights reserved.</p>
   </footer>
 </body>
+
 </html>

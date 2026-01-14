@@ -34,18 +34,18 @@ function createPool() {
 // Initialize database and create tables
 export async function initializeDatabase() {
   let connection = null;
-  
+
   try {
     // Step 1: Connect without database to create it if needed
     console.log('🔄 Connecting to MySQL server...');
     const tempPool = mysql.createPool(poolConfig);
     connection = await tempPool.getConnection();
-    
+
     // Step 2: Create database if not exists
     console.log(`🔄 Ensuring database '${DB_NAME}' exists...`);
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
     await connection.query(`USE \`${DB_NAME}\``);
-    
+
     // Step 3: Create students table
     console.log('🔄 Creating students table...');
     await connection.query(`
@@ -163,6 +163,44 @@ export async function initializeDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
+    // Step 7b: Create butterfly registrations table (4-student group offer)
+    console.log('🔄 Creating butterfly_registrations table...');
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS butterfly_registrations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        registration_id VARCHAR(25) UNIQUE,
+        primary_email VARCHAR(255) NOT NULL,
+        student1_name VARCHAR(255) NOT NULL,
+        student1_branch VARCHAR(100) NOT NULL,
+        student1_roll_number VARCHAR(50) NOT NULL,
+        student1_mobile VARCHAR(15) NOT NULL,
+        student1_email VARCHAR(255) NOT NULL,
+        student2_name VARCHAR(255) NOT NULL,
+        student2_branch VARCHAR(100) NOT NULL,
+        student2_roll_number VARCHAR(50) NOT NULL,
+        student2_mobile VARCHAR(15) NOT NULL,
+        student2_email VARCHAR(255) NOT NULL,
+        student3_name VARCHAR(255) NOT NULL,
+        student3_branch VARCHAR(100) NOT NULL,
+        student3_roll_number VARCHAR(50) NOT NULL,
+        student3_mobile VARCHAR(15) NOT NULL,
+        student3_email VARCHAR(255) NOT NULL,
+        student4_name VARCHAR(255) NOT NULL,
+        student4_branch VARCHAR(100) NOT NULL,
+        student4_roll_number VARCHAR(50) NOT NULL,
+        student4_mobile VARCHAR(15) NOT NULL,
+        student4_email VARCHAR(255) NOT NULL,
+        total_amount DECIMAL(10, 2) NOT NULL DEFAULT 1800.00,
+        payment_status ENUM('PENDING','PAID','FAILED') DEFAULT 'PENDING',
+        payment_id INT NULL,
+        qr_codes JSON NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_butterfly_primary_email (primary_email),
+        INDEX idx_butterfly_payment_status (payment_status)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
     // Step 8: Create payments table
     console.log('🔄 Creating payments table...');
     await connection.query(`
@@ -172,6 +210,7 @@ export async function initializeDatabase() {
         student_id INT NULL,
         form_id INT NULL,
         external_registration_id INT NULL,
+        butterfly_registration_id INT NULL,
         amount DECIMAL(10, 2) NOT NULL,
         status ENUM('PENDING', 'SUCCESS', 'FAILED', 'CANCELLED') DEFAULT 'PENDING',
         cf_order_id VARCHAR(100),
@@ -184,10 +223,12 @@ export async function initializeDatabase() {
         FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
         FOREIGN KEY (form_id) REFERENCES student_forms(id) ON DELETE CASCADE,
         FOREIGN KEY (external_registration_id) REFERENCES external_registrations(id) ON DELETE CASCADE,
+        FOREIGN KEY (butterfly_registration_id) REFERENCES butterfly_registrations(id) ON DELETE CASCADE,
         INDEX idx_order_id (order_id),
         INDEX idx_student_id (student_id),
         INDEX idx_form_id (form_id),
         INDEX idx_external_registration (external_registration_id),
+        INDEX idx_butterfly_registration (butterfly_registration_id),
         INDEX idx_status (status)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
@@ -231,7 +272,7 @@ export async function initializeDatabase() {
     if (paymentStatusIndex.length === 0) {
       await connection.query(
         'ALTER TABLE student_forms ADD INDEX idx_payment_status (payment_status)'
-      ).catch(() => {});
+      ).catch(() => { });
     }
 
     console.log('🔄 Normalizing student form branch and section data...');
@@ -268,12 +309,12 @@ export async function initializeDatabase() {
     } else {
       await connection.query(
         "ALTER TABLE students MODIFY COLUMN user_type ENUM('INTERNAL', 'HITAMONLY', 'EXTERNAL') DEFAULT 'INTERNAL'"
-      ).catch(() => {});
+      ).catch(() => { });
     }
 
     await connection.query(
       "UPDATE students SET user_type = 'HITAMONLY' WHERE user_type = 'INTERNAL'"
-    ).catch(() => {});
+    ).catch(() => { });
 
     await connection.query(
       "ALTER TABLE students MODIFY COLUMN user_type ENUM('HITAMONLY', 'EXTERNAL') DEFAULT 'HITAMONLY'"
@@ -282,8 +323,8 @@ export async function initializeDatabase() {
     });
 
     console.log('🔄 Ensuring payments table supports external registrations...');
-    await connection.query('ALTER TABLE payments MODIFY COLUMN student_id INT NULL').catch(() => {});
-    await connection.query('ALTER TABLE payments MODIFY COLUMN form_id INT NULL').catch(() => {});
+    await connection.query('ALTER TABLE payments MODIFY COLUMN student_id INT NULL').catch(() => { });
+    await connection.query('ALTER TABLE payments MODIFY COLUMN form_id INT NULL').catch(() => { });
 
     const [externalRegistrationColumn] = await connection.query(
       "SHOW COLUMNS FROM payments LIKE 'external_registration_id'"
@@ -294,7 +335,7 @@ export async function initializeDatabase() {
       );
       await connection.query(
         'ALTER TABLE payments ADD INDEX idx_external_registration (external_registration_id)'
-      ).catch(() => {});
+      ).catch(() => { });
     }
 
     try {
@@ -304,7 +345,7 @@ export async function initializeDatabase() {
         WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'payments' 
         AND CONSTRAINT_NAME = 'fk_payments_external_registration'
       `, [DB_NAME]);
-      
+
       if (existingFk.length === 0) {
         await connection.query(
           'ALTER TABLE payments ADD CONSTRAINT fk_payments_external_registration FOREIGN KEY (external_registration_id) REFERENCES external_registrations(id) ON DELETE CASCADE'
@@ -318,12 +359,45 @@ export async function initializeDatabase() {
       }
     }
 
+    // Ensure payments table supports butterfly registrations
+    console.log('🔄 Ensuring payments table supports butterfly registrations...');
+    const [butterflyRegistrationColumn] = await connection.query(
+      "SHOW COLUMNS FROM payments LIKE 'butterfly_registration_id'"
+    );
+    if (butterflyRegistrationColumn.length === 0) {
+      await connection.query(
+        'ALTER TABLE payments ADD COLUMN butterfly_registration_id INT NULL AFTER external_registration_id'
+      );
+      await connection.query(
+        'ALTER TABLE payments ADD INDEX idx_butterfly_registration (butterfly_registration_id)'
+      ).catch(() => { });
+    }
+
+    try {
+      const [existingButterflyFk] = await connection.query(`
+        SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS 
+        WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'payments' 
+        AND CONSTRAINT_NAME = 'fk_payments_butterfly_registration'
+      `, [DB_NAME]);
+
+      if (existingButterflyFk.length === 0) {
+        await connection.query(
+          'ALTER TABLE payments ADD CONSTRAINT fk_payments_butterfly_registration FOREIGN KEY (butterfly_registration_id) REFERENCES butterfly_registrations(id) ON DELETE CASCADE'
+        );
+        console.log('  ✓ Added butterfly registration foreign key');
+      }
+    } catch (err) {
+      if (!err.message.includes('Duplicate') && err.code !== 'ER_FK_ALREADY_EXISTS' && err.code !== 'ER_DUP_KEYNAME') {
+        console.warn('  ⚠️ Could not add butterfly registration foreign key:', err.message);
+      }
+    }
+
     // Step 10: Generate registration IDs for existing records
     console.log('🔄 Checking registration IDs...');
     const [rowsWithoutId] = await connection.query(
       'SELECT id FROM student_forms WHERE registration_id IS NULL'
     );
-    
+
     for (const row of rowsWithoutId) {
       const regId = 'ELYSIAN' + new Date().getFullYear().toString().slice(-2) + String(row.id).padStart(6, '0');
       await connection.query('UPDATE student_forms SET registration_id = ? WHERE id = ?', [regId, row.id]);
@@ -340,7 +414,7 @@ export async function initializeDatabase() {
 
     // Step 10: Seed events catalog (idempotent)
     console.log('🔄 Seeding events catalog...');
-    
+
     // Remove deprecated events that are no longer in the catalog
     const currentEventIds = EVENT_DEFINITIONS.map(e => e.id);
     const placeholders = currentEventIds.map(() => '?').join(',');
@@ -348,7 +422,7 @@ export async function initializeDatabase() {
       `DELETE FROM events WHERE id NOT IN (${placeholders}) AND id LIKE 'EVT_%'`,
       currentEventIds
     );
-    
+
     for (const event of EVENT_DEFINITIONS) {
       await connection.query(
         `INSERT INTO events (id, name, type, day_label, start_time, end_time, venue, description)
@@ -376,25 +450,25 @@ export async function initializeDatabase() {
 
     connection.release();
     await tempPool.end();
-    
+
     // Create the main pool with database selected
     createPool();
-    
+
     console.log('✅ Database initialized successfully!');
     console.log(`   Database: ${DB_NAME}`);
     console.log('   Tables: students, student_forms, events, event_registrations');
-    
+
   } catch (error) {
     console.error('❌ Database initialization error:', error.message);
-    
+
     if (error.code === 'ECONNREFUSED') {
       console.error('   Make sure MySQL server is running!');
     } else if (error.code === 'ER_ACCESS_DENIED_ERROR') {
       console.error('   Check your database username and password in .env file');
     }
-    
+
     if (connection) {
-      try { connection.release(); } catch (e) {}
+      try { connection.release(); } catch (e) { }
     }
     throw error;
   }

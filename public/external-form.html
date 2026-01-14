@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>External Registration - Elysian '26</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
   <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
   <style>
     :root {
@@ -904,7 +907,9 @@
       color: var(--text-secondary);
     }
 
-    input, select, textarea {
+    input,
+    select,
+    textarea {
       padding: 0.85rem 1rem;
       background: var(--bg-secondary);
       border: 1px solid var(--border-subtle);
@@ -919,7 +924,9 @@
       color: var(--text-muted);
     }
 
-    input:focus, select:focus, textarea:focus {
+    input:focus,
+    select:focus,
+    textarea:focus {
       outline: none;
       border-color: rgba(53, 101, 216, 0.55);
       background: rgba(53, 101, 216, 0.08);
@@ -1040,13 +1047,16 @@
     }
   </style>
 </head>
+
 <body>
   <!-- Fixed Navbar -->
   <nav class="top-navbar">
     <a href="/" class="navbar-brand">Elysian<span>'26</span></a>
     <div class="navbar-right">
       <div class="user-block">
-        <img id="user-avatar" class="user-avatar" src="" alt="">
+        <img id="user-avatar" class="user-avatar"
+          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23ddd'/%3E%3Ccircle cx='16' cy='12' r='5' fill='%23999'/%3E%3Cpath d='M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10' fill='%23999'/%3E%3C/svg%3E"
+          alt="">
         <div class="user-meta">
           <span class="user-name" id="user-name"></span>
           <span class="user-email" id="user-email"></span>
@@ -1061,168 +1071,175 @@
       <div class="registration-hero-copy">
         <span class="registration-hero-eyebrow">Guests & Delegations</span>
         <h2 class="registration-hero-title">Join HITAM for Elysian '26</h2>
-        <p class="registration-hero-text">Register your crew, pick curated add-ons, and stay informed as we unlock the complete cultural and technical lineup throughout the festival week.</p>
+        <p class="registration-hero-text">Register your crew, pick curated add-ons, and stay informed as we unlock the
+          complete cultural and technical lineup throughout the festival week.</p>
       </div>
       <div class="registration-hero-media">
         <img src="/assets/hitam-abt.jpg" alt="Visitors exploring the HITAM campus during Elysian">
       </div>
     </div>
-  <div class="page">
-    <!-- Sidebar (Desktop Only) -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <h1 class="sidebar-title">External Registration</h1>
-        <p class="sidebar-subtitle">Secure your Elysian '26 pass. Complete the form to join us for an unforgettable technical & cultural experience.</p>
-      </div>
-
-      <div class="pricing-box" id="sidebar-pricing">
-        <div class="pricing-row">
-          <span>Esparto pass</span>
-          <strong>₹500</strong>
+    <div class="page">
+      <!-- Sidebar (Desktop Only) -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h1 class="sidebar-title">External Registration</h1>
+          <p class="sidebar-subtitle">Secure your Elysian '26 pass. Complete the form to join us for an unforgettable
+            technical & cultural experience.</p>
         </div>
-        <div class="pricing-row" id="sidebar-pricing-addon" style="display: none;">
-          <span>Sahitya + Prasasti Add-on</span>
-          <strong>₹500</strong>
-        </div>
-        <div class="pricing-total">
-          <span>Total</span>
-          <strong id="sidebar-pricing-total">₹500</strong>
-        </div>
-      </div>
 
-      <div class="sidebar-addon">
-        <span class="sidebar-addon-badge">✦ Recommended</span>
-        <p class="sidebar-addon-title">Sahitya + Prasasti Cultural Access</p>
-        <p class="sidebar-addon-desc">Unlock the Sahitya and Prasasti showcases with this cultural add-on.</p>
-        <span class="sidebar-addon-price">+₹500</span>
-      </div>
-
-      <div class="support-copy">
-        Need help? <a href="mailto:elysian@hitam.org">elysian@hitam.org</a>
-      </div>
-    </aside>
-
-    <!-- Main Form -->
-    <main class="form-card">
-      <section class="section">
-        <div>
-          <h2 class="section-title">Participant Details</h2>
-          <p class="section-subtitle">Use an email you actively monitor. We'll send your registration code and receipts there.</p>
-        </div>
-        <form id="external-form">
-          <div class="form-grid">
-            <label>
-              Full name
-              <input type="text" id="full-name" name="full_name" placeholder="Ex: Priya Sharma" required>
-            </label>
-            <label>
-              Email address
-              <input type="email" id="email" name="email" placeholder="name@example.com" required>
-            </label>
-            <label>
-              Mobile number
-              <input type="tel" id="mobile" name="mobile" placeholder="9876543210" required>
-            </label>
-            <label>
-              Institution
-              <input type="text" id="institution" name="institution" placeholder="Your college / organization" required>
-            </label>
-            <label>
-              Department
-              <input type="text" id="department" name="department" placeholder="Ex: Computer Science" required>
-            </label>
-            <label>
-              Year of study
-              <select id="year" name="year_of_study" required>
-                <option value="">Select year</option>
-                <option value="1">1st Year</option>
-                <option value="2">2nd Year</option>
-                <option value="3">3rd Year</option>
-                <option value="4">4th Year</option>
-                <option value="5">5th Year</option>
-                <option value="6">6th Year</option>
-              </select>
-            </label>
-            <label>
-              Identity number
-              <input type="text" id="identity" name="identity_number" placeholder="College ID / Govt. ID" required>
-            </label>
+        <div class="pricing-box" id="sidebar-pricing">
+          <div class="pricing-row">
+            <span>Esparto pass</span>
+            <strong>₹500</strong>
           </div>
-
-          <div class="form-section">
-            <div class="section-label">Event Selection (Required)</div>
-            <p class="event-hint">Select at least one event to continue with registration. You can still update your choices later.</p>
-            <div class="event-groups" id="event-groups"></div>
-            <div class="field-error" id="events-error"></div>
+          <div class="pricing-row" id="sidebar-pricing-addon" style="display: none;">
+            <span>Sahitya + Prasasti Add-on</span>
+            <strong>₹500</strong>
           </div>
+          <div class="pricing-total">
+            <span>Total</span>
+            <strong id="sidebar-pricing-total">₹500</strong>
+          </div>
+        </div>
 
-          <div class="selection-summary">
-            <div class="summary-title">Your Selection</div>
-            <div class="summary-list" id="selection-summary">
-              <div class="summary-empty">Select at least one event to continue</div>
+        <div class="sidebar-addon">
+          <span class="sidebar-addon-badge">✦ Recommended</span>
+          <p class="sidebar-addon-title">Sahitya + Prasasti Cultural Access</p>
+          <p class="sidebar-addon-desc">Unlock the Sahitya and Prasasti showcases with this cultural add-on.</p>
+          <span class="sidebar-addon-price">+₹500</span>
+        </div>
+
+        <div class="support-copy">
+          Need help? <a href="mailto:elysian@hitam.org">elysian@hitam.org</a>
+        </div>
+      </aside>
+
+      <!-- Main Form -->
+      <main class="form-card">
+        <section class="section">
+          <div>
+            <h2 class="section-title">Participant Details</h2>
+            <p class="section-subtitle">Use an email you actively monitor. We'll send your registration code and
+              receipts there.</p>
+          </div>
+          <form id="external-form">
+            <div class="form-grid">
+              <label>
+                Full name
+                <input type="text" id="full-name" name="full_name" placeholder="Ex: Priya Sharma" required>
+              </label>
+              <label>
+                Email address
+                <input type="email" id="email" name="email" placeholder="name@example.com" required>
+              </label>
+              <label>
+                Mobile number
+                <input type="tel" id="mobile" name="mobile" placeholder="9876543210" required>
+              </label>
+              <label>
+                Institution
+                <input type="text" id="institution" name="institution" placeholder="Your college / organization"
+                  required>
+              </label>
+              <label>
+                Department
+                <input type="text" id="department" name="department" placeholder="Ex: Computer Science" required>
+              </label>
+              <label>
+                Year of study
+                <select id="year" name="year_of_study" required>
+                  <option value="">Select year</option>
+                  <option value="1">1st Year</option>
+                  <option value="2">2nd Year</option>
+                  <option value="3">3rd Year</option>
+                  <option value="4">4th Year</option>
+                  <option value="5">5th Year</option>
+                  <option value="6">6th Year</option>
+                </select>
+              </label>
+              <label>
+                Identity number
+                <input type="text" id="identity" name="identity_number" placeholder="College ID / Govt. ID" required>
+              </label>
             </div>
-          </div>
 
-          <!-- Mobile Bottom Panel: Pricing -->
-          <div class="mobile-bottom-panel">
-            <div class="pricing-box" id="mobile-pricing-box">
+            <div class="form-section">
+              <div class="section-label">Event Selection (Required)</div>
+              <p class="event-hint">Select at least one event to continue with registration. You can still update your
+                choices later.</p>
+              <div class="event-groups" id="event-groups"></div>
+              <div class="field-error" id="events-error"></div>
+            </div>
+
+            <div class="selection-summary">
+              <div class="summary-title">Your Selection</div>
+              <div class="summary-list" id="selection-summary">
+                <div class="summary-empty">Select at least one event to continue</div>
+              </div>
+            </div>
+
+            <!-- Mobile Bottom Panel: Pricing -->
+            <div class="mobile-bottom-panel">
+              <div class="pricing-box" id="mobile-pricing-box">
+                <div class="pricing-row">
+                  <span>Esparto pass</span>
+                  <strong>₹500</strong>
+                </div>
+                <div class="pricing-row" id="mobile-pricing-addon" style="display: none;">
+                  <span>Sahitya + Prasasti Add-on</span>
+                  <strong>₹500</strong>
+                </div>
+                <div class="pricing-total">
+                  <span>Total payable</span>
+                  <strong id="mobile-pricing-total">₹500</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Desktop Pricing (hidden on mobile via sidebar) -->
+            <div class="pricing-box desktop-only" id="pricing-box" style="margin-top: 1.5rem;">
               <div class="pricing-row">
                 <span>Esparto pass</span>
                 <strong>₹500</strong>
               </div>
-              <div class="pricing-row" id="mobile-pricing-addon" style="display: none;">
-                <span>Sahitya + Prasasti Add-on</span>
+              <div class="pricing-row" id="pricing-addon" style="display: none;">
+                <span>Cultural Events Add-on</span>
                 <strong>₹500</strong>
               </div>
               <div class="pricing-total">
                 <span>Total payable</span>
-                <strong id="mobile-pricing-total">₹500</strong>
+                <strong id="pricing-total">₹500</strong>
               </div>
             </div>
-          </div>
 
-          <!-- Desktop Pricing (hidden on mobile via sidebar) -->
-          <div class="pricing-box desktop-only" id="pricing-box" style="margin-top: 1.5rem;">
-            <div class="pricing-row">
-              <span>Esparto pass</span>
-              <strong>₹500</strong>
+            <!-- Cultural Add-On Selection (Bottom Position) -->
+            <div class="section-label" style="margin-top: 2rem;">Cultural Add-On (Optional)</div>
+            <div class="addon-toggle" id="addon-toggle" tabindex="0">
+              <div class="addon-toggle-check"></div>
+              <div class="addon-toggle-content">
+                <span class="addon-toggle-badge">✦ Recommended</span>
+                <p class="addon-toggle-title">Be part of Sahitya + Prasasti</p>
+                <p class="addon-toggle-desc">Experience the Sahitya and Prasasti cultural celebrations for just ₹500
+                  more.</p>
+              </div>
+              <span class="addon-toggle-price">+₹500</span>
             </div>
-            <div class="pricing-row" id="pricing-addon" style="display: none;">
-              <span>Cultural Events Add-on</span>
-              <strong>₹500</strong>
-            </div>
-            <div class="pricing-total">
-              <span>Total payable</span>
-              <strong id="pricing-total">₹500</strong>
-            </div>
-          </div>
 
-          <!-- Cultural Add-On Selection (Bottom Position) -->
-          <div class="section-label" style="margin-top: 2rem;">Cultural Add-On (Optional)</div>
-          <div class="addon-toggle" id="addon-toggle" tabindex="0">
-            <div class="addon-toggle-check"></div>
-            <div class="addon-toggle-content">
-              <span class="addon-toggle-badge">✦ Recommended</span>
-              <p class="addon-toggle-title">Be part of Sahitya + Prasasti</p>
-              <p class="addon-toggle-desc">Experience the Sahitya and Prasasti cultural celebrations for just ₹500 more.</p>
+            <div class="form-actions" style="margin-top: 1.5rem;">
+              <div id="form-message" class="message-box"></div>
+              <button type="submit" id="submit-btn" class="btn btn-primary">
+                <span id="submit-text">Submit &amp; Continue to Payment</span>
+              </button>
             </div>
-            <span class="addon-toggle-price">+₹500</span>
-          </div>
+          </form>
+        </section>
 
-          <div class="form-actions" style="margin-top: 1.5rem;">
-            <div id="form-message" class="message-box"></div>
-            <button type="submit" id="submit-btn" class="btn btn-primary">
-              <span id="submit-text">Submit &amp; Continue to Payment</span>
-            </button>
-          </div>
-        </form>
-      </section>
-
-      <div class="link-row">
-        Already registered? Re-submit the form with the same identity number to resume payment, or <a href="/login.html">return to login</a>.
-      </div>
-    </main>
-  </div>
+        <div class="link-row">
+          Already registered? Re-submit the form with the same identity number to resume payment, or <a
+            href="/login.html">return to login</a>.
+        </div>
+      </main>
+    </div>
   </div> <!-- End page-wrapper -->
 
   <script>
@@ -1237,7 +1254,7 @@
     const messageBox = document.getElementById('form-message');
     const submitBtn = document.getElementById('submit-btn');
     const submitText = document.getElementById('submit-text');
-    
+
     // All pricing elements
     const pricingAddonRow = document.getElementById('pricing-addon');
     const pricingTotal = document.getElementById('pricing-total');
@@ -1314,10 +1331,10 @@
       // Update all pricing displays (desktop, sidebar, mobile)
       if (pricingAddonRow) pricingAddonRow.style.display = hasAddOn ? 'flex' : 'none';
       if (pricingTotal) pricingTotal.textContent = totalText;
-      
+
       if (sidebarPricingAddon) sidebarPricingAddon.style.display = hasAddOn ? 'flex' : 'none';
       if (sidebarPricingTotal) sidebarPricingTotal.textContent = totalText;
-      
+
       if (mobilePricingAddon) mobilePricingAddon.style.display = hasAddOn ? 'flex' : 'none';
       if (mobilePricingTotal) mobilePricingTotal.textContent = totalText;
 
@@ -1740,10 +1757,10 @@
 
         activeRegistration = result.registration;
 
-        console.log('Registration response:', { 
-          isPaid: result.isPaid, 
+        console.log('Registration response:', {
+          isPaid: result.isPaid,
           isExisting: result.isExisting,
-          registrationId: activeRegistration.id 
+          registrationId: activeRegistration.id
         });
 
         // Don't show registration ID before payment - redirect to payment page
@@ -1805,9 +1822,11 @@
         const avatarEl = document.getElementById('user-avatar');
         const nameEl = document.getElementById('user-name');
         const emailEl = document.getElementById('user-email');
-        
+
         if (data.user.picture) {
           avatarEl.src = data.user.picture;
+        } else {
+          avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name || 'U')}&background=3565d8&color=fff`;
         }
         if (data.user.name) {
           nameEl.textContent = data.user.name;
@@ -1844,8 +1863,10 @@
     initPage();
   </script>
 
-  <footer style="background: #f8fafc; border-top: 1px solid rgba(148, 163, 184, 0.35); padding: 1.75rem; text-align: center;">
+  <footer
+    style="background: #f8fafc; border-top: 1px solid rgba(148, 163, 184, 0.35); padding: 1.75rem; text-align: center;">
     <p style="margin: 0; color: #64748b; font-size: 0.8rem;">© 2026 ROYAL EDUCATIONAL SOCIETY. All rights reserved.</p>
   </footer>
 </body>
+
 </html>

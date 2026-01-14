@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Butterfly Offer - Elysian '26</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    <style>
+        :root {
+            --bg-primary: #f5fbf4;
+            --bg-secondary: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.96);
+            --glass-border: rgba(77, 176, 60, 0.16);
+            --border-subtle: rgba(77, 176, 60, 0.12);
+            --accent: #4db03c;
+            --accent-dark: #3f8e31;
+            --accent-soft: rgba(77, 176, 60, 0.12);
+            --accent-strong: rgba(77, 176, 60, 0.2);
+            --success: #4db03c;
+            --error: #d16a6a;
+            --text-primary: #1f2a21;
+            --text-secondary: #49604c;
+            --text-muted: #738578;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top, rgba(77, 176, 60, 0.08) 0%, transparent 45%), var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-subtle);
+            box-shadow: 0 12px 30px rgba(47, 111, 55, 0.08);
+        }
+
+        @media (max-width: 640px) {
+            .top-navbar {
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        .navbar-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: 0.1em;
+        }
+
+        .navbar-brand span {
+            color: var(--accent);
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .navbar-right {
+                gap: 0.75rem;
+            }
+        }
+
+        .user-block {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 480px) {
+            .user-block {
+                gap: 0.5rem;
+            }
+        }
+
+        .user-avatar {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            border: 1px solid var(--border-subtle);
+            object-fit: cover;
+        }
+
+        .user-meta {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        @media (max-width: 480px) {
+            .user-meta {
+                display: none;
+            }
+        }
+
+        .user-name {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
+        .user-email {
+            font-size: 0.6875rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
+        .signout-link {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .signout-link:hover {
+            color: var(--text-primary);
+            border-color: var(--text-muted);
+        }
+
+        /* Page Layout */
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2.5rem;
+            padding: 5.5rem 1.5rem 3.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .page-wrapper {
+                padding: 5rem 1rem 2.5rem;
+                gap: 2rem;
+            }
+        }
+
+        /* Hero Section */
+        .registration-hero {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2.5rem;
+            padding: 2.75rem 3rem;
+            border-radius: 32px;
+            background: var(--accent);
+            box-shadow: 0 28px 50px rgba(77, 176, 60, 0.25);
+        }
+
+        .registration-hero-copy {
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .registration-hero-eyebrow {
+            font-size: 0.7rem;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 600;
+        }
+
+        .registration-hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.75rem;
+            font-weight: 600;
+            line-height: 1.1;
+            color: #ffffff;
+        }
+
+        .registration-hero-text {
+            font-size: 0.98rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.7;
+        }
+
+        .registration-hero-pricing {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .registration-hero-price {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .registration-hero-price-label {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .registration-hero-price-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .registration-hero-price-original {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: line-through;
+        }
+
+        .registration-hero-media {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            font-size: 5rem;
+        }
+
+        @media (max-width: 900px) {
+            .registration-hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 2.25rem;
+            }
+
+            .registration-hero-copy {
+                align-items: center;
+            }
+
+            .registration-hero-pricing {
+                justify-content: center;
+            }
+
+            .registration-hero-media {
+                justify-content: center;
+            }
+        }
+
+        /* Main Content Layout */
+        .page {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 3rem;
+        }
+
+        @media (max-width: 900px) {
+            .page {
+                grid-template-columns: 1fr;
+                max-width: 600px;
+            }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: sticky;
+            top: 5rem;
+            align-self: start;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                display: none;
+            }
+        }
+
+        .sidebar-header {
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .pricing-box {
+            border: 1px solid var(--accent-strong);
+            background: var(--accent-soft);
+            padding: 1.25rem;
+            display: grid;
+            gap: 0.75rem;
+            border-radius: 8px;
+        }
+
+        .pricing-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .pricing-total {
+            border-top: 1px solid var(--accent-strong);
+            padding-top: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-primary);
+        }
+
+        .support-copy {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .support-copy a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Form Area */
+        .form-area {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            box-shadow: 0 24px 45px rgba(47, 111, 55, 0.1);
+        }
+
+        .form-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .form-card-number {
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 50%;
+        }
+
+        .form-card-info h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-card-info p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .form-card-badge {
+            margin-left: auto;
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--accent);
+            background: var(--accent-soft);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .form-input,
+        .form-select {
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-soft);
+        }
+
+        .form-input:disabled {
+            background: #f5f5f5;
+            color: var(--text-muted);
+        }
+
+        /* Submit Section */
+        .submit-section {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            text-align: center;
+        }
+
+        .submit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            background: var(--accent);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(77, 176, 60, 0.35);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .submit-note {
+            margin-top: 0.75rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Messages */
+        .error-message,
+        .success-message {
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .error-message {
+            background: rgba(209, 106, 106, 0.12);
+            border: 1px solid rgba(209, 106, 106, 0.3);
+            color: var(--error);
+        }
+
+        .success-message {
+            background: rgba(77, 176, 60, 0.12);
+            border: 1px solid rgba(77, 176, 60, 0.3);
+            color: var(--success);
+        }
+
+        /* QR Section */
+        .qr-section {
+            display: none;
+        }
+
+        .qr-section.visible {
+            display: block;
+        }
+
+        .qr-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .qr-header h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .qr-header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .qr-reg-id {
+            display: inline-block;
+            padding: 0.5rem 1.25rem;
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 50px;
+            margin-top: 0.75rem;
+        }
+
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .qr-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .qr-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .qr-card img {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 1rem;
+        }
+
+        .qr-card-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .qr-card-roll {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 2000;
+        }
+
+        .loading-overlay.visible {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-subtle);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(10, 10, 15, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        footer p {
+            color: #888;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="top-navbar">
+        <a href="/" class="navbar-brand">Elysian<span>'26</span></a>
+        <div class="navbar-right">
+            <div class="user-block" id="userBlock" style="display: none;">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23ddd'/%3E%3Ccircle cx='16' cy='12' r='5' fill='%23999'/%3E%3Cpath d='M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10' fill='%23999'/%3E%3C/svg%3E"
+                    alt="User" class="user-avatar" id="userAvatar">
+                <div class="user-meta">
+                    <span class="user-name" id="userName"></span>
+                    <span class="user-email" id="userEmail"></span>
+                </div>
+            </div>
+            <a href="#" class="signout-link" id="signoutBtn">Sign Out</a>
+        </div>
+    </nav>
+
+    <div class="page-wrapper">
+        <!-- Hero Section -->
+        <section class="registration-hero">
+            <div class="registration-hero-copy">
+                <span class="registration-hero-eyebrow">🦋 Limited Time Offer</span>
+                <h1 class="registration-hero-title">Butterfly Group Pass</h1>
+                <p class="registration-hero-text">
+                    Register 4 students together and unlock exclusive savings!
+                    Get individual QR codes for each student for seamless event entry.
+                </p>
+                <div class="registration-hero-pricing">
+                    <div class="registration-hero-price">
+                        <span class="registration-hero-price-label">Group Price</span>
+                        <span class="registration-hero-price-value">₹1,800</span>
+                    </div>
+                    <div class="registration-hero-price">
+                        <span class="registration-hero-price-label">Individual Total</span>
+                        <span class="registration-hero-price-original">₹2,400</span>
+                    </div>
+                </div>
+            </div>
+            <div class="registration-hero-media">🦋</div>
+        </section>
+
+        <!-- Main Content -->
+        <div class="page" id="formSection">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2 class="sidebar-title">Group Registration</h2>
+                    <p class="sidebar-subtitle">Complete the form for all 4 students to proceed with payment.</p>
+                </div>
+
+                <div class="pricing-box">
+                    <div class="pricing-row">
+                        <span>Per Student (Regular)</span>
+                        <span>₹600</span>
+                    </div>
+                    <div class="pricing-row">
+                        <span>4 Students (Regular)</span>
+                        <span>₹2,400</span>
+                    </div>
+                    <div class="pricing-row" style="color: var(--accent); font-weight: 500;">
+                        <span>Butterfly Discount</span>
+                        <span>-₹600</span>
+                    </div>
+                    <div class="pricing-total">
+                        <span>You Pay</span>
+                        <span>₹1,800</span>
+                    </div>
+                </div>
+
+                <p class="support-copy">
+                    Need help? Contact us at <a href="mailto:support@elysianhitam.com">support@elysianhitam.com</a>
+                </p>
+            </aside>
+
+            <!-- Form Area -->
+            <div class="form-area">
+                <div id="errorMessage" class="error-message"></div>
+                <div id="successMessage" class="success-message"></div>
+
+                <form id="butterflyForm">
+                    <!-- Student 1 -->
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <div class="form-card-number">1</div>
+                            <div class="form-card-info">
+                                <h3>Student 1</h3>
+                                <p>Primary Contact</p>
+                            </div>
+                            <span class="form-card-badge">You</span>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" name="student1_name" class="form-input" required
+                                    placeholder="Enter full name">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Branch</label>
+                                <select name="student1_branch" class="form-select" required>
+                                    <option value="">Select Branch</option>
+                                    <option value="CSE">CSE</option>
+                                    <option value="EEE">EEE</option>
+                                    <option value="ECE">ECE</option>
+                                    <option value="MECH">MECH</option>
+                                    <option value="CSC">CSC</option>
+                                    <option value="CSD">CSD</option>
+                                    <option value="CSO">CSO</option>
+                                    <option value="CSM">CSM</option>
+                                    <option value="ITP">ITP</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Roll Number</label>
+                                <input type="text" name="student1_roll_number" class="form-input" required
+                                    placeholder="e.g., 22E51A6253">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Mobile</label>
+                                <input type="tel" name="student1_mobile" class="form-input" required
+                                    placeholder="10 digit number">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="student1_email" id="primaryEmail" class="form-input" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student 2 -->
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <div class="form-card-number">2</div>
+                            <div class="form-card-info">
+                                <h3>Student 2</h3>
+                                <p>Group Member</p>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" name="student2_name" class="form-input" required
+                                    placeholder="Enter full name">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Branch</label>
+                                <select name="student2_branch" class="form-select" required>
+                                    <option value="">Select Branch</option>
+                                    <option value="CSE">CSE</option>
+                                    <option value="EEE">EEE</option>
+                                    <option value="ECE">ECE</option>
+                                    <option value="MECH">MECH</option>
+                                    <option value="CSC">CSC</option>
+                                    <option value="CSD">CSD</option>
+                                    <option value="CSO">CSO</option>
+                                    <option value="CSM">CSM</option>
+                                    <option value="ITP">ITP</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Roll Number</label>
+                                <input type="text" name="student2_roll_number" class="form-input" required
+                                    placeholder="e.g., 22E51A6253">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Mobile</label>
+                                <input type="tel" name="student2_mobile" class="form-input" required
+                                    placeholder="10 digit number">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="student2_email" class="form-input" required
+                                    placeholder="@hitam.org">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student 3 -->
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <div class="form-card-number">3</div>
+                            <div class="form-card-info">
+                                <h3>Student 3</h3>
+                                <p>Group Member</p>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" name="student3_name" class="form-input" required
+                                    placeholder="Enter full name">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Branch</label>
+                                <select name="student3_branch" class="form-select" required>
+                                    <option value="">Select Branch</option>
+                                    <option value="CSE">CSE</option>
+                                    <option value="EEE">EEE</option>
+                                    <option value="ECE">ECE</option>
+                                    <option value="MECH">MECH</option>
+                                    <option value="CSC">CSC</option>
+                                    <option value="CSD">CSD</option>
+                                    <option value="CSO">CSO</option>
+                                    <option value="CSM">CSM</option>
+                                    <option value="ITP">ITP</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Roll Number</label>
+                                <input type="text" name="student3_roll_number" class="form-input" required
+                                    placeholder="e.g., 22E51A6253">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Mobile</label>
+                                <input type="tel" name="student3_mobile" class="form-input" required
+                                    placeholder="10 digit number">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="student3_email" class="form-input" required
+                                    placeholder="@hitam.org">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student 4 -->
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <div class="form-card-number">4</div>
+                            <div class="form-card-info">
+                                <h3>Student 4</h3>
+                                <p>Group Member</p>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" name="student4_name" class="form-input" required
+                                    placeholder="Enter full name">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Branch</label>
+                                <select name="student4_branch" class="form-select" required>
+                                    <option value="">Select Branch</option>
+                                    <option value="CSE">CSE</option>
+                                    <option value="EEE">EEE</option>
+                                    <option value="ECE">ECE</option>
+                                    <option value="MECH">MECH</option>
+                                    <option value="CSC">CSC</option>
+                                    <option value="CSD">CSD</option>
+                                    <option value="CSO">CSO</option>
+                                    <option value="CSM">CSM</option>
+                                    <option value="ITP">ITP</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Roll Number</label>
+                                <input type="text" name="student4_roll_number" class="form-input" required
+                                    placeholder="e.g., 22E51A6253">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Mobile</label>
+                                <input type="tel" name="student4_mobile" class="form-input" required
+                                    placeholder="10 digit number">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="student4_email" class="form-input" required
+                                    placeholder="@hitam.org">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="submit-section">
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            Register & Pay ₹1,800
+                        </button>
+                        <p class="submit-note">Secure payment powered by Cashfree</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- QR Codes Section -->
+        <section class="qr-section" id="qrSection">
+            <div class="qr-header">
+                <h2>🎉 Registration Complete!</h2>
+                <p>Your group passes are ready. Show these QR codes at entry.</p>
+                <div class="qr-reg-id" id="regIdDisplay"></div>
+            </div>
+            <div class="qr-grid" id="qrGrid"></div>
+        </section>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p style="color: var(--text-muted);">Processing your registration...</p>
+    </div>
+
+    <footer>
+        <p>© 2026 ROYAL EDUCATIONAL SOCIETY. All rights reserved.</p>
+    </footer>
+
+    <script>
+        let currentUser = null;
+        let registrationId = null;
+        let cashfree = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+        });
+
+        async function checkAuth() {
+            try {
+                const res = await fetch('/api/auth/status', { credentials: 'include' });
+                const data = await res.json();
+
+                if (!data.isAuthenticated || !data.user) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                currentUser = data.user;
+                updateUserUI();
+                checkExistingRegistration();
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        function updateUserUI() {
+            if (currentUser) {
+                document.getElementById('userBlock').style.display = 'flex';
+                document.getElementById('userName').textContent = currentUser.name || '';
+                document.getElementById('userEmail').textContent = currentUser.email || '';
+
+                const avatarUrl = currentUser.picture || currentUser.photoURL || currentUser.profile_picture;
+                const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name || 'U')}&background=4db03c&color=fff`;
+                document.getElementById('userAvatar').src = avatarUrl || fallbackUrl;
+
+                document.getElementById('primaryEmail').value = currentUser.email || '';
+            }
+        }
+
+        async function checkExistingRegistration() {
+            try {
+                const res = await fetch('/api/butterfly/registration/by-email', { credentials: 'include' });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.registration) {
+                        if (data.registration.payment_status === 'PAID') {
+                            showQRCodes();
+                        } else {
+                            registrationId = data.registration.id;
+                            populateForm(data.registration);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking existing registration:', error);
+            }
+        }
+
+        function populateForm(reg) {
+            for (let i = 1; i <= 4; i++) {
+                const nameField = document.querySelector(`[name="student${i}_name"]`);
+                const branchField = document.querySelector(`[name="student${i}_branch"]`);
+                const rollField = document.querySelector(`[name="student${i}_roll_number"]`);
+                const mobileField = document.querySelector(`[name="student${i}_mobile"]`);
+                const emailField = document.querySelector(`[name="student${i}_email"]`);
+
+                if (nameField) nameField.value = reg[`student${i}_name`] || '';
+                if (branchField) branchField.value = reg[`student${i}_branch`] || '';
+                if (rollField) rollField.value = reg[`student${i}_roll_number`] || '';
+                if (mobileField) mobileField.value = reg[`student${i}_mobile`] || '';
+                if (emailField && i > 1) emailField.value = reg[`student${i}_email`] || '';
+            }
+        }
+
+        document.getElementById('signoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+                window.location.href = '/login.html';
+            } catch (error) {
+                window.location.href = '/login.html';
+            }
+        });
+
+        document.getElementById('butterflyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+            showLoading(true);
+
+            try {
+                const formData = new FormData(e.target);
+                const payload = {
+                    student1: {
+                        name: formData.get('student1_name'),
+                        branch: formData.get('student1_branch'),
+                        roll_number: formData.get('student1_roll_number'),
+                        mobile: formData.get('student1_mobile'),
+                        email: formData.get('student1_email')
+                    },
+                    student2: {
+                        name: formData.get('student2_name'),
+                        branch: formData.get('student2_branch'),
+                        roll_number: formData.get('student2_roll_number'),
+                        mobile: formData.get('student2_mobile'),
+                        email: formData.get('student2_email')
+                    },
+                    student3: {
+                        name: formData.get('student3_name'),
+                        branch: formData.get('student3_branch'),
+                        roll_number: formData.get('student3_roll_number'),
+                        mobile: formData.get('student3_mobile'),
+                        email: formData.get('student3_email')
+                    },
+                    student4: {
+                        name: formData.get('student4_name'),
+                        branch: formData.get('student4_branch'),
+                        roll_number: formData.get('student4_roll_number'),
+                        mobile: formData.get('student4_mobile'),
+                        email: formData.get('student4_email')
+                    }
+                };
+
+                const regRes = await fetch('/api/butterfly/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+
+                const regData = await regRes.json();
+
+                if (!regRes.ok || !regData.success) {
+                    throw new Error(regData.error || 'Registration failed');
+                }
+
+                registrationId = regData.registration.id;
+
+                if (regData.isPaid) {
+                    showQRCodes();
+                    return;
+                }
+
+                const orderRes = await fetch('/api/butterfly/payment/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ registrationId })
+                });
+
+                const orderData = await orderRes.json();
+
+                if (!orderRes.ok || !orderData.success) {
+                    throw new Error(orderData.error || 'Failed to create payment order');
+                }
+
+                const mode = orderData.mode === 'production' ? 'production' : 'sandbox';
+                cashfree = Cashfree({ mode });
+
+                cashfree.checkout({
+                    paymentSessionId: orderData.paymentSessionId,
+                    redirectTarget: '_self'
+                });
+
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = error.message || 'Something went wrong. Please try again.';
+                errorMessage.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    Register & Pay ₹1,800
+                `;
+                showLoading(false);
+            }
+        });
+
+        async function showQRCodes() {
+            showLoading(true);
+            try {
+                const res = await fetch('/api/butterfly/qr-codes', { credentials: 'include' });
+                const data = await res.json();
+
+                if (!res.ok || !data.success) {
+                    throw new Error(data.error || 'Failed to load QR codes');
+                }
+
+                document.getElementById('formSection').style.display = 'none';
+                document.getElementById('qrSection').classList.add('visible');
+                document.getElementById('regIdDisplay').textContent = data.registrationId;
+
+                const qrGrid = document.getElementById('qrGrid');
+                qrGrid.innerHTML = '';
+
+                data.qrCodes.forEach(qr => {
+                    const card = document.createElement('div');
+                    card.className = 'qr-card';
+                    card.innerHTML = `
+                        <img src="${qr.qrCode}" alt="QR Code for ${qr.name}">
+                        <div class="qr-card-name">${qr.name}</div>
+                        <div class="qr-card-roll">${qr.rollNumber}</div>
+                    `;
+                    qrGrid.appendChild(card);
+                });
+
+            } catch (error) {
+                console.error('Error loading QR codes:', error);
+                document.getElementById('errorMessage').textContent = error.message || 'Failed to load QR codes';
+                document.getElementById('errorMessage').style.display = 'block';
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingOverlay').classList.toggle('visible', show);
+        }
+    </script>
+</body>
+
+</html>

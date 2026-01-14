@@ -2,7 +2,7 @@ import { getUserType } from '../config/passport.js';
 import { findOrCreateUser } from '../config/firebase.js';
 import { getStudentForm } from '../Services/student.service.js';
 import { getExternalRegistrationByEmail } from '../Services/external.service.js';
-import { signToken, getCookieName, getCookieOptions, sanitizeUserPayload } from '../utils/jwt.js';
+import { signToken, getCookieName, getCookieOptions, getClearCookieOptions, sanitizeUserPayload } from '../utils/jwt.js';
 
 export async function firebaseLoginHandler(req, res) {
   try {
@@ -123,12 +123,12 @@ export async function getCurrentUser(req, res) {
 }
 
 export async function logoutHandler(req, res) {
-  res.clearCookie(getCookieName(), getCookieOptions());
+  res.clearCookie(getCookieName(), getClearCookieOptions());
   return res.redirect('/login.html');
 }
 
 export async function logoutApiHandler(req, res) {
-  res.clearCookie(getCookieName(), getCookieOptions());
+  res.clearCookie(getCookieName(), getClearCookieOptions());
   return res.json({
     success: true,
     message: 'Logged out successfully'
@@ -157,7 +157,7 @@ export async function checkAuthStatus(req, res) {
       try {
         if (authUser.id && !authUser.isTemporary) {
           let existingForm = null;
-          
+
           if (authUser.userType === 'HITAMONLY') {
             // HITAM students - check student_forms table
             existingForm = await getStudentForm(authUser.id);
@@ -165,7 +165,7 @@ export async function checkAuthStatus(req, res) {
             // External users - check external_registrations table by email
             existingForm = await getExternalRegistrationByEmail(authUser.email);
           }
-          
+
           const hasSubmittedForm = !!existingForm;
 
           if (hasSubmittedForm !== authUser.hasSubmittedForm) {

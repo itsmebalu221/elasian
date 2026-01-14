@@ -11,8 +11,9 @@ import { studentRoutes } from './src/Routes/student.routes.js';
 import { paymentRoutes } from './src/Routes/payment.routes.js';
 import { externalRoutes } from './src/Routes/external.routes.js';
 import { eventRoutes } from './src/Routes/event.routes.js';
+import { butterflyRoutes } from './src/Routes/butterfly.routes.js';
 import { initializeDatabase } from './src/db/mysql.js';
-import { verifyToken, getCookieName, getCookieOptions } from './src/utils/jwt.js';
+import { verifyToken, getCookieName, getClearCookieOptions } from './src/utils/jwt.js';
 
 // Load environment variables
 dotenv.config();
@@ -42,32 +43,32 @@ function rateLimiter(req, res, next) {
   if (!req.path.startsWith('/api/')) {
     return next();
   }
-  
+
   const ip = req.ip || req.connection?.remoteAddress || 'unknown';
   const now = Date.now();
-  
+
   if (!rateLimitMap.has(ip)) {
     rateLimitMap.set(ip, { count: 1, startTime: now });
     return next();
   }
-  
+
   const record = rateLimitMap.get(ip);
-  
+
   if (now - record.startTime > RATE_LIMIT_WINDOW_MS) {
     // Reset window
     rateLimitMap.set(ip, { count: 1, startTime: now });
     return next();
   }
-  
+
   record.count++;
-  
+
   if (record.count > RATE_LIMIT_MAX_REQUESTS) {
-    return res.status(429).json({ 
+    return res.status(429).json({
       error: 'Too many requests. Please try again later.',
       retryAfter: Math.ceil((RATE_LIMIT_WINDOW_MS - (now - record.startTime)) / 1000)
     });
   }
-  
+
   return next();
 }
 
@@ -100,7 +101,7 @@ app.use((req, res, next) => {
   } catch (error) {
     console.warn('Invalid auth token:', error.message);
     req.user = null;
-    res.clearCookie(getCookieName(), getCookieOptions());
+    res.clearCookie(getCookieName(), getClearCookieOptions());
   }
 
   return next();
@@ -115,6 +116,7 @@ studentRoutes(app);
 paymentRoutes(app);
 externalRoutes(app);
 eventRoutes(app);
+butterflyRoutes(app);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

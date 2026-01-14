@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Event Registration — Student Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap"
+    rel="stylesheet">
   <style>
     :root {
       --bg-primary: #f4f6fb;
@@ -33,7 +36,8 @@
       box-sizing: border-box;
     }
 
-    html, body {
+    html,
+    body {
       height: 100%;
       width: 100%;
     }
@@ -89,6 +93,7 @@
       .top-navbar {
         padding: 0.75rem 1rem;
       }
+
       .page {
         padding: 4.5rem 1rem 3rem;
       }
@@ -831,7 +836,9 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     /* Selection Summary */
@@ -919,13 +926,16 @@
     }
   </style>
 </head>
+
 <body>
   <!-- Fixed Navbar -->
   <nav class="top-navbar">
     <a href="/" class="navbar-brand">Elysian<span>'26</span></a>
     <div class="navbar-right">
       <div class="user-block">
-        <img id="user-avatar" class="user-avatar" src="" alt="">
+        <img id="user-avatar" class="user-avatar"
+          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23ddd'/%3E%3Ccircle cx='16' cy='12' r='5' fill='%23999'/%3E%3Cpath d='M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10' fill='%23999'/%3E%3C/svg%3E"
+          alt="">
         <div class="user-meta">
           <span class="user-name" id="user-name"></span>
           <span class="user-email" id="user-email"></span>
@@ -962,24 +972,59 @@
           <div class="page-hero-copy">
             <span class="page-hero-eyebrow">HITAM Students</span>
             <h2 class="page-hero-title">Secure Your All-Access Festival Pass</h2>
-            <p class="page-hero-text">Complete the registration form to unlock Elysian experiences across campus. Your pass keeps every curated workshop, performance, and competition at your fingertips.</p>
+            <p class="page-hero-text">Complete the registration form to unlock Elysian experiences across campus. Your
+              pass keeps every curated workshop, performance, and competition at your fingertips.</p>
           </div>
           <div class="page-hero-media">
             <img src="/assets/elysian-logo.PNG" alt="Students celebrating during Elysian events">
           </div>
         </div>
 
+        <!-- Butterfly Offer Promotion Banner -->
+        <a href="/butterfly-form.html" class="butterfly-promo-banner" style="
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 1.25rem 1.75rem;
+          margin-bottom: 2.5rem;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 16px;
+          text-decoration: none;
+          box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(102, 126, 234, 0.35)';"
+          onmouseout="this.style.transform='none'; this.style.boxShadow='0 8px 24px rgba(102, 126, 234, 0.25)';">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <span style="font-size: 1.75rem;">🦋</span>
+            <div>
+              <div
+                style="font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.8); margin-bottom: 0.25rem;">
+                GROUP OFFER</div>
+              <div style="font-size: 1rem; font-weight: 600; color: white;">Butterfly Offer — Register 4 students for
+                just ₹1800!</div>
+            </div>
+          </div>
+          <div
+            style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 0.8125rem; font-weight: 600;">
+            Get Started
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </div>
+        </a>
+
         <!-- Form -->
         <form id="student-form">
           <!-- Personal Information -->
           <div class="form-section">
             <div class="section-label">Personal Information</div>
-            
+
             <div class="field">
               <label class="field-label" for="full_name">
                 Full Name <span class="required">*</span>
               </label>
-              <input type="text" id="full_name" name="full_name" class="field-input" placeholder="Enter your full name" required>
+              <input type="text" id="full_name" name="full_name" class="field-input" placeholder="Enter your full name"
+                required>
               <div class="field-error" id="full_name-error"></div>
             </div>
 
@@ -988,7 +1033,8 @@
                 <label class="field-label" for="roll_number">
                   Roll Number <span class="required">*</span>
                 </label>
-                <input type="text" id="roll_number" name="roll_number" class="field-input" placeholder="e.g., 21A31A0501" required>
+                <input type="text" id="roll_number" name="roll_number" class="field-input"
+                  placeholder="e.g., 21A31A0501" required>
                 <div class="field-error" id="roll_number-error"></div>
               </div>
 
@@ -1045,7 +1091,8 @@
           <!-- Event Selection -->
           <div class="form-section">
             <div class="section-label">Event Selection <span class="required">*</span></div>
-            <p class="event-hint">Select either one multi-day experience or one event per available day. Conflicting choices are automatically disabled.</p>
+            <p class="event-hint">Select either one multi-day experience or one event per available day. Conflicting
+              choices are automatically disabled.</p>
 
             <div class="event-groups" id="event-groups"></div>
 
@@ -1080,7 +1127,8 @@
             </div>
             <div class="payment-note">
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
               Secure payment powered by Cashfree
             </div>
@@ -1442,7 +1490,7 @@
           return;
         }
 
-        const userPicture = data.user.picture || 'https://via.placeholder.com/40';
+        const userPicture = data.user.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name || 'U')}&background=3565d8&color=fff`;
         const userName = data.user.name || '';
         const userEmail = data.user.email || '';
 
@@ -1467,7 +1515,7 @@
 
     document.getElementById('student-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       document.querySelectorAll('.field-error').forEach(el => el.textContent = '');
       document.querySelectorAll('.field-input').forEach(el => el.classList.remove('error'));
       document.getElementById('error-message').style.display = 'none';
@@ -1477,7 +1525,7 @@
       const submitBtn = document.getElementById('submit-btn');
       const btnText = document.getElementById('btn-text');
       const spinner = document.getElementById('spinner');
-      
+
       submitBtn.disabled = true;
       btnText.textContent = 'Submitting';
       spinner.style.display = 'block';
@@ -1582,8 +1630,10 @@
     checkAuth();
   </script>
 
-  <footer style="background: rgba(10, 10, 15, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 1.5rem; text-align: center;">
+  <footer
+    style="background: rgba(10, 10, 15, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 1.5rem; text-align: center;">
     <p style="margin: 0; color: #888; font-size: 0.75rem;">© 2026 ROYAL EDUCATIONAL SOCIETY. All rights reserved.</p>
   </footer>
 </body>
+
 </html>
