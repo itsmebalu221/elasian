@@ -33,7 +33,7 @@ export function getCookieOptions() {
     secure: isProduction,
     sameSite: 'lax',  // Use 'lax' to allow cookies on redirect from payment gateway
     path: '/',
-    maxAge: 24 * 60 * 60 // seconds
+    maxAge: 24 * 60 * 60 * 1000 // milliseconds (24 hours)
   };
 }
 

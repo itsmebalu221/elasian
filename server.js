@@ -88,6 +88,14 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(rateLimiter);
 
+// Short-circuit CORS preflight requests before hitting auth middleware
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});
+
 app.use((req, res, next) => {
   const token = req.cookies?.[getCookieName()];
 
