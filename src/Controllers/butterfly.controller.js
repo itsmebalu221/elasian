@@ -6,15 +6,21 @@ const REUSE_WINDOW_MINUTES = 30;
 
 export async function registerButterflyOffer(req, res) {
     try {
+        console.log('🦋 Register request - req.user:', req.user ? { email: req.user.email, id: req.user.id } : 'none');
+
         const userEmail = req.user?.email;
         if (!userEmail) {
+            console.log('🦋 Auth check failed - no email in req.user');
             return res.status(401).json({
                 success: false,
-                error: 'Authentication required'
+                error: 'Authentication required. Please login first.'
             });
         }
 
+        console.log('🦋 Validating request body...');
         const validated = butterflyRegistrationSchema.parse(req.body);
+        console.log('🦋 Validation passed, creating registration...');
+
         const result = await butterflyService.createButterflyRegistration(validated, userEmail);
 
         const responseData = { ...result.record };
@@ -30,16 +36,36 @@ export async function registerButterflyOffer(req, res) {
             isPaid: result.isPaid
         });
     } catch (error) {
-        console.error('Butterfly registration error:', error);
+        console.error('🦋 Butterfly registration error:', error.name, error.message);
 
         if (error.name === 'ZodError') {
-            const message = error.errors?.[0]?.message || 'Invalid data provided';
+            // Build a clear error message showing which field failed
+            const firstError = error.errors?.[0];
+            let message = 'Invalid form data';
+
+            if (firstError) {
+                const path = firstError.path || [];
+                // Convert path like ['student2', 'email'] to "Student 2 Email"
+                const fieldPath = path.map((p, i) => {
+                    if (typeof p === 'string' && p.startsWith('student')) {
+                        const num = p.replace('student', '');
+                        return `Student ${num}`;
+                    }
+                    return p.charAt(0).toUpperCase() + p.slice(1).replace(/_/g, ' ');
+                }).join(' → ');
+
+                message = fieldPath
+                    ? `${fieldPath}: ${firstError.message}`
+                    : firstError.message;
+            }
+
+            console.log('🦋 Validation error:', message);
             return res.status(400).json({ success: false, error: message });
         }
 
         return res.status(500).json({
             success: false,
-            error: 'Failed to register'
+            error: 'Failed to register. Please try again.'
         });
     }
 }
