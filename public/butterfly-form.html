@@ -1111,36 +1111,65 @@
 
             try {
                 const formData = new FormData(e.target);
+
+                // Build payload
                 const payload = {
                     student1: {
-                        name: formData.get('student1_name'),
-                        branch: formData.get('student1_branch'),
-                        roll_number: formData.get('student1_roll_number'),
-                        mobile: formData.get('student1_mobile'),
-                        email: formData.get('student1_email')
+                        name: formData.get('student1_name')?.trim() || '',
+                        branch: formData.get('student1_branch')?.trim() || '',
+                        roll_number: formData.get('student1_roll_number')?.trim() || '',
+                        mobile: formData.get('student1_mobile')?.trim() || '',
+                        email: formData.get('student1_email')?.trim() || currentUser?.email || ''
                     },
                     student2: {
-                        name: formData.get('student2_name'),
-                        branch: formData.get('student2_branch'),
-                        roll_number: formData.get('student2_roll_number'),
-                        mobile: formData.get('student2_mobile'),
-                        email: formData.get('student2_email')
+                        name: formData.get('student2_name')?.trim() || '',
+                        branch: formData.get('student2_branch')?.trim() || '',
+                        roll_number: formData.get('student2_roll_number')?.trim() || '',
+                        mobile: formData.get('student2_mobile')?.trim() || '',
+                        email: formData.get('student2_email')?.trim() || ''
                     },
                     student3: {
-                        name: formData.get('student3_name'),
-                        branch: formData.get('student3_branch'),
-                        roll_number: formData.get('student3_roll_number'),
-                        mobile: formData.get('student3_mobile'),
-                        email: formData.get('student3_email')
+                        name: formData.get('student3_name')?.trim() || '',
+                        branch: formData.get('student3_branch')?.trim() || '',
+                        roll_number: formData.get('student3_roll_number')?.trim() || '',
+                        mobile: formData.get('student3_mobile')?.trim() || '',
+                        email: formData.get('student3_email')?.trim() || ''
                     },
                     student4: {
-                        name: formData.get('student4_name'),
-                        branch: formData.get('student4_branch'),
-                        roll_number: formData.get('student4_roll_number'),
-                        mobile: formData.get('student4_mobile'),
-                        email: formData.get('student4_email')
+                        name: formData.get('student4_name')?.trim() || '',
+                        branch: formData.get('student4_branch')?.trim() || '',
+                        roll_number: formData.get('student4_roll_number')?.trim() || '',
+                        mobile: formData.get('student4_mobile')?.trim() || '',
+                        email: formData.get('student4_email')?.trim() || ''
                     }
                 };
+
+                // Debug: log the payload
+                console.log('🦋 Submitting butterfly form with payload:', JSON.stringify(payload, null, 2));
+                console.log('🦋 Current user:', currentUser);
+
+                // Frontend validation - check for empty required fields
+                const validateStudent = (student, num) => {
+                    const errors = [];
+                    if (!student.name || student.name.length < 2) errors.push(`Student ${num}: Name is required (min 2 chars)`);
+                    if (!student.branch || student.branch.length < 2) errors.push(`Student ${num}: Please select a branch`);
+                    if (!student.roll_number || student.roll_number.length < 4) errors.push(`Student ${num}: Roll number is required (min 4 chars)`);
+                    if (!student.mobile || !/^[6-9]\d{9}$/.test(student.mobile)) errors.push(`Student ${num}: Valid 10-digit mobile number required`);
+                    if (!student.email || !student.email.includes('@')) errors.push(`Student ${num}: Valid email is required`);
+                    return errors;
+                };
+
+                const validationErrors = [
+                    ...validateStudent(payload.student1, 1),
+                    ...validateStudent(payload.student2, 2),
+                    ...validateStudent(payload.student3, 3),
+                    ...validateStudent(payload.student4, 4)
+                ];
+
+                if (validationErrors.length > 0) {
+                    console.log('🦋 Frontend validation errors:', validationErrors);
+                    throw new Error(validationErrors[0]);
+                }
 
                 const regRes = await fetch('/api/butterfly/register', {
                     method: 'POST',
