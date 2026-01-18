@@ -212,7 +212,7 @@ export async function initializeDatabase() {
         mobile VARCHAR(15) NOT NULL,
         branch VARCHAR(100) NOT NULL,
         year_of_graduation INT NOT NULL,
-        total_amount DECIMAL(10, 2) NOT NULL DEFAULT 500.00,
+        total_amount DECIMAL(10, 2) NOT NULL DEFAULT 600.00,
         payment_status ENUM('PENDING','PAID','FAILED') DEFAULT 'PENDING',
         payment_id INT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
