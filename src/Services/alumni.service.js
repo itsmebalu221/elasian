@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import db from '../db/mysql.js';
 
-export const ALUMNI_AMOUNT = 800;
+export const ALUMNI_AMOUNT = 500;
 
 function generateAlumniRegistrationId() {
     const year = new Date().getFullYear().toString().slice(-2);
