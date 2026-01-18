@@ -201,6 +201,27 @@ export async function initializeDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
+    // Step 7c: Create alumni registrations table
+    console.log('🔄 Creating alumni_registrations table...');
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS alumni_registrations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        registration_id VARCHAR(25) UNIQUE,
+        full_name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        mobile VARCHAR(15) NOT NULL,
+        branch VARCHAR(100) NOT NULL,
+        year_of_graduation INT NOT NULL,
+        total_amount DECIMAL(10, 2) NOT NULL DEFAULT 800.00,
+        payment_status ENUM('PENDING','PAID','FAILED') DEFAULT 'PENDING',
+        payment_id INT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_alumni_email (email),
+        INDEX idx_alumni_payment_status (payment_status)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
     // Step 8: Create payments table
     console.log('🔄 Creating payments table...');
     await connection.query(`
@@ -211,6 +232,7 @@ export async function initializeDatabase() {
         form_id INT NULL,
         external_registration_id INT NULL,
         butterfly_registration_id INT NULL,
+        alumni_registration_id INT NULL,
         amount DECIMAL(10, 2) NOT NULL,
         status ENUM('PENDING', 'SUCCESS', 'FAILED', 'CANCELLED') DEFAULT 'PENDING',
         cf_order_id VARCHAR(100),
@@ -224,11 +246,13 @@ export async function initializeDatabase() {
         FOREIGN KEY (form_id) REFERENCES student_forms(id) ON DELETE CASCADE,
         FOREIGN KEY (external_registration_id) REFERENCES external_registrations(id) ON DELETE CASCADE,
         FOREIGN KEY (butterfly_registration_id) REFERENCES butterfly_registrations(id) ON DELETE CASCADE,
+        FOREIGN KEY (alumni_registration_id) REFERENCES alumni_registrations(id) ON DELETE CASCADE,
         INDEX idx_order_id (order_id),
         INDEX idx_student_id (student_id),
         INDEX idx_form_id (form_id),
         INDEX idx_external_registration (external_registration_id),
         INDEX idx_butterfly_registration (butterfly_registration_id),
+        INDEX idx_alumni_registration (alumni_registration_id),
         INDEX idx_status (status)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
@@ -389,6 +413,39 @@ export async function initializeDatabase() {
     } catch (err) {
       if (!err.message.includes('Duplicate') && err.code !== 'ER_FK_ALREADY_EXISTS' && err.code !== 'ER_DUP_KEYNAME') {
         console.warn('  ⚠️ Could not add butterfly registration foreign key:', err.message);
+      }
+    }
+
+    // Ensure payments table supports alumni registrations
+    console.log('🔄 Ensuring payments table supports alumni registrations...');
+    const [alumniRegistrationColumn] = await connection.query(
+      "SHOW COLUMNS FROM payments LIKE 'alumni_registration_id'"
+    );
+    if (alumniRegistrationColumn.length === 0) {
+      await connection.query(
+        'ALTER TABLE payments ADD COLUMN alumni_registration_id INT NULL AFTER butterfly_registration_id'
+      );
+      await connection.query(
+        'ALTER TABLE payments ADD INDEX idx_alumni_registration (alumni_registration_id)'
+      ).catch(() => { });
+    }
+
+    try {
+      const [existingAlumniFk] = await connection.query(`
+        SELECT CONSTRAINT_NAME FROM information_schema.TABLE_CONSTRAINTS 
+        WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'payments' 
+        AND CONSTRAINT_NAME = 'fk_payments_alumni_registration'
+      `, [DB_NAME]);
+
+      if (existingAlumniFk.length === 0) {
+        await connection.query(
+          'ALTER TABLE payments ADD CONSTRAINT fk_payments_alumni_registration FOREIGN KEY (alumni_registration_id) REFERENCES alumni_registrations(id) ON DELETE CASCADE'
+        );
+        console.log('  ✓ Added alumni registration foreign key');
+      }
+    } catch (err) {
+      if (!err.message.includes('Duplicate') && err.code !== 'ER_FK_ALREADY_EXISTS' && err.code !== 'ER_DUP_KEYNAME') {
+        console.warn('  ⚠️ Could not add alumni registration foreign key:', err.message);
       }
     }
 

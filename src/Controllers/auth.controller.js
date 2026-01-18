@@ -2,11 +2,12 @@ import { getUserType } from '../config/passport.js';
 import { findOrCreateUser } from '../config/firebase.js';
 import { getStudentForm } from '../Services/student.service.js';
 import { getExternalRegistrationByEmail } from '../Services/external.service.js';
+import { getAlumniRegistrationByEmail } from '../Services/alumni.service.js';
 import { signToken, getCookieName, getCookieOptions, getClearCookieOptions, sanitizeUserPayload } from '../utils/jwt.js';
 
 export async function firebaseLoginHandler(req, res) {
   try {
-    const { user } = req.body;
+    const { user, loginType } = req.body || {};
 
     if (!user) {
       return res.status(400).json({
@@ -23,7 +24,9 @@ export async function firebaseLoginHandler(req, res) {
     }
 
     const email = user.email.toLowerCase().trim();
-    const userType = getUserType(email);
+    const loginFlow = (loginType || '').toString().toLowerCase();
+    const isAlumniLogin = loginFlow === 'alumni';
+    const detectedUserType = getUserType(email);
 
     let dbUser;
     try {
@@ -46,26 +49,28 @@ export async function firebaseLoginHandler(req, res) {
 
     let hasSubmittedForm = false;
     let existingForm = null;
+    const normalizedDbType =
+      dbUser.user_type === 'INTERNAL' ? 'HITAMONLY' : dbUser.user_type;
+
+    const resolvedUserType = isAlumniLogin
+      ? 'ALUMNI'
+      : (normalizedDbType || detectedUserType);
+
     try {
       if (dbUser.id && !dbUser.is_temporary) {
-        if (userType === 'HITAMONLY') {
-          // HITAM students - check student_forms table
+        if (resolvedUserType === 'ALUMNI') {
+          existingForm = await getAlumniRegistrationByEmail(email);
+        } else if (resolvedUserType === 'HITAMONLY') {
           existingForm = await getStudentForm(dbUser.id);
-          hasSubmittedForm = !!existingForm;
         } else {
-          // External users - check external_registrations table by email
           existingForm = await getExternalRegistrationByEmail(email);
-          hasSubmittedForm = !!existingForm;
         }
+
+        hasSubmittedForm = !!existingForm;
       }
     } catch (formError) {
       console.warn('Could not check form status:', formError.message);
     }
-
-    const normalizedDbType =
-      dbUser.user_type === 'INTERNAL' ? 'HITAMONLY' : dbUser.user_type;
-
-    const resolvedUserType = normalizedDbType || userType;
 
     const authUser = {
       id: dbUser.id,
@@ -158,7 +163,9 @@ export async function checkAuthStatus(req, res) {
         if (authUser.id && !authUser.isTemporary) {
           let existingForm = null;
 
-          if (authUser.userType === 'HITAMONLY') {
+          if (authUser.userType === 'ALUMNI') {
+            existingForm = await getAlumniRegistrationByEmail(authUser.email);
+          } else if (authUser.userType === 'HITAMONLY') {
             // HITAM students - check student_forms table
             existingForm = await getStudentForm(authUser.id);
           } else {

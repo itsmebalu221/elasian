@@ -344,6 +344,29 @@ export async function sendConfirmationForPayment(orderId) {
         institution: registration.institution,
         orderId: payment.order_id
       });
+    } else if (payment.alumni_registration_id) {
+      // Alumni participant
+      const [alumni] = await db.query(
+        'SELECT * FROM alumni_registrations WHERE id = ?',
+        [payment.alumni_registration_id]
+      );
+
+      if (alumni.length === 0) {
+        return { success: false, reason: 'Alumni registration not found' };
+      }
+
+      const registration = alumni[0];
+
+      return sendPaymentConfirmationEmail({
+        email: registration.email,
+        name: registration.full_name,
+        mobile: registration.mobile,
+        registrationId: registration.registration_id,
+        selectedEvents: [], // Alumni have all-day access, no specific events
+        amount: payment.amount,
+        isExternal: false, // Use internal styling
+        orderId: payment.order_id
+      });
     }
 
     return { success: false, reason: 'No associated registration found' };

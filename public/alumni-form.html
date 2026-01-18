@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumni Registration - Elysian '26</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    <style>
+        :root {
+            --bg-primary: #f5fbf4;
+            --bg-secondary: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.88);
+            --glass-border: rgba(77, 176, 60, 0.12);
+            --border-subtle: rgba(77, 176, 60, 0.08);
+            --accent: #4db03c;
+            --accent-dark: #3f8e31;
+            --accent-soft: rgba(77, 176, 60, 0.12);
+            --accent-strong: rgba(77, 176, 60, 0.2);
+            --success: #4db03c;
+            --error: #d16a6a;
+            --text-primary: #1f2a21;
+            --text-secondary: #49604c;
+            --text-muted: #738578;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top, rgba(77, 176, 60, 0.12) 0%, transparent 45%), var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Fixed Navbar */
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.875rem 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-subtle);
+            box-shadow: 0 12px 30px rgba(47, 111, 55, 0.08);
+        }
+
+        @media (max-width: 640px) {
+            .top-navbar {
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        .navbar-brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: 0.1em;
+        }
+
+        @media (max-width: 640px) {
+            .navbar-brand {
+                font-size: 1.25rem;
+            }
+        }
+
+        .navbar-brand span {
+            color: var(--accent);
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .navbar-right {
+                gap: 0.75rem;
+            }
+        }
+
+        .user-block {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 480px) {
+            .user-block {
+                gap: 0.5rem;
+            }
+        }
+
+        .user-avatar {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            border: 1px solid var(--border-subtle);
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .user-meta {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        @media (max-width: 480px) {
+            .user-meta {
+                display: none;
+            }
+        }
+
+        .user-name {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
+        .user-email {
+            font-size: 0.6875rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
+        .signout-link {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 0.375rem 0.75rem;
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .signout-link:hover {
+            color: var(--text-primary);
+            border-color: var(--text-muted);
+        }
+
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2.5rem;
+            padding: 5.5rem 1.5rem 3.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .page-wrapper {
+                padding: 5rem 1rem 2.5rem;
+                gap: 2rem;
+            }
+        }
+
+        /* Hero Section */
+        .registration-hero {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2.5rem;
+            padding: 2.75rem 3rem;
+            border-radius: 32px;
+            background: linear-gradient(135deg, rgba(77, 176, 60, 0.16), rgba(255, 255, 255, 0.7));
+            border: 1px solid rgba(77, 176, 60, 0.18);
+            box-shadow: 0 28px 50px rgba(47, 111, 55, 0.18);
+        }
+
+        .registration-hero-copy {
+            max-width: 460px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .registration-hero-eyebrow {
+            font-size: 0.7rem;
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .registration-hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.75rem;
+            font-weight: 600;
+            line-height: 1.1;
+            color: var(--text-primary);
+        }
+
+        .registration-hero-text {
+            font-size: 0.98rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .registration-hero-media {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .registration-hero-media img {
+            width: 100%;
+            max-width: 340px;
+            border-radius: 20px;
+            box-shadow: 0 22px 38px rgba(47, 111, 55, 0.22);
+            object-fit: cover;
+        }
+
+        @media (max-width: 900px) {
+            .registration-hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 2.25rem;
+            }
+
+            .registration-hero-copy {
+                align-items: center;
+            }
+
+            .registration-hero-media {
+                justify-content: center;
+            }
+
+            .registration-hero-media img {
+                max-width: 280px;
+            }
+        }
+
+        /* Two Column Layout */
+        .page {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 3rem;
+        }
+
+        @media (max-width: 900px) {
+            .page {
+                grid-template-columns: 1fr;
+                max-width: 600px;
+            }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: sticky;
+            top: 5rem;
+            align-self: start;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                display: none;
+            }
+        }
+
+        .sidebar-header {
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Mobile bottom panel */
+        .mobile-bottom-panel {
+            display: none;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        @media (max-width: 900px) {
+            .mobile-bottom-panel {
+                display: block;
+            }
+        }
+
+        .pricing-box {
+            border: 1px solid var(--accent-strong);
+            background: var(--accent-soft);
+            padding: 1.25rem;
+            display: grid;
+            gap: 0.75rem;
+            border-radius: 12px;
+        }
+
+        .pricing-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .pricing-total {
+            border-top: 1px solid var(--accent-strong);
+            padding-top: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-primary);
+        }
+
+        .support-copy {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .support-copy a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .support-copy a:hover {
+            text-decoration: underline;
+        }
+
+        /* Alumni Promo Box */
+        .alumni-promo {
+            border: 1px solid rgba(77, 176, 60, 0.28);
+            background: linear-gradient(135deg, rgba(77, 176, 60, 0.16) 0%, rgba(77, 176, 60, 0.06) 100%);
+            padding: 1.25rem 1.5rem;
+            display: grid;
+            gap: 0.75rem;
+            border-radius: 18px;
+            box-shadow: 0 16px 30px rgba(47, 111, 55, 0.16);
+        }
+
+        .alumni-promo-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent-dark);
+            background: rgba(77, 176, 60, 0.18);
+            border: 1px solid rgba(77, 176, 60, 0.35);
+            padding: 0.25rem 0.6rem;
+            width: fit-content;
+            border-radius: 999px;
+        }
+
+        .alumni-promo-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .alumni-promo-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .alumni-promo-price {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .alumni-promo-amount {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-dark);
+        }
+
+        .alumni-promo-note {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Features List */
+        .features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            background: var(--accent-soft);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        .feature-icon::after {
+            content: '✓';
+            font-size: 0.65rem;
+            color: var(--accent-dark);
+            font-weight: 600;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 24px 45px rgba(47, 111, 55, 0.15);
+        }
+
+        @media (max-width: 900px) {
+            .form-card {
+                padding: 1.75rem;
+            }
+        }
+
+        .section {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .section-label {
+            font-size: 0.6875rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1.25rem;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        @media (max-width: 540px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .field-full {
+            grid-column: 1 / -1;
+        }
+
+        .field-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0.02em;
+        }
+
+        .field-label .required {
+            color: var(--error);
+            margin-left: 0.25rem;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            border-radius: 8px;
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .field-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .field-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--bg-secondary);
+        }
+
+        .field-input.readonly {
+            background: rgba(77, 176, 60, 0.06);
+            cursor: not-allowed;
+        }
+
+        .field-input.error {
+            border-color: var(--error);
+        }
+
+        .field-error {
+            font-size: 0.6875rem;
+            color: var(--error);
+        }
+
+        select.field-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6c70' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.625rem;
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #4db03c 0%, #3f8e31 100%);
+            border: none;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border-radius: 12px;
+            box-shadow: 0 16px 32px rgba(77, 176, 60, 0.25);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(77, 176, 60, 0.3);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-spinner {
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .message {
+            padding: 1rem 1.25rem;
+            font-size: 0.8125rem;
+            line-height: 1.6;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .message-success {
+            background: rgba(77, 176, 60, 0.1);
+            border: 1px solid rgba(77, 176, 60, 0.3);
+            color: var(--success);
+        }
+
+        .message-error {
+            background: rgba(209, 106, 106, 0.1);
+            border: 1px solid rgba(209, 106, 106, 0.3);
+            color: var(--error);
+        }
+
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 50vh;
+            gap: 1rem;
+        }
+
+        .loading-spinner {
+            width: 2rem;
+            height: 2rem;
+            border: 2px solid var(--border-subtle);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .loading-text {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="top-navbar">
+        <a href="/" class="navbar-brand">Elysian<span>'26</span></a>
+        <div class="navbar-right">
+            <div class="user-block">
+                <img id="user-avatar" class="user-avatar"
+                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%23ddd'/%3E%3Ccircle cx='16' cy='12' r='5' fill='%23999'/%3E%3Cpath d='M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10' fill='%23999'/%3E%3C/svg%3E"
+                    alt="">
+                <div class="user-meta">
+                    <span class="user-name" id="user-name"></span>
+                    <span class="user-email" id="user-email"></span>
+                </div>
+            </div>
+            <a href="/auth/logout" class="signout-link">Sign out</a>
+        </div>
+    </nav>
+
+    <div class="page-wrapper">
+        <div id="loading" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Loading...</p>
+        </div>
+
+        <div id="main-content" style="display: none;">
+            <div class="registration-hero">
+                <div class="registration-hero-copy">
+                    <span class="registration-hero-eyebrow">HITAM Alumni</span>
+                    <h1 class="registration-hero-title">Welcome Back to Elysian</h1>
+                    <p class="registration-hero-text">Register for the Elysian '26 celebration and reconnect with your
+                        alma mater. Your all-access pass awaits.</p>
+                </div>
+                <div class="registration-hero-media">
+                    <img src="/assets/elysian-logo.PNG" alt="Elysian Logo">
+                </div>
+            </div>
+
+            <div class="page">
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <div class="sidebar-header">
+                        <h2 class="sidebar-title">Alumni Pass</h2>
+                        <p class="sidebar-subtitle">Complete your registration to get exclusive access to all Elysian '26 events and activities.</p>
+                    </div>
+
+                    <div class="alumni-promo">
+                        <span class="alumni-promo-badge">✨ All-Access</span>
+                        <h3 class="alumni-promo-title">Alumni Pass Benefits</h3>
+                        <p class="alumni-promo-desc">Get complete access to all 7 days of festivities, performances, and networking sessions.</p>
+                        <div class="alumni-promo-price">
+                            <span class="alumni-promo-amount">₹800</span>
+                            <span class="alumni-promo-note">one-time fee</span>
+                        </div>
+                    </div>
+
+                    <div class="pricing-box">
+                        <div class="pricing-row">
+                            <span>Alumni Pass</span>
+                            <span>₹800</span>
+                        </div>
+                        <div class="pricing-total">
+                            <span>Total</span>
+                            <span>₹800</span>
+                        </div>
+                    </div>
+
+                    <div class="features-list">
+                        <div class="feature-item">
+                            <div class="feature-icon"></div>
+                            <span>Access to all 7 days of Elysian '26</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"></div>
+                            <span>Entry to all events and performances</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"></div>
+                            <span>QR-coded digital pass via email</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon"></div>
+                            <span>Alumni networking sessions</span>
+                        </div>
+                    </div>
+
+                    <p class="support-copy">
+                        Questions? Contact us at <a href="mailto:support@elysian26.com">support@elysian26.com</a>
+                    </p>
+                </aside>
+
+                <!-- Main Form Area -->
+                <main>
+                    <div id="success-message" class="message message-success" style="display: none;"></div>
+                    <div id="error-message" class="message message-error" style="display: none;"></div>
+
+                    <form id="alumni-form" class="form-card">
+                        <div class="section">
+                            <div class="section-label">Personal Information</div>
+                            <div class="form-grid">
+                                <div class="field field-full">
+                                    <label class="field-label" for="full_name">Full Name <span
+                                            class="required">*</span></label>
+                                    <input type="text" id="full_name" name="full_name" class="field-input"
+                                        placeholder="Enter your full name" required>
+                                    <div class="field-error" id="full_name-error"></div>
+                                </div>
+
+                                <div class="field field-full">
+                                    <label class="field-label" for="email">Email Address</label>
+                                    <input type="email" id="email" name="email" class="field-input readonly" readonly>
+                                </div>
+
+                                <div class="field">
+                                    <label class="field-label" for="mobile">Mobile Number <span
+                                            class="required">*</span></label>
+                                    <input type="tel" id="mobile" name="mobile" class="field-input"
+                                        placeholder="10-digit number" required>
+                                    <div class="field-error" id="mobile-error"></div>
+                                </div>
+
+                                <div class="field">
+                                    <label class="field-label" for="branch">Branch <span class="required">*</span></label>
+                                    <select id="branch" name="branch" class="field-input" required>
+                                        <option value="">Select branch</option>
+                                        <option value="CSE">CSE</option>
+                                        <option value="EEE">EEE</option>
+                                        <option value="ECE">ECE</option>
+                                        <option value="MECH">MECH</option>
+                                        <option value="CSC">CSC</option>
+                                        <option value="CSD">CSD</option>
+                                        <option value="CSO">CSO</option>
+                                        <option value="CSM">CSM</option>
+                                        <option value="ITP">ITP</option>
+                                    </select>
+                                    <div class="field-error" id="branch-error"></div>
+                                </div>
+
+                                <div class="field">
+                                    <label class="field-label" for="year_of_graduation">Year of Graduation <span
+                                            class="required">*</span></label>
+                                    <select id="year_of_graduation" name="year_of_graduation" class="field-input" required>
+                                        <option value="">Select year</option>
+                                    </select>
+                                    <div class="field-error" id="year_of_graduation-error"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mobile Bottom Panel (shows on mobile only) -->
+                        <div class="mobile-bottom-panel">
+                            <div class="pricing-box">
+                                <div class="pricing-row">
+                                    <span>Alumni Pass</span>
+                                    <span>₹800</span>
+                                </div>
+                                <div class="pricing-total">
+                                    <span>Total</span>
+                                    <span>₹800</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit" id="submit-btn">
+                            <span id="btn-text">Proceed to Payment — ₹800</span>
+                            <div class="btn-spinner" id="spinner"></div>
+                        </button>
+                    </form>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authUser = null;
+        let existingRegistration = null;
+
+        // Populate graduation years (2000 to current year)
+        const yearSelect = document.getElementById('year_of_graduation');
+        const currentYear = new Date().getFullYear();
+        for (let year = currentYear; year >= 2000; year--) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            yearSelect.appendChild(option);
+        }
+
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/status', { credentials: 'include' });
+                const data = await response.json();
+
+                if (!data.isAuthenticated || !data.user) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+
+                authUser = data.user;
+
+                // Update UI with user info
+                document.getElementById('user-name').textContent = authUser.name || authUser.email.split('@')[0];
+                document.getElementById('user-email').textContent = authUser.email;
+                if (authUser.picture) {
+                    document.getElementById('user-avatar').src = authUser.picture;
+                }
+                document.getElementById('email').value = authUser.email;
+
+                // Check for existing registration
+                await checkExistingRegistration();
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                window.location.href = '/login.html';
+            }
+        }
+
+        async function checkExistingRegistration() {
+            try {
+                const response = await fetch('/api/alumni/registration/by-email', { credentials: 'include' });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.registration) {
+                        existingRegistration = data.registration;
+
+                        // If already paid, redirect to dashboard
+                        if (existingRegistration.payment_status === 'PAID') {
+                            window.location.href = '/dashboard.html';
+                            return;
+                        }
+
+                        // Pre-fill form with existing data
+                        document.getElementById('full_name').value = existingRegistration.full_name || '';
+                        document.getElementById('mobile').value = existingRegistration.mobile || '';
+                        document.getElementById('branch').value = existingRegistration.branch || '';
+                        document.getElementById('year_of_graduation').value = existingRegistration.year_of_graduation || '';
+                    }
+                }
+            } catch (error) {
+                console.log('No existing registration found');
+            }
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('error-message');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const successEl = document.getElementById('success-message');
+            successEl.textContent = message;
+            successEl.style.display = 'block';
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function clearMessages() {
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        function setLoading(loading) {
+            const btn = document.getElementById('submit-btn');
+            const btnText = document.getElementById('btn-text');
+            const spinner = document.getElementById('spinner');
+
+            btn.disabled = loading;
+            btnText.textContent = loading ? 'Processing...' : 'Proceed to Payment — ₹800';
+            spinner.style.display = loading ? 'block' : 'none';
+        }
+
+        function validateForm() {
+            let isValid = true;
+
+            // Clear previous errors
+            document.querySelectorAll('.field-error').forEach(el => el.textContent = '');
+            document.querySelectorAll('.field-input').forEach(el => el.classList.remove('error'));
+
+            const fullName = document.getElementById('full_name').value.trim();
+            const mobile = document.getElementById('mobile').value.trim();
+            const branch = document.getElementById('branch').value;
+            const yearOfGraduation = document.getElementById('year_of_graduation').value;
+
+            if (fullName.length < 2) {
+                document.getElementById('full_name-error').textContent = 'Full name must be at least 2 characters';
+                document.getElementById('full_name').classList.add('error');
+                isValid = false;
+            }
+
+            if (!/^[6-9]\d{9}$/.test(mobile)) {
+                document.getElementById('mobile-error').textContent = 'Please enter a valid 10-digit mobile number';
+                document.getElementById('mobile').classList.add('error');
+                isValid = false;
+            }
+
+            if (!branch) {
+                document.getElementById('branch-error').textContent = 'Please select a branch';
+                document.getElementById('branch').classList.add('error');
+                isValid = false;
+            }
+
+            if (!yearOfGraduation) {
+                document.getElementById('year_of_graduation-error').textContent = 'Please select your graduation year';
+                document.getElementById('year_of_graduation').classList.add('error');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            clearMessages();
+
+            if (!validateForm()) {
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                // Step 1: Register/update alumni registration
+                const formData = {
+                    full_name: document.getElementById('full_name').value.trim(),
+                    email: authUser.email,
+                    mobile: document.getElementById('mobile').value.trim(),
+                    branch: document.getElementById('branch').value,
+                    year_of_graduation: parseInt(document.getElementById('year_of_graduation').value)
+                };
+
+                const registerResponse = await fetch('/api/alumni/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(formData)
+                });
+
+                const registerData = await registerResponse.json();
+
+                if (!registerData.success) {
+                    showError(registerData.error || 'Failed to submit registration');
+                    setLoading(false);
+                    return;
+                }
+
+                // If already paid, redirect to dashboard
+                if (registerData.isPaid) {
+                    showSuccess('Registration already completed! Redirecting to dashboard...');
+                    setTimeout(() => window.location.href = '/dashboard.html', 1500);
+                    return;
+                }
+
+                const registration = registerData.registration;
+
+                // Step 2: Create payment order
+                const paymentResponse = await fetch('/api/alumni/payment/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ registrationId: registration.id })
+                });
+
+                const paymentData = await paymentResponse.json();
+
+                if (!paymentData.success) {
+                    showError(paymentData.error || 'Failed to initiate payment');
+                    setLoading(false);
+                    return;
+                }
+
+                // Step 3: Redirect to Cashfree checkout
+                const cashfree = Cashfree({
+                    mode: paymentData.mode === 'production' ? 'production' : 'sandbox'
+                });
+
+                await cashfree.checkout({
+                    paymentSessionId: paymentData.paymentSessionId,
+                    redirectTarget: '_self'
+                });
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                showError('Something went wrong. Please try again.');
+                setLoading(false);
+            }
+        }
+
+        document.getElementById('alumni-form').addEventListener('submit', handleSubmit);
+        checkAuth();
+    </script>
+</body>
+
+</html>

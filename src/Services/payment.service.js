@@ -93,6 +93,7 @@ export async function createPaymentOrder({
   formId = null,
   externalRegistrationId = null,
   butterflyRegistrationId = null,
+  alumniRegistrationId = null,
   customerName,
   customerEmail,
   customerPhone,
@@ -144,7 +145,9 @@ export async function createPaymentOrder({
             ? `EXT_${externalRegistrationId}`
             : butterflyRegistrationId
               ? `BTF_${butterflyRegistrationId}`
-              : `GUEST_${Date.now()}`,
+              : alumniRegistrationId
+                ? `ALM_${alumniRegistrationId}`
+                : `GUEST_${Date.now()}`,
         customer_name: customerName,
         customer_email: customerEmail,
         customer_phone: customerPhone
@@ -160,7 +163,9 @@ export async function createPaymentOrder({
             ? `Elysian 2026 External Pass - Registration ID: ${externalRegistrationId}`
             : butterflyRegistrationId
               ? `Butterfly Offer - Registration ID: ${butterflyRegistrationId}`
-              : 'Elysian 2026 Payment')
+              : alumniRegistrationId
+                ? `Elysian 2026 Alumni Pass - Registration ID: ${alumniRegistrationId}`
+                : 'Elysian 2026 Payment')
     };
 
     console.log('Creating Cashfree order:', JSON.stringify(orderRequest, null, 2));
@@ -178,13 +183,14 @@ export async function createPaymentOrder({
           form_id,
           external_registration_id,
           butterfly_registration_id,
+          alumni_registration_id,
           amount,
           status,
           cf_order_id,
           payment_session_id,
           created_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, 'PENDING', ?, ?, NOW())
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING', ?, ?, NOW())
       `,
         [
           orderId,
@@ -192,6 +198,7 @@ export async function createPaymentOrder({
           formId,
           externalRegistrationId,
           butterflyRegistrationId,
+          alumniRegistrationId,
           amount,
           response.data.cf_order_id,
           response.data.payment_session_id
@@ -234,7 +241,8 @@ export async function verifyPaymentStatus(orderId) {
     const payment = payments[0];
     const isExternal = !!payment.external_registration_id;
     const isButterfly = !!payment.butterfly_registration_id;
-    const context = isButterfly ? 'BUTTERFLY' : (isExternal ? 'EXTERNAL' : 'HITAMONLY');
+    const isAlumni = !!payment.alumni_registration_id;
+    const context = isButterfly ? 'BUTTERFLY' : (isAlumni ? 'ALUMNI' : (isExternal ? 'EXTERNAL' : 'HITAMONLY'));
 
     let registrationCode = null;
     if (payment.form_id) {
@@ -255,6 +263,12 @@ export async function verifyPaymentStatus(orderId) {
         [payment.butterfly_registration_id]
       );
       registrationCode = butterflies[0]?.registration_id || null;
+    } else if (isAlumni) {
+      const [alumni] = await db.query(
+        'SELECT registration_id FROM alumni_registrations WHERE id = ?',
+        [payment.alumni_registration_id]
+      );
+      registrationCode = alumni[0]?.registration_id || null;
     }
 
     // If already successful, return cached status
@@ -360,6 +374,17 @@ export async function verifyPaymentStatus(orderId) {
           sendButterflyConfirmationEmails(payment.butterfly_registration_id).catch(err => {
             console.error('Failed to send butterfly confirmation emails:', err);
           });
+        } else if (isAlumni) {
+          console.log('🎓 Updating alumni registration to PAID:', {
+            paymentId: payment.id,
+            alumniRegistrationId: payment.alumni_registration_id
+          });
+          await db.query(`
+            UPDATE alumni_registrations
+            SET payment_status = 'PAID', payment_id = ?, updated_at = NOW()
+            WHERE id = ?
+          `, [payment.id, payment.alumni_registration_id]);
+          console.log('🎓 Alumni registration updated to PAID successfully');
         }
 
         // Send confirmation email for non-butterfly registrations (async, don't block response)
@@ -397,6 +422,10 @@ export async function verifyPaymentStatus(orderId) {
           await db.query(`
             UPDATE butterfly_registrations SET payment_status = 'FAILED', updated_at = NOW() WHERE id = ?
           `, [payment.butterfly_registration_id]);
+        } else if (isAlumni) {
+          await db.query(`
+            UPDATE alumni_registrations SET payment_status = 'FAILED', updated_at = NOW() WHERE id = ?
+          `, [payment.alumni_registration_id]);
         }
 
         return {
@@ -637,6 +666,23 @@ export async function isButterflyRegistrationPaid(butterflyRegistrationId) {
   const [rows] = await db.query(
     'SELECT payment_status FROM butterfly_registrations WHERE id = ?',
     [butterflyRegistrationId]
+  );
+  return rows[0]?.payment_status === 'PAID';
+}
+
+// Alumni registration payment helpers
+export async function getPaymentByAlumniRegistrationId(alumniRegistrationId) {
+  const [payments] = await db.query(
+    'SELECT * FROM payments WHERE alumni_registration_id = ? ORDER BY created_at DESC LIMIT 1',
+    [alumniRegistrationId]
+  );
+  return payments[0] || null;
+}
+
+export async function isAlumniRegistrationPaid(alumniRegistrationId) {
+  const [rows] = await db.query(
+    'SELECT payment_status FROM alumni_registrations WHERE id = ?',
+    [alumniRegistrationId]
   );
   return rows[0]?.payment_status === 'PAID';
 }

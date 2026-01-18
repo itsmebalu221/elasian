@@ -2248,11 +2248,34 @@
         }
 
         const userType = data.user.userType || 'HITAMONLY';
+        const urlParams = new URLSearchParams(window.location.search);
+        const typeParam = urlParams.get('type');
+        const forceAlumniFlow = typeParam === 'alumni' || userType === 'ALUMNI';
 
         document.getElementById('user-avatar').src = data.user.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name || 'U')}&background=3565d8&color=fff`;
         document.getElementById('user-name').textContent = data.user.name;
         document.getElementById('user-email').textContent = data.user.email;
         document.getElementById('display-email').textContent = data.user.email;
+
+        // Handle ALUMNI users - prioritize alumni dashboard when explicitly requested
+        if (forceAlumniFlow) {
+          await loadAlumniDashboard(data.user);
+          return;
+        }
+
+        // Also check if user has an alumni registration (covers legacy sessions without ALUMNI type)
+        try {
+          const alumniCheck = await fetch('/api/alumni/registration/by-email', { credentials: 'include' });
+          if (alumniCheck.ok) {
+            const alumniData = await alumniCheck.json();
+            if (alumniData.success && alumniData.registration) {
+              await loadAlumniDashboard(data.user, alumniData.registration);
+              return;
+            }
+          }
+        } catch (e) {
+          // Not an alumni registration, continue with standard flow
+        }
 
         // Handle EXTERNAL users
         if (userType === 'EXTERNAL') {
@@ -2354,6 +2377,199 @@
         console.error('Error loading external dashboard:', error);
         // On error, redirect to form
         window.location.href = '/external-form.html';
+      }
+    }
+
+    async function loadAlumniDashboard(user, existingRegistration = null) {
+      try {
+        let registration = existingRegistration;
+
+        if (!registration) {
+          const response = await fetch('/api/alumni/registration/by-email', {
+            credentials: 'include'
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.registration) {
+              registration = data.registration;
+            }
+          }
+        }
+
+        if (registration) {
+          await displayAlumniRegistration(registration);
+          return;
+        }
+
+        // No registration found - redirect to alumni form
+        window.location.href = '/alumni-form.html';
+      } catch (error) {
+        console.error('Error loading alumni dashboard:', error);
+        window.location.href = '/alumni-form.html';
+      }
+    }
+
+    async function displayAlumniRegistration(registration) {
+      const hasPaid = registration.payment_status === 'PAID';
+      const amount = registration.total_amount || 800;
+
+      // Update registration ID display
+      const regIdElement = document.getElementById('display-reg-id');
+      if (regIdElement) {
+        if (hasPaid && registration.registration_id) {
+          regIdElement.textContent = registration.registration_id;
+          regIdElement.classList.remove('locked');
+        } else {
+          regIdElement.textContent = 'Complete payment to view ID';
+          regIdElement.classList.add('locked');
+        }
+      }
+
+      // Update QR display for alumni
+      updateQRDisplayAlumni(hasPaid, registration, amount);
+
+      // Update labels for alumni
+      document.querySelectorAll('.data-label').forEach(label => {
+        if (label.textContent.trim() === 'Roll Number') label.textContent = 'Graduation Year';
+      });
+
+      document.querySelectorAll('.qr-info-label').forEach(label => {
+        if (label.textContent.trim() === 'Roll No') label.textContent = 'Year';
+      });
+
+      // Update basic info
+      document.getElementById('display-name').textContent = registration.full_name || '—';
+      document.getElementById('display-roll').textContent = registration.year_of_graduation || '—';
+      document.getElementById('display-mobile').textContent = registration.mobile || '—';
+      document.getElementById('display-branch').textContent = registration.branch || '—';
+      document.getElementById('display-year').textContent = 'Alumni';
+
+      // Update QR section info
+      document.getElementById('qr-display-name').textContent = registration.full_name || '—';
+      document.getElementById('qr-display-roll').textContent = registration.year_of_graduation || '—';
+      document.getElementById('qr-display-branch').textContent = registration.branch || '—';
+
+      // Hide events section - alumni have all-access
+      const eventsContainer = document.getElementById('events-container');
+      if (eventsContainer) {
+        eventsContainer.innerHTML = '<div class="no-events" style="color: var(--success);">🎓 All-Access Alumni Pass - Valid for all 7 days</div>';
+      }
+
+      // Show payment status
+      if (registration.created_at) {
+        const date = new Date(registration.created_at);
+        document.getElementById('submission-date').textContent =
+          `Registered ${date.toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          })}`;
+      }
+
+      // Handle payment banner for alumni
+      showAlumniPaymentBanner(registration, hasPaid, amount);
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('main-content').style.display = 'block';
+    }
+
+    function updateQRDisplayAlumni(isPaid, registration, amount) {
+      const qrCard = document.getElementById('qr-card');
+      const qrImg = document.getElementById('qr-code');
+      const placeholder = document.getElementById('qr-placeholder');
+      const instructions = document.getElementById('qr-instructions-text');
+
+      if (!qrCard || !qrImg || !placeholder || !instructions) {
+        return;
+      }
+
+      if (isPaid && registration?.registration_id) {
+        qrCard.classList.add('ready');
+        qrCard.classList.remove('pending');
+        qrImg.src = generateQRCode(registration.registration_id);
+        placeholder.textContent = 'QR ready';
+        instructions.textContent = 'Show this QR code at the entrance for verification';
+      } else {
+        qrCard.classList.add('pending');
+        qrCard.classList.remove('ready');
+        qrImg.removeAttribute('src');
+        placeholder.textContent = 'Complete payment to unlock QR';
+        instructions.textContent = `Pay ₹${amount} to unlock your digital alumni pass QR code`;
+      }
+    }
+
+    async function showAlumniPaymentBanner(registration, hasPaid, amount) {
+      const paymentBanner = document.getElementById('payment-banner');
+      const downloadBtn = document.getElementById('download-pass-btn');
+
+      if (!paymentBanner) return;
+      paymentBanner.style.display = 'flex';
+
+      if (hasPaid) {
+        paymentBanner.classList.remove('pending');
+        paymentBanner.classList.add('paid');
+        paymentBanner.innerHTML = `
+          <div class="payment-icon">✓</div>
+          <div class="payment-text">
+            <div class="payment-title">Payment Complete</div>
+            <div class="payment-subtitle">Your alumni pass is confirmed</div>
+          </div>
+        `;
+
+        if (downloadBtn) {
+          downloadBtn.style.opacity = '1';
+          downloadBtn.style.pointerEvents = 'auto';
+          downloadBtn.title = 'Download your alumni pass';
+        }
+      } else {
+        paymentBanner.classList.add('pending');
+        paymentBanner.classList.remove('paid');
+        paymentBanner.innerHTML = `
+          <div class="payment-icon">₹</div>
+          <div class="payment-text">
+            <div class="payment-title">Payment Pending</div>
+            <div class="payment-subtitle">Complete payment to receive your alumni pass</div>
+          </div>
+          <a href="#" class="btn-pay-now" onclick="initiateAlumniPayment(${registration.id}); return false;">
+            Pay ₹${amount} →
+          </a>
+        `;
+
+        if (downloadBtn) {
+          downloadBtn.style.opacity = '0.4';
+          downloadBtn.style.pointerEvents = 'none';
+          downloadBtn.title = 'Complete payment first';
+        }
+      }
+    }
+
+    async function initiateAlumniPayment(registrationId) {
+      try {
+        const response = await fetch('/api/alumni/payment/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ registrationId })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          const cashfree = Cashfree({
+            mode: data.mode === 'production' ? 'production' : 'sandbox'
+          });
+
+          await cashfree.checkout({
+            paymentSessionId: data.paymentSessionId,
+            redirectTarget: '_self'
+          });
+        } else {
+          alert(data.error || 'Failed to initiate payment');
+        }
+      } catch (error) {
+        console.error('Payment error:', error);
+        alert('Payment initiation failed. Please try again.');
       }
     }
 

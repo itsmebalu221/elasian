@@ -12,6 +12,7 @@ import { paymentRoutes } from './src/Routes/payment.routes.js';
 import { externalRoutes } from './src/Routes/external.routes.js';
 import { eventRoutes } from './src/Routes/event.routes.js';
 import { butterflyRoutes } from './src/Routes/butterfly.routes.js';
+import { alumniRoutes } from './src/Routes/alumni.routes.js';
 import { initializeDatabase } from './src/db/mysql.js';
 import { verifyToken, getCookieName, getClearCookieOptions } from './src/utils/jwt.js';
 
@@ -125,6 +126,7 @@ paymentRoutes(app);
 externalRoutes(app);
 eventRoutes(app);
 butterflyRoutes(app);
+alumniRoutes(app);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

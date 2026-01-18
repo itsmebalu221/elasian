@@ -123,7 +123,7 @@
 
     .container {
       width: 100%;
-      max-width: 780px;
+      max-width: 1320px;
     }
 
     @media (max-width: 640px) {
@@ -181,9 +181,17 @@
       border-radius: 20px;
       padding: 2rem 1.75rem;
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
       gap: 0;
-      max-width: 720px;
+      max-width: 1280px;
+    }
+
+    @media (max-width: 900px) {
+      .card {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        max-width: 420px;
+      }
     }
 
     .card-section {
@@ -454,6 +462,45 @@
 
         <div class="card-section">
           <div class="card-header">
+            <p class="card-title">HITAM Alumni</p>
+            <p class="card-subtitle">Welcome back! Sign in with any Google account to register for Elysian '26.</p>
+          </div>
+
+          <div class="info-box">
+            <p class="info-label">Alumni Access</p>
+            <p class="info-text">
+              Reconnect with your alma mater at Elysian '26. All alumni are welcome.
+            </p>
+            <p class="info-text" style="margin-top: 0.75rem;">
+              Alumni pass: ₹800 for all 7 days.
+            </p>
+          </div>
+
+          <button id="alumni-signin-btn" class="btn" onclick="signInWithGoogle('alumni')">
+            <svg class="btn-icon" width="18" height="18" viewBox="0 0 18 18" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"
+                fill="#4285F4" />
+              <path
+                d="M9.003 18c2.43 0 4.467-.806 5.956-2.18L12.05 13.56c-.806.54-1.836.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.96v2.332C2.44 15.983 5.485 18 9.003 18z"
+                fill="#34A853" />
+              <path
+                d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71 0-.593.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"
+                fill="#FBBC05" />
+              <path
+                d="M9.003 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.464.891 11.426 0 9.003 0 5.485 0 2.44 2.017.96 4.958L3.967 7.29c.708-2.127 2.692-3.71 5.036-3.71z"
+                fill="#EA4335" />
+            </svg>
+            <span id="alumni-btn-text">Continue as Alumni</span>
+            <div class="btn-spinner" id="alumni-spinner"></div>
+          </button>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <div class="card-section">
+          <div class="card-header">
             <p class="card-title">Non-HITAM Participants</p>
             <p class="card-subtitle">Login with any Google account to access your external participant dashboard and
               registration.</p>
@@ -545,9 +592,12 @@
         });
         const data = await response.json();
         if (data.isAuthenticated && data.user) {
+          const userType = data.user.userType || 'HITAMONLY';
           const target = data.user.hasSubmittedForm
             ? '/dashboard.html'
-            : (data.user.userType === 'HITAMONLY' ? '/butterfly-form.html' : '/external-form.html');
+            : (userType === 'ALUMNI'
+              ? '/alumni-form.html'
+              : (userType === 'HITAMONLY' ? '/butterfly-form.html' : '/external-form.html'));
           window.location.href = target;
         }
       } catch (err) {
@@ -580,6 +630,14 @@
         btn.disabled = loading;
         btnText.textContent = text || (loading ? 'Authenticating...' : 'Continue with HITAM ID');
         spinner.style.display = loading ? 'block' : 'none';
+      } else if (type === 'alumni') {
+        const btn = document.getElementById('alumni-signin-btn');
+        const btnText = document.getElementById('alumni-btn-text');
+        const spinner = document.getElementById('alumni-spinner');
+
+        btn.disabled = loading;
+        btnText.textContent = text || (loading ? 'Authenticating...' : 'Continue as Alumni');
+        spinner.style.display = loading ? 'block' : 'none';
       } else {
         const btn = document.getElementById('external-signin-btn');
         const btnText = document.getElementById('external-btn-text');
@@ -602,6 +660,7 @@
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify({
+            loginType: type,
             user: {
               uid: user.uid,
               email: user.email,
@@ -677,11 +736,15 @@
         const serverResult = await sendLoginToServer(user, 1, type);
 
         if (serverResult.success) {
-          // Success - redirect based on user type
+          // Success - redirect based on user type and login type
           const hasForm = serverResult.data.hasSubmittedForm;
-          const userType = serverResult.data.userType;
+          const userType = serverResult.data.userType || (type === 'alumni' ? 'ALUMNI' : 'HITAMONLY');
+          const isAlumniFlow = type === 'alumni' || userType === 'ALUMNI';
 
-          if (userType === 'HITAMONLY') {
+          if (isAlumniFlow) {
+            // Alumni users always go to alumni form or dashboard
+            window.location.href = hasForm ? '/dashboard.html' : '/alumni-form.html';
+          } else if (userType === 'HITAMONLY') {
             // HITAM students go to butterfly form or dashboard
             window.location.href = hasForm ? '/dashboard.html' : '/butterfly-form.html';
           } else {

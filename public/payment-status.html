@@ -466,6 +466,7 @@
       const type = flowTypeParam.toLowerCase();
       if (type === 'external') flowContext = 'EXTERNAL';
       else if (type === 'butterfly') flowContext = 'BUTTERFLY';
+      else if (type === 'alumni') flowContext = 'ALUMNI';
     }
     let successRedirectTimeout = null;
 
@@ -518,7 +519,7 @@
           flowContext = data.context;
         }
 
-        if (!['HITAMONLY', 'EXTERNAL', 'BUTTERFLY'].includes(flowContext)) {
+        if (!['HITAMONLY', 'EXTERNAL', 'BUTTERFLY', 'ALUMNI'].includes(flowContext)) {
           flowContext = 'HITAMONLY';
         }
 
@@ -554,10 +555,13 @@
 
       const isExternal = flowContext === 'EXTERNAL';
       const isButterfly = flowContext === 'BUTTERFLY';
+      const isAlumni = flowContext === 'ALUMNI';
       const registrationCode = data.registrationCode || null;
 
       if (isButterfly) {
         message.textContent = 'Your Butterfly Offer registration is confirmed! Redirecting you to view your QR codes...';
+      } else if (isAlumni) {
+        message.textContent = 'Your alumni registration is confirmed. A copy of your receipt and pass instructions has been sent to your email. Redirecting you to the dashboard...';
       } else if (isExternal) {
         message.textContent = 'Your external registration is confirmed. A copy of your receipt and pass instructions has been sent to your email. Redirecting you to the dashboard...';
       } else {
@@ -597,7 +601,7 @@
             View QR Codes
           </a>
         `;
-      } else if (isExternal) {
+      } else if (isAlumni || isExternal) {
         buttons.innerHTML = `
           <a href="/dashboard.html" class="btn-primary">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
