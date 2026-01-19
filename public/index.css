@@ -1,0 +1,615 @@
+/* 1. Variables & Base Styles */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-card: #ffffff;
+  --border: rgba(15, 23, 42, 0.1);
+  --text-primary: #0d1320;
+  --text-secondary: #171313;
+  --text-muted: #64748b;
+  --accent: #1f4499;
+  --accent-hover: #2a5abf;
+  --gradient-start: #1f4499;
+  --gradient-end: #3b6ef5;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* 2. Navbar */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px); /* Safari support */
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  letter-spacing: 0.1em;
+}
+
+.navbar-brand span { color: var(--accent); }
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.nav-links a {
+  color: #000;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--accent); }
+
+.btn-nav-register {
+  padding: 0.5rem 1.25rem;
+  background: #fff;
+  color: #000000;
+  border: 2px solid #000;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-nav-register:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+/* 3. Hero Section */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8rem 2rem 4rem;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  background: #05070a; /* Deep space black */
+  color: #ffffff;
+}
+
+/* Cyber Grid Background Effect */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(107, 140, 206, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(107, 140, 206, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  z-index: -2;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse at center, black, transparent 80%);
+  transform: perspective(500px) rotateX(60deg);
+  transform-origin: center top;
+  animation: grid-move 20s linear infinite;
+}
+
+@keyframes grid-move {
+  from { background-position: 0 0; }
+  to { background-position: 0 50px; }
+}
+
+.hero-content {
+  max-width: 900px;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(4px);
+}
+
+.hero-logo-cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  margin-bottom: 3rem;
+  opacity: 0.9;
+}
+
+.hero-logo {
+  height: 200px;
+  width: auto;
+  filter: drop-shadow(0 0 8px rgba(107, 140, 206, 0.4)) grayscale(0.2);
+  transition: all 0.3s ease;
+}
+
+.hero-logo:hover {
+  filter: drop-shadow(0 0 12px rgba(107, 140, 206, 0.8)) grayscale(0);
+  transform: translateY(-2px);
+}
+
+.hero-logo-side {
+  height: 150px; /* Side logos even smaller for hierarchy */
+}
+
+/* Futuristic Typography */
+.hero-date {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: #6b8cce;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(107, 140, 206, 0.5);
+}
+
+.hero-title {
+  font-family: 'Inter', sans-serif; /* Cleaner font for tech look */
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 1.5rem;
+}
+
+.hero-title span {
+  background: linear-gradient(to bottom, #fff 30%, #6b8cce 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 30px rgba(107, 140, 206, 0.3));
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: #a0a0a0;
+  max-width: 600px;
+  margin: 0 auto 2.5rem;
+}
+
+#hero-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none; /* Allows clicking buttons through the particles */
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2; /* Sits above the particles */
+}
+
+/* Glowing Buttons */
+.btn-primary {
+  background: #6b8cce;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 0 20px rgba(107, 140, 206, 0.4);
+  transition: 0.3s;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 30px rgba(107, 140, 206, 0.7);
+  transform: translateY(-2px);
+}
+
+/* 4. Buttons */
+.btn-primary, .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s;
+  border-radius: 4px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  color: #fff;
+  border: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(31, 68, 153, 0.2);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05); /* Very slight white tint */
+  color: #ffffff;                        /* Force text to white */
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Semi-transparent white border */
+  backdrop-filter: blur(5px);            /* Glassmorphism effect */
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #6b8cce;                 /* Changes to blue on hover to match theme */
+  color: #6b8cce;
+  transform: translateY(-2px);
+}
+
+/* 5. About Section & Image Scroller */
+.about-section {
+  padding: 5rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.about-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  border-radius: 20px;
+  padding: 2.5rem;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.image-scroller {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 1rem;
+}
+
+.scroll-target {
+  flex: 0 0 100%;
+  scroll-snap-align: start;
+  width: 100%;
+  height: clamp(250px, 40vh, 400px);
+  object-fit: cover;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
+}
+
+/* 6. Stats Section */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 4rem;
+  padding: 3rem 2rem;
+  background: var(--bg-secondary);
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.stat-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* 7. Lightbox Modal */
+.lightbox {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(8px);
+  justify-content: center;
+  align-items: center;
+}
+
+.lightbox-content {
+  max-width: 90%;
+  max-height: 80vh;
+  border-radius: 12px;
+  animation: zoom 0.3s ease-out;
+}
+
+@keyframes zoom {
+  from { transform: scale(0.8); opacity: 0; } 
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* 8. Responsive Media Queries */
+@media (max-width: 1024px) {
+  .about-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .stats { gap: 2rem; }
+  .stat-value { font-size: 2.2rem; }
+  .hero { padding-top: 6rem; }
+}
+
+@media (max-width: 640px) {
+  .navbar { padding: 0.75rem 1rem; }
+  .navbar-brand { font-size: 1.25rem; }
+}
+
+/* 9. Featured Events Section Fixes */
+.events-section {
+  padding: 5rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.event-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.event-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+}
+
+/* Fix for the Large Images/Logos */
+.event-image {
+  width: 100%;
+  height: 350px; /* Constrains the height */
+  object-fit: cover; /* Ensures image isn't stretched while filling the space */
+  border-bottom: 1px solid var(--border);
+}
+
+.event-icon {
+  font-size: 1.5rem;
+  margin: 1.5rem 1.5rem 0.5rem;
+}
+
+.event-category {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-weight: 700;
+  padding: 0 1.5rem;
+}
+
+.event-name {
+  padding: 0.5rem 1.5rem;
+  font-size: 1.5rem;
+}
+
+.event-desc {
+  padding: 0 1.5rem 1.5rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  flex-grow: 1;
+}
+
+.event-meta {
+  padding: 1rem 1.5rem;
+  background: var(--bg-secondary);
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  border-top: 1px solid var(--border);
+}
+
+/* 10. Footer Refinement */
+/* 10. Footer Refinement (Dark Theme with Flex Layout) */
+.footer {
+  padding: 3rem 2rem;
+  /* Keeping your dark theme colors */
+  background: #05070a; 
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem; /* Increased gap slightly for better breathing room */
+}
+
+.footer-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; /* Slightly larger for elegance */
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+}
+
+.footer-text {
+  font-size: 0.85rem;
+  color: #a0a0a0; /* Muted silver/gray */
+}
+
+.footer-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.footer-links a {
+  color: #a0a0a0;
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.footer-links a:hover {
+  color: #6b8cce; /* Accent blue from your hero section */
+  transform: translateY(-2px);
+}
+
+/* Mobile Alignment */
+@media (max-width: 640px) {
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .footer-links {
+    order: -1; /* Puts links above text on mobile */
+  }
+}
+
+/* 11. CTA Section Modern Styling */
+.cta-section {
+  padding: 8rem 2rem;
+  background: var(--bg-primary); /* White background to create contrast */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-content {
+  background: #05070a; /* Dark theme to match Hero and Footer */
+  padding: 4rem 3rem;
+  border-radius: 24px;
+  max-width: 1000px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(107, 140, 206, 0.2);
+  z-index: 1;
+}
+
+/* Decorative Glow behind the CTA card */
+.cta-content::before {
+  content: '';
+  position: absolute;
+  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  background: linear-gradient(45deg, #1f4499, #6b8cce, #1f4499);
+  z-index: -1;
+  border-radius: 26px;
+  opacity: 0.3;
+  filter: blur(10px);
+}
+
+.cta-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.cta-desc {
+  color: #a0a0a0;
+  max-width: 600px;
+  margin: 0 auto 2.5rem;
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.cta-section .btn-primary {
+  padding: 1.25rem 3rem;
+  font-size: 1.1rem;
+  border-radius: 50px; /* Rounded pill style for CTA */
+  background: #6b8cce;
+  border: none;
+  box-shadow: 0 10px 25px rgba(107, 140, 206, 0.4);
+}
+
+.cta-section .btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 30px rgba(107, 140, 206, 0.6);
+  background: #ffffff;
+  color: #05070a;
+}
+
+.cta-section svg {
+  transition: transform 0.3s ease;
+}
+
+.cta-section .btn-primary:hover svg {
+  transform: translateX(5px);
+}
+
+/* Mobile adjustments */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 1rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .stats {
+        gap: 2rem;
+      }
+
+      .stat-value {
+        font-size: 2rem;
+      }
+
+      .events-section,
+      .schedule-section,
+      .cta-section {
+        padding: 4rem 1rem;
+      }
+
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+      }
+
+    }

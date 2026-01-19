@@ -5,750 +5,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Elysian 2026 - HITAM Tech & Cultural Fest</title>
+  
+  <link rel="stylesheet" href="index.css">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet">
-  <style>
-    :root {
-      --bg-primary: #ffffff;
-      --bg-secondary: #f8f9fa;
-      --bg-card: #ffffff;
-      --border: rgba(15, 23, 42, 0.1);
-      --text-primary: #0d1320;
-      --text-secondary: #171313;
-      --text-muted: #64748b;
-      --accent: #1f4499;
-      --accent-hover: #2a5abf;
-      --gradient-start: #1f4499;
-      --gradient-end: #3b6ef5;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: #ffffff;
-      color: var(--text-primary);
-      line-height: 1.6;
-      min-height: 100vh;
-    }
-
-    /* Navbar */
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      width: 100%;
-      z-index: 1000;
-      padding: 1rem 2rem;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    @media (max-width: 640px) {
-      .navbar {
-        padding: 0.75rem 1rem;
-      }
-    }
-
-    .navbar-brand {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--text-primary);
-      text-decoration: none;
-      letter-spacing: 0.1em;
-    }
-
-    @media (max-width: 640px) {
-      .navbar-brand {
-        font-size: 1.25rem;
-      }
-    }
-
-    .navbar-brand span {
-      color: var(--accent);
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      align-items: center;
-    }
-
-    @media (max-width: 640px) {
-      .nav-links {
-        gap: 1rem;
-      }
-
-      .nav-links a:not(.btn-nav-register) {
-        display: none;
-      }
-    }
-
-    .nav-links a {
-      color: #000;
-      text-decoration: none;
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover {
-      color: var(--text-primary);
-    }
-
-    .btn-nav-register {
-      padding: 0.5rem 1.25rem;
-      background: #fff;
-      color: #000000;
-      border: 2px solid #000;
-      font-size: 0.875rem;
-      font-weight: 500;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-
-    @media (max-width: 640px) {
-      .btn-nav-register {
-        padding: 0.4rem 1rem;
-        font-size: 0.8125rem;
-      }
-    }
-
-    .btn-nav-register:hover {
-      background: linear-gradient(135deg, var(--accent-hover), var(--gradient-start));
-      transform: translateY(-1px);
-    }
-
-    /* Hero Section */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 6rem 2rem 4rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(ellipse at center top, rgba(107, 140, 206, 0.15) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .hero-content {
-      max-width: 900px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero-logo-cluster {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      align-items: center;
-      justify-items: center;
-      gap: clamp(1rem, 3vw, 2rem);
-      margin-bottom: 2.5rem;
-      width: 100%;
-    }
-
-    .hero-logo-slot {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-    }
-
-    .hero-logo-slot.left {
-      justify-content: flex-start;
-    }
-
-    .hero-logo-slot.right {
-      justify-content: flex-end;
-    }
-
-    .hero-logo {
-      width: clamp(130px, 22vw, 220px);
-      max-width: 100%;
-      height: auto;
-      object-fit: contain;
-    }
-
-    .hero-logo.hero-logo-side {
-      width: clamp(110px, 18vw, 160px);
-    }
-
-    .hero-logo-slot.center .hero-logo {
-      width: clamp(150px, 26vw, 260px);
-    }
-
-    @media (max-width: 640px) {
-      .hero-logo-cluster {
-        grid-template-columns: repeat(3, minmax(80px, 1fr));
-        gap: 0.75rem;
-      }
-
-      .hero-logo {
-        width: clamp(90px, 20vw, 140px);
-      }
-
-      .hero-logo.hero-logo-side {
-        width: clamp(80px, 18vw, 120px);
-      }
-
-      .hero-logo-slot.center .hero-logo {
-        width: clamp(100px, 22vw, 160px);
-      }
-    }
-
-    .event-image {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      object-fit: cover;
-      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
-    }
-
-    .hero-date {
-      display: inline-block;
-      padding: 0.5rem 1.5rem;
-      background: rgba(107, 140, 206, 0.1);
-      border: 1px solid rgba(107, 140, 206, 0.3);
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 2rem;
-    }
-
-    .hero-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(3rem, 10vw, 6rem);
-      font-weight: 600;
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
-      letter-spacing: 0.05em;
-    }
-
-    .hero-title span {
-      background: linear-gradient(135deg, #0f0d0d 0%, #6b8cce 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-subtitle {
-      font-size: 1.125rem;
-      color: var(--text-muted);
-      max-width: 600px;
-      margin: 0 auto 2.5rem;
-      line-height: 1.8;
-    }
-
-    .hero-buttons {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    /* About HITAM */
-    .about-section {
-      padding: 5rem 2rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .about-card {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-      border-radius: 20px;
-      padding: 2.5rem;
-      display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-      gap: 3rem;
-      align-items: center;
-    }
-
-    .about-heading {
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      font-size: 0.8rem;
-      color: var(--accent);
-      font-weight: 600;
-    }
-
-    .about-content h2 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.5rem;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-    }
-
-    .about-content p {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-    }
-
-    .about-media {
-      position: relative;
-    }
-
-    .about-media img {
-      width: 100%;
-      border-radius: 20px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
-      object-fit: cover;
-      display: block;
-    }
-
-    .about-media::after {
-      content: '';
-      position: absolute;
-      inset: 9% 7%;
-      border: 1px solid rgba(31, 68, 153, 0.2);
-      border-radius: 24px;
-      pointer-events: none;
-    }
-
-    @media (max-width: 1024px) {
-      .about-card {
-        padding: 2rem;
-        grid-template-columns: 1fr;
-        text-align: center;
-      }
-
-      .about-media::after {
-        inset: 6% 5%;
-      }
-    }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 1rem 2.5rem;
-      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-      color: #fff;
-      border: none;
-      font-family: 'Inter', sans-serif;
-      font-size: 1rem;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .btn-primary:hover {
-      background: linear-gradient(135deg, var(--accent-hover), var(--gradient-start));
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(107, 140, 206, 0.3);
-    }
-
-    .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 1rem 2.5rem;
-      background: transparent;
-      color: var(--text-primary);
-      border: 1px solid var(--border);
-      font-family: 'Inter', sans-serif;
-      font-size: 1rem;
-      font-weight: 500;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    /* Stats Section */
-    .stats {
-      display: flex;
-      justify-content: center;
-      gap: 4rem;
-      padding: 3rem 2rem;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: var(--bg-secondary);
-      flex-wrap: wrap;
-    }
-
-    .stat-item {
-      text-align: center;
-    }
-
-    .stat-value {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 3rem;
-      font-weight: 600;
-      color: var(--accent);
-      line-height: 1;
-    }
-
-    .stat-label {
-      font-size: 0.75rem;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-top: 0.5rem;
-    }
-
-    /* Events Section */
-    .events-section {
-      padding: 6rem 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .section-header {
-      text-align: center;
-      margin-bottom: 4rem;
-    }
-
-    .section-label {
-      font-size: 0.625rem;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 1rem;
-    }
-
-    .section-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.5rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
-
-    .section-desc {
-      color: var(--text-muted);
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .events-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 1.5rem;
-      justify-items: center;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .event-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      padding: 2rem;
-      transition: all 0.3s;
-      position: relative;
-      overflow: hidden;
-      width: 100%;
-      max-width: 380px;
-    }
-
-    .event-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform 0.3s;
-    }
-
-    .event-card:hover {
-      border-color: rgba(107, 140, 206, 0.3);
-      transform: translateY(-4px);
-    }
-
-    .event-card:hover::before {
-      transform: scaleX(1);
-    }
-
-    .event-icon {
-      width: 48px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(107, 140, 206, 0.1);
-      border: 1px solid rgba(107, 140, 206, 0.2);
-      margin-bottom: 1.5rem;
-      font-size: 1.5rem;
-    }
-
-    .event-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .event-category {
-      font-size: 0.625rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 1rem;
-    }
-
-    .event-desc {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-      margin-bottom: 1.5rem;
-    }
-
-    .event-meta {
-      display: flex;
-      gap: 1.5rem;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .event-meta-item {
-      display: flex;
-      align-items: center;
-      gap: 0.375rem;
-    }
-
-    /* Schedule Section */
-    .schedule-section {
-      padding: 6rem 2rem;
-      background: var(--bg-secondary);
-    }
-
-    .schedule-container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    .schedule-days {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-
-    @media (max-width: 768px) {
-      .schedule-days {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .schedule-day {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      padding: 2rem;
-    }
-
-    .day-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .day-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
-
-    .day-date {
-      font-size: 0.75rem;
-      color: var(--accent);
-      font-weight: 500;
-    }
-
-    .time-slot {
-      padding: 1rem 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .time-slot:last-child {
-      border-bottom: none;
-    }
-
-    .slot-time {
-      font-size: 0.625rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-    }
-
-    .slot-events {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .slot-event-tag {
-      padding: 0.25rem 0.75rem;
-      background: rgba(107, 140, 206, 0.1);
-      border: 1px solid rgba(107, 140, 206, 0.2);
-      font-size: 0.75rem;
-      font-weight: 500;
-    }
-
-    /* CTA Section */
-    .cta-section {
-      padding: 6rem 2rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .cta-section::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(ellipse at center, rgba(107, 140, 206, 0.1) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .cta-content {
-      position: relative;
-      z-index: 1;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .cta-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2.5rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-    }
-
-    .cta-desc {
-      color: var(--text-muted);
-      margin-bottom: 2rem;
-    }
-
-    /* Footer */
-    .footer {
-      padding: 3rem 2rem;
-      border-top: 1px solid var(--border);
-      background: var(--bg-secondary);
-    }
-
-    .footer-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .footer-brand {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.25rem;
-      font-weight: 600;
-    }
-
-    .footer-text {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-    }
-
-    .footer-links {
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    .footer-links a {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.75rem;
-      transition: color 0.2s;
-    }
-
-    .footer-links a:hover {
-      color: var(--text-primary);
-    }
-
-    /* Mobile adjustments */
-    @media (max-width: 768px) {
-      .navbar {
-        padding: 1rem;
-      }
-
-      .nav-links {
-        display: none;
-      }
-
-      .stats {
-        gap: 2rem;
-      }
-
-      .stat-value {
-        font-size: 2rem;
-      }
-
-      .events-section,
-      .schedule-section,
-      .cta-section {
-        padding: 4rem 1rem;
-      }
-
-      .footer-content {
-        flex-direction: column;
-        text-align: center;
-      }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-  <!-- Navbar -->
   <nav class="navbar">
     <a href="#" class="navbar-brand">Elysian<span>'26</span></a>
     <div class="nav-links">
@@ -757,58 +22,65 @@
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="hero-logo-cluster">
-        <div class="hero-logo-slot left">
-          <img src="/assets/Hitam-logo-greenbg.png" alt="HITAM logo" class="hero-logo hero-logo-side">
-        </div>
-        <div class="hero-logo-slot center">
-          <img src="/assets/elysian-logo.PNG" alt="Elysian festival mark" class="hero-logo">
-        </div>
-        <div class="hero-logo-slot right">
-          <img src="/assets/25-Y.PNG" alt="25 years emblem" class="hero-logo hero-logo-side">
-        </div>
+<section class="hero">
+  <canvas id="hero-particles"></canvas>
+  
+  <div class="hero-content">
+    <div class="hero-logo-cluster">
+      <div class="hero-logo-slot left">
+        <img src="/assets/25-Y.PNG" alt="25 years emblem" class="hero-logo hero-logo-side">
       </div>
-      <div class="hero-date">January 24-31, 2026</div>
-      <h1 class="hero-title"><span>Elysian 2026</span></h1>
-      <p class="hero-subtitle">
-        Immerse yourself in a seven-day celebration of sport, culture, innovation, and community at HITAM's signature
-        festival.
-      </p>
-      <div class="hero-buttons">
-        <a href="/login.html" class="btn-primary">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Register Now
-        </a>
-        <a href="#events" class="btn-secondary">
-          Explore Events
-        </a>
+      <div class="hero-logo-slot center">
+        <img src="/assets/Elysian logo black.jpg" alt="Elysian festival mark" class="hero-logo">
+      </div>
+      <div class="hero-logo-slot right">
+        <img src="/assets/Hitam-logo-greenbg.png" alt="HITAM Logo" class="hero-logo hero-logo-side">
       </div>
     </div>
-  </section>
+    
+    <div class="hero-date">January 24-31, 2026</div>
+    <h1 class="hero-title"><span>Elysian 2026</span></h1>
+    <p class="hero-subtitle">
+      Immerse yourself in a seven-day celebration of sport, culture, innovation, and community at HITAM's signature festival.
+    </p>
+    <div class="hero-buttons">
+      <a href="/login.html" class="btn-primary">Register Now</a>
+      <a href="#events" class="btn-secondary">Explore Events</a>
+    </div>
+  </div>
+</section>
 
-  <!-- About HITAM -->
   <section class="about-section">
-    <div class="about-card">
-      <div class="about-media">
-        <img src="/assets/hitam-abt.jpg" alt="HITAM campus overview">
+  <div class="about-card">
+    <div class="about-media">
+      <div class="image-scroller">
+        <img src="/assets/campus/hitam1.jpg" alt="Campus 1" class="scroll-target">
+        <img src="/assets/campus/hitam2.jpeg" alt="Campus 2" class="scroll-target">
+        <img src="/assets/campus/hitam3.jpeg" alt="Campus 3" class="scroll-target">
+        <img src="/assets/campus/hitam4.jpeg" alt="Campus 4" class="scroll-target">
+        <img src="/assets/campus/hitam5.jpeg" alt="Campus 5" class="scroll-target">
+        <img src="/assets/campus/hitam6.jpeg" alt="Campus 6" class="scroll-target">
+        <img src="/assets/campus/hitam7.jpeg" alt="Campus 7" class="scroll-target">
+        <img src="/assets/campus/hitam8.jpeg" alt="Campus 8" class="scroll-target">
+        <img src="/assets/campus/hitam9.jpeg" alt="Campus 9" class="scroll-target">
+        <img src="/assets/campus/hitam10.jpeg" alt="Campus 10" class="scroll-target">
       </div>
-      <div class="about-content">
-        <span class="about-heading">About HITAM</span>
-        <h2>Engineering Beyond Classrooms</h2>
-        <p>HITAM is a top-ranked autonomous engineering college with 24 years of legacy. Its ‘Doing Engineering’
-          approach turns concepts into hands-on experiences, nurturing industry-ready innovators.</p>
-        <p>Signature initiatives like Project-Based Learning (PBL) and XPLORE immerse students in real-world problem
-          solving while strengthening core technical and analytical skills.</p>
-      </div>
+      <div class="scroll-hint">Click to enlarge • Scroll to see more</div>
     </div>
-  </section>
+    <div class="about-content">
+      <span class="about-heading">About HITAM</span>
+      <h2>Engineering Beyond Classrooms</h2>
+      <p>HITAM is a top-ranked autonomous engineering college with 24 years of legacy. Its ‘Doing Engineering’ approach turns concepts into hands-on experiences, nurturing industry-ready innovators.</p>
+      <p>Signature initiatives like Project-Based Learning (PBL) and XPLORE immerse students in real-world problem solving while strengthening core technical and analytical skills.</p>
+    </div>
+  </div>
+</section>
 
-  <!-- Stats -->
+<div id="lightbox" class="lightbox">
+  <span class="close-lightbox">&times;</span>
+  <img class="lightbox-content" id="lightbox-img">
+</div>
+
   <section class="stats">
     <div class="stat-item">
       <div class="stat-value">15+</div>
@@ -828,7 +100,6 @@
     </div>
   </section>
 
-  <!-- Events Section -->
   <section class="events-section" id="events">
     <div class="section-header">
       <div class="section-label">What Awaits You</div>
@@ -842,8 +113,7 @@
         <div class="event-icon">🏅</div>
         <div class="event-category">Sports</div>
         <h3 class="event-name">Sangram</h3>
-        <p class="event-desc">Three electrifying days of inter-department sporting clashes featuring football,
-          basketball, volleyball, and more.</p>
+        <p class="event-desc">Three electrifying days of inter-department sporting clashes featuring football, basketball, volleyball, and more.</p>
         <div class="event-meta">
           <span class="event-meta-item">📅 Jan 24, 26-27</span>
           <span class="event-meta-item">👥 Team Championships</span>
@@ -855,8 +125,7 @@
         <div class="event-icon">📚</div>
         <div class="event-category">Literary & Cultural</div>
         <h3 class="event-name">Sahithya</h3>
-        <p class="event-desc">A curated celebration of literature, theatre, and spoken word that spotlights the creative
-          voices of the campus.</p>
+        <p class="event-desc">A curated celebration of literature, theatre, and spoken word that spotlights the creative voices of the campus.</p>
         <div class="event-meta">
           <span class="event-meta-item">📅 Jan 27</span>
           <span class="event-meta-item">👥 Solo & Ensemble</span>
@@ -868,8 +137,7 @@
         <div class="event-icon">⚙️</div>
         <div class="event-category">Technical</div>
         <h3 class="event-name">Esparto</h3>
-        <p class="event-desc">Esparto unlocks Espacto's signature workshop and competition series with ten deep-dive
-          tracks across AI, hardware, and design.</p>
+        <p class="event-desc">Esparto unlocks Espacto's signature workshop and competition series with ten deep-dive tracks across AI, hardware, and design.</p>
         <div class="event-meta">
           <span class="event-meta-item">📅 Jan 28-29</span>
           <span class="event-meta-item">👥 Team & Individual</span>
@@ -881,8 +149,7 @@
         <div class="event-icon">🏆</div>
         <div class="event-category">Honors</div>
         <h3 class="event-name">Prasasthi</h3>
-        <p class="event-desc">An evening recognising outstanding innovators, performers, and champions from across the
-          Elysian circuit.</p>
+        <p class="event-desc">An evening recognising outstanding innovators, performers, and champions from across the Elysian circuit.</p>
         <div class="event-meta">
           <span class="event-meta-item">📅 Jan 30</span>
           <span class="event-meta-item">👥 Invite Only</span>
@@ -894,8 +161,7 @@
         <div class="event-icon">🎶</div>
         <div class="event-category">Festival Finale</div>
         <h3 class="event-name">Bliss</h3>
-        <p class="event-desc">Close out Elysian with live bands, DJs, and collaborative performances that keep the
-          campus dancing into the night.</p>
+        <p class="event-desc">Close out Elysian with live bands, DJs, and collaborative performances that keep the campus dancing into the night.</p>
         <div class="event-meta">
           <span class="event-meta-item">📅 Jan 31</span>
           <span class="event-meta-item">👥 Full Campus</span>
@@ -904,13 +170,10 @@
     </div>
   </section>
 
-  <!-- CTA Section -->
   <section class="cta-section">
     <div class="cta-content">
       <h2 class="cta-title">Ready to Participate?</h2>
-      <p class="cta-desc">
-        Secure your spot now. Register with your college email and choose the events you want to participate in.
-      </p>
+      <p class="cta-desc">Secure your spot now. Register with your college email and choose the events you want to participate in.</p>
       <a href="/login.html" class="btn-primary">
         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -920,7 +183,6 @@
     </div>
   </section>
 
-  <!-- Floating WhatsApp Button -->
   <a href="https://wa.me/919640040089?text=Hi%2C%20I%20have%20a%20query%20regarding%20Elysian%20%2726%20registration."
     target="_blank" rel="noopener noreferrer"
     style="position: fixed; bottom: 24px; right: 24px; width: 60px; height: 60px; background: #25D366; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4); z-index: 9999; transition: transform 0.3s ease, box-shadow 0.3s ease; text-decoration: none;"
@@ -928,12 +190,10 @@
     onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 20px rgba(37, 211, 102, 0.4)';"
     title="Chat with us on WhatsApp">
     <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
-      <path
-        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
     </svg>
   </a>
 
-  <!-- Footer -->
   <footer class="footer">
     <div class="footer-content">
       <div>
