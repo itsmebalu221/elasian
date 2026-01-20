@@ -500,7 +500,7 @@ export async function handleWebhook(payload, signature) {
       `, [paymentData?.cf_payment_id, paymentData?.payment_group || paymentData?.payment_method || null, orderId]);
 
       const [payments] = await db.query(
-        'SELECT form_id, external_registration_id, id FROM payments WHERE order_id = ?',
+        'SELECT form_id, external_registration_id, butterfly_registration_id, alumni_registration_id, id FROM payments WHERE order_id = ?',
         [orderId]
       );
 
@@ -519,12 +519,42 @@ export async function handleWebhook(payload, signature) {
             SET payment_status = 'PAID', payment_id = ?, updated_at = NOW()
             WHERE id = ?
           `, [payment.id, payment.external_registration_id]);
+        } else if (payment.butterfly_registration_id) {
+          console.log('🦋 Webhook: Updating butterfly registration to PAID:', {
+            paymentId: payment.id,
+            butterflyRegistrationId: payment.butterfly_registration_id
+          });
+          await db.query(`
+            UPDATE butterfly_registrations
+            SET payment_status = 'PAID', payment_id = ?, updated_at = NOW()
+            WHERE id = ?
+          `, [payment.id, payment.butterfly_registration_id]);
+          console.log('🦋 Webhook: Butterfly registration updated to PAID successfully');
+
+          // Send butterfly confirmation emails to all 4 students (async)
+          sendButterflyConfirmationEmails(payment.butterfly_registration_id).catch(err => {
+            console.error('Failed to send butterfly confirmation emails from webhook:', err);
+          });
+        } else if (payment.alumni_registration_id) {
+          console.log('🎓 Webhook: Updating alumni registration to PAID:', {
+            paymentId: payment.id,
+            alumniRegistrationId: payment.alumni_registration_id
+          });
+          await db.query(`
+            UPDATE alumni_registrations
+            SET payment_status = 'PAID', payment_id = ?, updated_at = NOW()
+            WHERE id = ?
+          `, [payment.id, payment.alumni_registration_id]);
+          console.log('🎓 Webhook: Alumni registration updated to PAID successfully');
         }
 
         // Send confirmation email (async, don't block webhook response)
-        sendConfirmationForPayment(orderId).catch(err => {
-          console.error('Failed to send confirmation email from webhook:', err);
-        });
+        // Note: Butterfly emails are handled separately above
+        if (!payment.butterfly_registration_id) {
+          sendConfirmationForPayment(orderId).catch(err => {
+            console.error('Failed to send confirmation email from webhook:', err);
+          });
+        }
       }
 
       console.log(`✅ Payment successful for order: ${orderId}`);
@@ -534,7 +564,7 @@ export async function handleWebhook(payload, signature) {
       `, [orderId]);
 
       const [payments] = await db.query(
-        'SELECT form_id, external_registration_id FROM payments WHERE order_id = ?',
+        'SELECT form_id, external_registration_id, butterfly_registration_id, alumni_registration_id FROM payments WHERE order_id = ?',
         [orderId]
       );
 
@@ -549,6 +579,14 @@ export async function handleWebhook(payload, signature) {
           await db.query(`
             UPDATE external_registrations SET payment_status = 'FAILED', updated_at = NOW() WHERE id = ?
           `, [payment.external_registration_id]);
+        } else if (payment.butterfly_registration_id) {
+          await db.query(`
+            UPDATE butterfly_registrations SET payment_status = 'FAILED', updated_at = NOW() WHERE id = ?
+          `, [payment.butterfly_registration_id]);
+        } else if (payment.alumni_registration_id) {
+          await db.query(`
+            UPDATE alumni_registrations SET payment_status = 'FAILED', updated_at = NOW() WHERE id = ?
+          `, [payment.alumni_registration_id]);
         }
       }
 
@@ -617,7 +655,7 @@ export async function verifyFormOwnership(formId, studentId) {
 // Verify that a payment belongs to a specific user (by student_id, email for external, or email for butterfly)
 export async function verifyPaymentOwnership(orderId, studentId, email) {
   const [payments] = await db.query(
-    'SELECT student_id, external_registration_id, butterfly_registration_id FROM payments WHERE order_id = ?',
+    'SELECT student_id, external_registration_id, butterfly_registration_id, alumni_registration_id FROM payments WHERE order_id = ?',
     [orderId]
   );
 
@@ -648,6 +686,15 @@ export async function verifyPaymentOwnership(orderId, studentId, email) {
       [payment.butterfly_registration_id]
     );
     return butterflies[0]?.primary_email?.toLowerCase() === email?.toLowerCase();
+  }
+
+  // Check if it's an alumni payment
+  if (payment.alumni_registration_id && email) {
+    const [alumni] = await db.query(
+      'SELECT email FROM alumni_registrations WHERE id = ?',
+      [payment.alumni_registration_id]
+    );
+    return alumni[0]?.email?.toLowerCase() === email?.toLowerCase();
   }
 
   return false;
