@@ -477,13 +477,13 @@ body {
   }
 
   .hero-logo {
-    height: 120px;
-    /* Larger center logo on mobile */
+    height: 80px;
+    /* Smaller center logo on mobile */
   }
 
   .hero-logo-side {
-    height: 95px;
-    /* Larger side logos */
+    height: 65px;
+    /* Smaller side logos */
   }
 
   /* About Section - Full Width */
@@ -545,13 +545,13 @@ body {
   }
 
   .hero-logo {
-    height: 100px;
-    /* Still substantial on small phones */
+    height: 70px;
+    /* Compact on small phones */
   }
 
   .hero-logo-side {
-    height: 80px;
-    /* Proportional side logos */
+    height: 55px;
+    /* Minimal side logos */
   }
 }
 
