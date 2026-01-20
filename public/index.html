@@ -119,12 +119,34 @@
       .scroll-hint {
         font-size: 0.8rem;
       }
+
+      /* Hero Logo Sizes for Mobile */
+      .hero-logo-cluster {
+        gap: 0.75rem;
+      }
+
+      .hero-logo {
+        height: 80px;
+      }
+
+      .hero-logo-side {
+        height: 65px;
+      }
     }
 
     @media (max-width: 480px) {
       .scroll-target {
         aspect-ratio: 16 / 9;
         min-height: 220px;
+      }
+
+      /* Smaller hero logos for small phones */
+      .hero-logo {
+        height: 70px;
+      }
+
+      .hero-logo-side {
+        height: 55px;
       }
     }
   </style>
