@@ -42,7 +42,8 @@ body {
   padding: 1rem 2rem;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px); /* Safari support */
+  -webkit-backdrop-filter: blur(20px);
+  /* Safari support */
   border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
@@ -58,7 +59,9 @@ body {
   letter-spacing: 0.1em;
 }
 
-.navbar-brand span { color: var(--accent); }
+.navbar-brand span {
+  color: var(--accent);
+}
 
 .nav-links {
   display: flex;
@@ -74,7 +77,9 @@ body {
   transition: color 0.2s;
 }
 
-.nav-links a:hover { color: var(--accent); }
+.nav-links a:hover {
+  color: var(--accent);
+}
 
 .btn-nav-register {
   padding: 0.5rem 1.25rem;
@@ -105,7 +110,8 @@ body {
   position: relative;
   overflow: hidden;
   z-index: 1;
-  background: #05070a; /* Deep space black */
+  background: #05070a;
+  /* Deep space black */
   color: #ffffff;
 }
 
@@ -114,7 +120,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: 
+  background-image:
     linear-gradient(rgba(107, 140, 206, 0.1) 1px, transparent 1px),
     linear-gradient(90deg, rgba(107, 140, 206, 0.1) 1px, transparent 1px);
   background-size: 50px 50px;
@@ -127,8 +133,13 @@ body {
 }
 
 @keyframes grid-move {
-  from { background-position: 0 0; }
-  to { background-position: 0 50px; }
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 0 50px;
+  }
 }
 
 .hero-content {
@@ -160,7 +171,8 @@ body {
 }
 
 .hero-logo-side {
-  height: 150px; /* Side logos even smaller for hierarchy */
+  height: 150px;
+  /* Side logos even smaller for hierarchy */
 }
 
 /* Futuristic Typography */
@@ -175,7 +187,8 @@ body {
 }
 
 .hero-title {
-  font-family: 'Inter', sans-serif; /* Cleaner font for tech look */
+  font-family: 'Inter', sans-serif;
+  /* Cleaner font for tech look */
   font-size: clamp(3rem, 8vw, 5.5rem);
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -205,12 +218,14 @@ body {
   width: 100%;
   height: 100%;
   z-index: -1;
-  pointer-events: none; /* Allows clicking buttons through the particles */
+  pointer-events: none;
+  /* Allows clicking buttons through the particles */
 }
 
 .hero-content {
   position: relative;
-  z-index: 2; /* Sits above the particles */
+  z-index: 2;
+  /* Sits above the particles */
 }
 
 /* Glowing Buttons */
@@ -231,7 +246,8 @@ body {
 }
 
 /* 4. Buttons */
-.btn-primary, .btn-secondary {
+.btn-primary,
+.btn-secondary {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -254,15 +270,20 @@ body {
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.05); /* Very slight white tint */
-  color: #ffffff;                        /* Force text to white */
-  border: 1px solid rgba(255, 255, 255, 0.3); /* Semi-transparent white border */
-  backdrop-filter: blur(5px);            /* Glassmorphism effect */
+  background: rgba(255, 255, 255, 0.05);
+  /* Very slight white tint */
+  color: #ffffff;
+  /* Force text to white */
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  /* Semi-transparent white border */
+  backdrop-filter: blur(5px);
+  /* Glassmorphism effect */
 }
 
 .btn-secondary:hover {
   background: rgba(255, 255, 255, 0.1);
-  border-color: #6b8cce;                 /* Changes to blue on hover to match theme */
+  border-color: #6b8cce;
+  /* Changes to blue on hover to match theme */
   color: #6b8cce;
   transform: translateY(-2px);
 }
@@ -292,6 +313,51 @@ body {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   padding-bottom: 1rem;
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+}
+
+.image-scroller::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
+}
+
+.carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.carousel-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.carousel-btn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  transform: scale(1.1);
+}
+
+/* Updated Scroll Hint */
+.scroll-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .scroll-target {
@@ -302,6 +368,26 @@ body {
   object-fit: cover;
   border-radius: 12px;
   transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+/* Mobile: Use landscape aspect ratio for better viewing */
+@media (max-width: 768px) {
+  .scroll-target {
+    height: auto;
+    aspect-ratio: 16 / 9;
+    /* Landscape ratio */
+    min-height: 280px;
+    /* Larger images on mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .scroll-target {
+    aspect-ratio: 16 / 9;
+    min-height: 220px;
+    /* Still substantial on small devices */
+  }
 }
 
 /* 6. Stats Section */
@@ -343,8 +429,15 @@ body {
 }
 
 @keyframes zoom {
-  from { transform: scale(0.8); opacity: 0; } 
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* 8. Responsive Media Queries */
@@ -356,16 +449,93 @@ body {
   }
 }
 
+/* Full-width carousel on mobile for immersive experience */
 @media (max-width: 768px) {
-  .nav-links { display: none; }
-  .stats { gap: 2rem; }
-  .stat-value { font-size: 2.2rem; }
-  .hero { padding-top: 6rem; }
+  .about-section {
+    padding: 3rem 0;
+    /* Remove side padding */
+    max-width: 100%;
+    /* Full width */
+  }
+
+  .about-card {
+    border-radius: 0;
+    /* Remove border radius for edge-to-edge */
+    border-left: none;
+    border-right: none;
+    padding: 2rem 1.5rem;
+    /* Keep some padding for text content */
+  }
+
+  .about-media {
+    margin: 0 -1.5rem;
+    /* Extend images to full width */
+  }
+
+  .image-scroller {
+    border-radius: 0;
+    /* Images go edge-to-edge */
+  }
+
+  .scroll-target {
+    border-radius: 0;
+    /* Remove rounded corners on mobile */
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+
+  .stats {
+    gap: 2rem;
+  }
+
+  .stat-value {
+    font-size: 2.2rem;
+  }
+
+  .hero {
+    padding-top: 6rem;
+  }
+
+  /* Log-cluster responsive fix */
+  .hero-logo-cluster {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-logo {
+    height: 100px;
+  }
+
+  .hero-logo-side {
+    height: 80px;
+  }
 }
 
 @media (max-width: 640px) {
-  .navbar { padding: 0.75rem 1rem; }
-  .navbar-brand { font-size: 1.25rem; }
+  .navbar {
+    padding: 0.75rem 1rem;
+  }
+
+  .navbar-brand {
+    font-size: 1.25rem;
+  }
+
+  /* Further reduce for very small screens */
+  .hero-logo-cluster {
+    gap: 0.5rem;
+  }
+
+  .hero-logo {
+    height: 80px;
+  }
+
+  .hero-logo-side {
+    height: 60px;
+  }
 }
 
 /* 9. Featured Events Section Fixes */
@@ -382,7 +552,7 @@ body {
 
 .events-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
 }
 
@@ -398,14 +568,16 @@ body {
 
 .event-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
 }
 
 /* Fix for the Large Images/Logos */
 .event-image {
   width: 100%;
-  height: 350px; /* Constrains the height */
-  object-fit: cover; /* Ensures image isn't stretched while filling the space */
+  height: 350px;
+  /* Constrains the height */
+  object-fit: cover;
+  /* Ensures image isn't stretched while filling the space */
   border-bottom: 1px solid var(--border);
 }
 
@@ -450,7 +622,7 @@ body {
 .footer {
   padding: 3rem 2rem;
   /* Keeping your dark theme colors */
-  background: #05070a; 
+  background: #05070a;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -461,12 +633,14 @@ body {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 2rem; /* Increased gap slightly for better breathing room */
+  gap: 2rem;
+  /* Increased gap slightly for better breathing room */
 }
 
 .footer-brand {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.5rem; /* Slightly larger for elegance */
+  font-size: 1.5rem;
+  /* Slightly larger for elegance */
   font-weight: 600;
   color: #ffffff;
   letter-spacing: 0.05em;
@@ -474,7 +648,8 @@ body {
 
 .footer-text {
   font-size: 0.85rem;
-  color: #a0a0a0; /* Muted silver/gray */
+  color: #a0a0a0;
+  /* Muted silver/gray */
 }
 
 .footer-links {
@@ -491,7 +666,8 @@ body {
 }
 
 .footer-links a:hover {
-  color: #6b8cce; /* Accent blue from your hero section */
+  color: #6b8cce;
+  /* Accent blue from your hero section */
   transform: translateY(-2px);
 }
 
@@ -501,16 +677,18 @@ body {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .footer-links {
-    order: -1; /* Puts links above text on mobile */
+    order: -1;
+    /* Puts links above text on mobile */
   }
 }
 
 /* 11. CTA Section Modern Styling */
 .cta-section {
   padding: 8rem 2rem;
-  background: var(--bg-primary); /* White background to create contrast */
+  background: var(--bg-primary);
+  /* White background to create contrast */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -519,7 +697,8 @@ body {
 }
 
 .cta-content {
-  background: #05070a; /* Dark theme to match Hero and Footer */
+  background: #05070a;
+  /* Dark theme to match Hero and Footer */
   padding: 4rem 3rem;
   border-radius: 24px;
   max-width: 1000px;
@@ -535,7 +714,10 @@ body {
 .cta-content::before {
   content: '';
   position: absolute;
-  top: -2px; left: -2px; right: -2px; bottom: -2px;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
   background: linear-gradient(45deg, #1f4499, #6b8cce, #1f4499);
   z-index: -1;
   border-radius: 26px;
@@ -562,7 +744,8 @@ body {
 .cta-section .btn-primary {
   padding: 1.25rem 3rem;
   font-size: 1.1rem;
-  border-radius: 50px; /* Rounded pill style for CTA */
+  border-radius: 50px;
+  /* Rounded pill style for CTA */
   background: #6b8cce;
   border: none;
   box-shadow: 0 10px 25px rgba(107, 140, 206, 0.4);
@@ -584,32 +767,32 @@ body {
 }
 
 /* Mobile adjustments */
-    @media (max-width: 768px) {
-      .navbar {
-        padding: 1rem;
-      }
+@media (max-width: 768px) {
+  .navbar {
+    padding: 1rem;
+  }
 
-      .nav-links {
-        display: none;
-      }
+  .nav-links {
+    display: none;
+  }
 
-      .stats {
-        gap: 2rem;
-      }
+  .stats {
+    gap: 2rem;
+  }
 
-      .stat-value {
-        font-size: 2rem;
-      }
+  .stat-value {
+    font-size: 2rem;
+  }
 
-      .events-section,
-      .schedule-section,
-      .cta-section {
-        padding: 4rem 1rem;
-      }
+  .events-section,
+  .schedule-section,
+  .cta-section {
+    padding: 4rem 1rem;
+  }
 
-      .footer-content {
-        flex-direction: column;
-        text-align: center;
-      }
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+  }
 
-    }
+}

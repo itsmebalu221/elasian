@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
       img.addEventListener('click', () => {
         lightbox.style.display = 'block';
         if (lightboxImg) lightboxImg.src = img.src;
-        document.body.style.overflow = 'hidden'; 
+        document.body.style.overflow = 'hidden';
       });
     });
 
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     closeBtn?.addEventListener('click', closeLightbox);
-    
+
     lightbox.addEventListener('click', (e) => {
       if (e.target !== lightboxImg) closeLightbox();
     });
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const ctx = canvas.getContext('2d');
   let particles = [];
-  
+
   // Adjust particle count based on screen width for better performance
   const getParticleCount = () => window.innerWidth < 768 ? 40 : 80;
 
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     particles = [];
     const count = window.innerWidth < 768 ? 40 : 80;
-    
+
     for (let i = 0; i < count; i++) {
       particles.push({
         x: Math.random() * canvas.width,
@@ -101,6 +101,55 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('resize', () => {
     init();
   });
+
+  /* --- 3. Auto-Scrolling Carousel Logic --- */
+  const initCarousel = () => {
+    const scroller = document.querySelector('.image-scroller');
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+
+    if (!scroller) return;
+
+    let isPaused = false;
+
+    // Pause on hover/touch
+    scroller.addEventListener('mouseenter', () => isPaused = true);
+    scroller.addEventListener('mouseleave', () => isPaused = false);
+    scroller.addEventListener('touchstart', () => isPaused = true);
+    scroller.addEventListener('touchend', () => isPaused = false);
+
+    const scrollNext = () => {
+      const maxScroll = scroller.scrollWidth - scroller.clientWidth;
+      const currentScroll = scroller.scrollLeft;
+
+      if (currentScroll >= maxScroll - 10) {
+        scroller.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        scroller.scrollBy({ left: scroller.clientWidth, behavior: 'smooth' });
+      }
+    };
+
+    const scrollPrev = () => {
+      const maxScroll = scroller.scrollWidth - scroller.clientWidth;
+      const currentScroll = scroller.scrollLeft;
+
+      if (currentScroll <= 10) {
+        scroller.scrollTo({ left: maxScroll, behavior: 'smooth' });
+      } else {
+        scroller.scrollBy({ left: -scroller.clientWidth, behavior: 'smooth' });
+      }
+    };
+
+    if (nextBtn) nextBtn.addEventListener('click', scrollNext);
+    if (prevBtn) prevBtn.addEventListener('click', scrollPrev);
+
+    // Auto-scroll function
+    setInterval(() => {
+      if (!isPaused) scrollNext();
+    }, 3000);
+  };
+
+  initCarousel();
 
   init();
   animate();
