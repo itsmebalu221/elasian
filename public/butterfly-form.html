@@ -1028,6 +1028,13 @@
                     return;
                 }
 
+                // Butterfly form is disabled - redirect HITAM students to regular form
+                if (data.user.userType === 'HITAMONLY' || (data.user.email && data.user.email.toLowerCase().endsWith('@hitam.org'))) {
+                    alert('Butterfly registration is currently disabled. Redirecting to regular registration.');
+                    window.location.href = '/form.html';
+                    return;
+                }
+
                 currentUser = data.user;
                 updateUserUI();
                 checkExistingRegistration();

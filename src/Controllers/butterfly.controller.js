@@ -2,10 +2,29 @@ import { butterflyRegistrationSchema } from '../Schemas/butterfly.schema.js';
 import * as butterflyService from '../Services/butterfly.service.js';
 import * as paymentService from '../Services/payment.service.js';
 
+const BUTTERFLY_OFFER_ENABLED = (process.env.BUTTERFLY_OFFER_ENABLED || '').toLowerCase() === 'true';
+const BUTTERFLY_DISABLED_MESSAGE = 'Butterfly Offer registrations are currently closed.';
+
+function ensureButterflyEnabled(res) {
+    if (BUTTERFLY_OFFER_ENABLED) {
+        return true;
+    }
+
+    res.status(410).json({
+        success: false,
+        error: BUTTERFLY_DISABLED_MESSAGE
+    });
+    return false;
+}
+
 const REUSE_WINDOW_MINUTES = 30;
 
 export async function registerButterflyOffer(req, res) {
     try {
+        if (!ensureButterflyEnabled(res)) {
+            return;
+        }
+
         console.log('🦋 Register request - req.user:', req.user ? { email: req.user.email, id: req.user.id } : 'none');
 
         const userEmail = req.user?.email;
@@ -72,6 +91,10 @@ export async function registerButterflyOffer(req, res) {
 
 export async function createButterflyOrder(req, res) {
     try {
+        if (!ensureButterflyEnabled(res)) {
+            return;
+        }
+
         const { registrationId } = req.body;
         const userEmail = req.user?.email?.toLowerCase().trim();
 

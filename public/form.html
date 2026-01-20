@@ -976,42 +976,12 @@
               pass keeps every curated workshop, performance, and competition at your fingertips.</p>
           </div>
           <div class="page-hero-media">
-            <img src="/assets/elysian-logo.PNG" alt="Students celebrating during Elysian events">
+            <img src="/assets/Campus/hitam1.jpg" alt="Students celebrating during Elysian events">
           </div>
         </div>
 
-        <!-- Butterfly Offer Promotion Banner -->
-        <a href="/butterfly-form.html" class="butterfly-promo-banner" style="
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 1.25rem 1.75rem;
-          margin-bottom: 2.5rem;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          border-radius: 16px;
-          text-decoration: none;
-          box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 32px rgba(102, 126, 234, 0.35)';"
-          onmouseout="this.style.transform='none'; this.style.boxShadow='0 8px 24px rgba(102, 126, 234, 0.25)';">
-          <div style="display: flex; align-items: center; gap: 1rem;">
-            <span style="font-size: 1.75rem;">🦋</span>
-            <div>
-              <div
-                style="font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.8); margin-bottom: 0.25rem;">
-                GROUP OFFER</div>
-              <div style="font-size: 1rem; font-weight: 600; color: white;">Butterfly Offer — Register 4 students for
-                just ₹1800!</div>
-            </div>
-          </div>
-          <div
-            style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.2); border-radius: 8px; color: white; font-size: 0.8125rem; font-weight: 600;">
-            Get Started
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </div>
-        </a>
+        <!-- Butterfly Offer Promotion Banner - DISABLED -->
+        <!-- Butterfly registration is currently disabled for HITAM students -->
 
         <!-- Form -->
         <form id="student-form">
@@ -1114,7 +1084,7 @@
               <div class="payment-info-title">Registration Fee</div>
             </div>
             <div class="payment-info-amount">
-              <span class="payment-amount-value">₹600</span>
+              <span class="payment-amount-value">₹650</span>
               <span class="payment-amount-label">One-time fee</span>
             </div>
             <div class="payment-info-details">
@@ -1136,8 +1106,8 @@
 
           <!-- Submit -->
           <div class="form-footer">
-            <button type="submit" class="btn" id="submit-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
-              <span id="btn-text">Registration Closed</span>
+            <button type="submit" class="btn" id="submit-btn">
+              <span id="btn-text">Continue to Payment</span>
               <div class="btn-spinner" id="spinner"></div>
             </button>
           </div>
@@ -1153,6 +1123,27 @@
     const eventsContainer = document.getElementById('event-groups');
     const eventsErrorEl = document.getElementById('events-error');
     const summaryContainer = document.getElementById('selection-summary');
+    const DEFAULT_AVATAR_SRC = '/assets/Hitam-logo-greenbg.png';
+    const userAvatarEl = document.getElementById('user-avatar');
+
+    if (userAvatarEl) {
+      userAvatarEl.onerror = () => {
+        userAvatarEl.onerror = null;
+        userAvatarEl.src = DEFAULT_AVATAR_SRC;
+      };
+    }
+
+    function buildAvatarUrl(existingPicture, fallbackName) {
+      if (existingPicture && typeof existingPicture === 'string') {
+        return existingPicture;
+      }
+
+      if (fallbackName && fallbackName.trim().length) {
+        return `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName.trim())}&background=3565d8&color=fff`;
+      }
+
+      return DEFAULT_AVATAR_SRC;
+    }
 
     let EVENT_TYPES_ENUM = {
       MULTI_DAY: 'MULTI_DAY',
@@ -1490,11 +1481,13 @@
           return;
         }
 
-        const userPicture = data.user.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name || 'U')}&background=3565d8&color=fff`;
         const userName = data.user.name || '';
         const userEmail = data.user.email || '';
+        const avatarUrl = buildAvatarUrl(data.user.picture, userName);
 
-        document.getElementById('user-avatar').src = userPicture;
+        if (userAvatarEl) {
+          userAvatarEl.src = avatarUrl;
+        }
         document.getElementById('user-name').textContent = userName;
         document.getElementById('user-email').textContent = userEmail;
         document.getElementById('full_name').value = userName;

@@ -84,6 +84,6 @@ CashfreeSDK.XEnvironment = CASHFREE_MODE === 'production'
 // Export the configured SDK class
 const Cashfree = CashfreeSDK;
 
-export const PAYMENT_AMOUNT = 600; // ₹600 for event pass
+export const PAYMENT_AMOUNT = 650; // ₹650 for HITAM-only event pass
 
 export { Cashfree, CASHFREE_MODE };

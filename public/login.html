@@ -597,7 +597,7 @@
             ? '/dashboard.html'
             : (userType === 'ALUMNI'
               ? '/alumni-form.html'
-              : (userType === 'HITAMONLY' ? '/butterfly-form.html' : '/external-form.html'));
+              : (userType === 'HITAMONLY' ? '/form.html' : '/external-form.html'));
           window.location.href = target;
         }
       } catch (err) {
@@ -745,8 +745,8 @@
             // Alumni users always go to alumni form or dashboard
             window.location.href = hasForm ? '/dashboard.html' : '/alumni-form.html';
           } else if (userType === 'HITAMONLY') {
-            // HITAM students go to butterfly form or dashboard
-            window.location.href = hasForm ? '/dashboard.html' : '/butterfly-form.html';
+            // HITAM students go to regular form or dashboard
+            window.location.href = hasForm ? '/dashboard.html' : '/form.html';
           } else {
             // External users go to external form or dashboard
             window.location.href = hasForm ? '/dashboard.html' : '/external-form.html';
