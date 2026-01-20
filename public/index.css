@@ -451,43 +451,13 @@ body {
 
 /* Full-width carousel on mobile for immersive experience */
 @media (max-width: 768px) {
-  .about-section {
-    padding: 3rem 0;
-    /* Remove side padding */
-    max-width: 100%;
-    /* Full width */
-  }
 
-  .about-card {
-    border-radius: 0;
-    /* Remove border radius for edge-to-edge */
-    border-left: none;
-    border-right: none;
-    padding: 2rem 1.5rem;
-    /* Keep some padding for text content */
-  }
-
-  .about-media {
-    margin: 0 -1.5rem;
-    /* Extend images to full width */
-  }
-
-  .image-scroller {
-    border-radius: 0;
-    /* Images go edge-to-edge */
-  }
-
-  .scroll-target {
-    border-radius: 0;
-    /* Remove rounded corners on mobile */
-  }
-}
-
-@media (max-width: 768px) {
+  /* Navigation */
   .nav-links {
     display: none;
   }
 
+  /* Stats */
   .stats {
     gap: 2rem;
   }
@@ -496,22 +466,67 @@ body {
     font-size: 2.2rem;
   }
 
+  /* Hero Section - Smaller logos */
   .hero {
     padding-top: 6rem;
   }
 
-  /* Log-cluster responsive fix */
   .hero-logo-cluster {
-    gap: 1rem;
+    gap: 0.75rem;
     flex-wrap: wrap;
   }
 
   .hero-logo {
-    height: 100px;
+    height: 120px;
+    /* Larger center logo on mobile */
   }
 
   .hero-logo-side {
-    height: 80px;
+    height: 95px;
+    /* Larger side logos */
+  }
+
+  /* About Section - Full Width */
+  .about-section {
+    padding: 3rem 0;
+    max-width: 100%;
+  }
+
+  .about-card {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    padding: 2rem 1.5rem;
+  }
+
+  .about-media {
+    margin: 0 -1.5rem;
+  }
+
+  .image-scroller {
+    border-radius: 0;
+  }
+
+  .scroll-target {
+    border-radius: 0;
+  }
+
+  /* Carousel Controls - More prominent on mobile */
+  .carousel-controls {
+    margin-top: 1rem;
+    padding: 0 1.5rem;
+  }
+
+  .carousel-btn {
+    width: 44px;
+    /* Larger touch target */
+    height: 44px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .scroll-hint {
+    font-size: 0.8rem;
   }
 }
 
@@ -530,11 +545,13 @@ body {
   }
 
   .hero-logo {
-    height: 80px;
+    height: 100px;
+    /* Still substantial on small phones */
   }
 
   .hero-logo-side {
-    height: 60px;
+    height: 80px;
+    /* Proportional side logos */
   }
 }
 
