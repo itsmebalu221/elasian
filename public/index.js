@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (lightbox) {
     scrollImages.forEach(img => {
       img.addEventListener('click', () => {
-        lightbox.style.display = 'block';
+        lightbox.style.display = 'flex';
         if (lightboxImg) lightboxImg.src = img.src;
         document.body.style.overflow = 'hidden';
       });

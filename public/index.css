@@ -177,13 +177,30 @@ body {
 
 /* Futuristic Typography */
 .hero-date {
-  font-family: 'Inter', sans-serif;
-  letter-spacing: 0.3em;
+  font-family: 'JetBrains Mono', monospace; 
+  letter-spacing: 0.4em;
   text-transform: uppercase;
-  font-size: 0.85rem;
-  color: #6b8cce;
-  margin-bottom: 1rem;
-  text-shadow: 0 0 10px rgba(107, 140, 206, 0.5);
+  font-size: 1rem;
+  font-weight: 600;
+  color: #a0c4ff;
+  margin-bottom: 1.5rem;
+  
+  text-shadow: 
+    0 0 5px rgba(160, 196, 255, 0.4),
+    0 0 15px rgba(107, 140, 206, 0.2);
+  
+  background: rgba(107, 140, 206, 0.1);
+  padding: 4px 12px;
+  border-left: 2px solid #6b8cce;
+  display: inline-block;
+  animation: flicker 3s infinite alternate;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  95% { opacity: 1; }
+  96% { opacity: 0.8; }
+  97% { opacity: 1; }
 }
 
 .hero-title {
@@ -198,8 +215,8 @@ body {
 
 .hero-title span {
   background: linear-gradient(to bottom, #fff 30%, #6b8cce 100%);
-  -webkit-background-clip: text;
   background-clip: text;
+  -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 0 30px rgba(107, 140, 206, 0.3));
 }
@@ -289,10 +306,66 @@ body {
 }
 
 /* 5. About Section & Image Scroller */
-.about-section {
-  padding: 5rem 2rem;
-  max-width: 1100px;
-  margin: 0 auto;
+.about-content {
+  padding: 2rem;
+  max-width: 850px;
+}
+
+/* 1. Main Heading: Large, Bold, and Impactful */
+.about-heading {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(3rem, 8vw, 4.5rem); /* Significantly larger */
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: 0.01em;
+  line-height: 0.9;
+  margin-bottom: 0.5rem;
+  
+  /* Subtle gradient to give it a "machined" look */
+  background: linear-gradient(180deg, #0f172a 40%, #4a90e2 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 2. Tagline: Smaller, Stylish, and Technical */
+.about-content h2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: #4a90e2;
+  margin-bottom: 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Glowing dot next to the tagline for a "System Active" feel */
+.about-content h2::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: #4a90e2;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #4a90e2;
+}
+
+/* 3. Description: Keeping your original content body structure */
+.about-content p {
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: #475569;
+  margin-bottom: 1.5rem;
+  max-width: 700px;
+}
+
+/* Subtle background interaction on hover */
+.about-content:hover .about-heading {
+  filter: drop-shadow(0 0 15px rgba(74, 144, 226, 0.1));
+  transition: filter 0.4s ease;
 }
 
 .about-card {
@@ -392,52 +465,118 @@ body {
 
 /* 6. Stats Section */
 .stats {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+  padding: 5rem 1rem;
+  background: #ffffff;
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 3px solid #f1f5f9;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.stat-item {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: 4rem;
-  padding: 3rem 2rem;
-  background: var(--bg-secondary);
-  flex-wrap: wrap;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  text-align: center;
+  padding: 0.5rem;
 }
 
 .stat-value {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 3rem;
-  color: var(--accent);
-  font-weight: 600;
+  --accent-color: #7cfc00;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(2.2rem, 5vw, 3.8rem); 
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  margin-bottom: 0.75rem;
+  background: linear-gradient(180deg, #020617 50%, var(--accent-color) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap; 
+}
+
+.stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem; 
+  font-weight: 700;
+  color: #1e293b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #f8fafc;
+  padding: 4px 10px;
+  border-radius: 4px;
+  border-bottom: 2px solid #7cfc00; /* Matches the new accent color */
+}
+
+/* Optional: Add a subtle hover effect that changes the accent color */
+.stat-item:hover .stat-value {
+  --accent-color: #6366f1; /* Transitions to Indigo on hover */
+  transform: scale(1.05);
+  transition: all 0.3s ease;
 }
 
 /* 7. Lightbox Modal */
 .lightbox {
-  display: none;
-  position: fixed;
-  z-index: 2000;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(8px);
+  display: none; /* Controlled by JS */
   justify-content: center;
+  position: fixed;
   align-items: center;
+  padding: 40px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.98); /* Modern clean white overlay */
+  backdrop-filter: blur(15px); /* Futuristic glass effect */
+  z-index: 10000;
 }
 
 .lightbox-content {
   max-width: 90%;
   max-height: 80vh;
+  object-fit: contain;
   border-radius: 12px;
-  animation: zoom 0.3s ease-out;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+  animation: lightboxZoom 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes zoom {
-  from {
-    transform: scale(0.8);
-    opacity: 0;
-  }
+@keyframes lightboxZoom {
+  from { transform: scale(0.9) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
 
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+.close-lightbox {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  font-size: 3rem;
+  color: #1a202c;
+  cursor: pointer;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+.close-lightbox:hover {
+  transform: rotate(90deg) scale(1.2);
+  color: #4a90e2;
+}
+
+.scroll-hint {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: #4a90e2;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  background: rgba(74, 144, 226, 0.05);
+  padding: 6px 16px;
+  border-radius: 100px;
+  border: 1px solid rgba(74, 144, 226, 0.15);
 }
 
 /* 8. Responsive Media Queries */
@@ -539,23 +678,19 @@ body {
     font-size: 1.25rem;
   }
 
-  /* Further reduce for very small screens */
   .hero-logo-cluster {
     gap: 0.5rem;
   }
 
   .hero-logo {
     height: 70px;
-    /* Compact on small phones */
   }
 
   .hero-logo-side {
     height: 55px;
-    /* Minimal side logos */
   }
 }
 
-/* 9. Featured Events Section Fixes */
 .events-section {
   padding: 5rem 2rem;
   max-width: 1200px;
@@ -564,43 +699,160 @@ body {
 
 .section-header {
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
+  padding: 0 1rem;
+}
+
+.section-title {
+  font-family: 'Kanit', sans-serif; /* A thick, modern variable font */
+  font-size: clamp(2.5rem, 8vw, 4rem); /* Responsive sizing */
+  font-weight: 900;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0;
+
+    background: linear-gradient(
+    135deg, 
+    #0f172a 20%, 
+    #4a90e2 45%, 
+    #a0c4ff 55%, 
+    #0f172a 80%
+  );
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  
+  /* Animate the gradient to make it look like light is catching it */
+  animation: shine 6s linear infinite;
+  
+  /* Modern "Tight" Typography */
+  letter-spacing: 0.02em;
+  filter: drop-shadow(0 10px 15px rgba(74, 144, 226, 0.15));
+}
+
+@keyframes shine {
+  to { background-position: 200% center; }
+}
+
+.section-desc {
+  max-width: 550px;
+  margin: 1.5rem auto 0;
+  color: #475569;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  
+  /* Create a soft "light leak" behind the text */
+  background: radial-gradient(
+    circle at center, 
+    rgba(74, 144, 226, 0.08) 0%, 
+    transparent 70%
+  );
+  padding: 20px;
+}
+
+.text-glow {
+  color: #4a90e2;
+  font-weight: 600;
+  border-bottom: 1px dashed rgba(74, 144, 226, 0.4);
 }
 
 .events-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2.5rem;
+  padding: 2rem;
 }
 
 .event-card {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  background: #fcfcfd;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
+  position: relative;
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05), 
+    0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .event-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  border-color: #4a90e2; 
+  background: #ffffff;
+  
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+    0 10px 10px -5px rgba(74, 144, 226, 0.1);
 }
 
-/* Fix for the Large Images/Logos */
-.event-image {
+.event-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 350px;
-  /* Constrains the height */
-  object-fit: cover;
-  /* Ensures image isn't stretched while filling the space */
-  border-bottom: 1px solid var(--border);
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #4a90e2, transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
 }
 
-.event-icon {
-  font-size: 1.5rem;
-  margin: 1.5rem 1.5rem 0.5rem;
+.event-card:hover::after {
+  transform: translateX(100%);
+}
+
+.event-card img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  filter: saturate(0.8) contrast(1.1);
+  transition: filter 0.4s ease;
+}
+
+.event-divider {
+  height: 1px;
+  background-color: #e2e8f0;
+  margin: 0;
+  position: relative;
+  border: none;
+}
+
+.event-card:hover img {
+  filter: saturate(1.1) contrast(1.1);
+}
+
+.event-card h3 {
+  text-align: center;
+  margin: 1.5rem 0.5rem 0.5rem 1rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: linear-gradient(135deg, #1a202c 30%, #4a90e2 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  display: block;
+}
+.event-card h3::after {
+  content: "";
+  display: block;
+  width: 0;
+  height: 2px;
+  background: #4a90e2;
+  margin: 5px auto 0 auto;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 4px;
+}
+
+.event-card:hover h3::after {
+  width: 40px;
 }
 
 .event-category {
@@ -622,23 +874,57 @@ body {
   color: var(--text-muted);
   font-size: 0.95rem;
   flex-grow: 1;
+  text-align: justify;
 }
 
 .event-meta {
-  padding: 1rem 1.5rem;
-  background: var(--bg-secondary);
+  padding: 1.2rem;
+  background: #ffffff;
   display: flex;
-  justify-content: space-between;
-  font-size: 0.85rem;
-  color: var(--text-primary);
-  border-top: 1px solid var(--border);
+  justify-content: center;
+  border-top: 1px solid #f1f5f9;
 }
 
-/* 10. Footer Refinement */
-/* 10. Footer Refinement (Dark Theme with Flex Layout) */
+.event-meta-item {
+  position: relative;
+  padding: 0 15px;
+  /* Thin vertical bars on the sides to frame the date like a digital readout */
+  border-left: 2px solid #e2e8f0;
+  border-right: 2px solid #e2e8f0;
+}
+
+.meta-value {
+  /* Using a clean, wide-set font style */
+  font-family: 'Inter', sans-serif;
+  font-size: 1.6rem; /* Large and bold */
+  font-weight: 800;
+  color: #0f172a; /* Deep near-black */
+  letter-spacing: 0.05em;
+  line-height: 1;
+  display: flex;
+  align-items: flex-start;
+}
+
+.meta-suffix {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4a90e2;
+  margin-left: 4px;
+  margin-top: 4px;
+  /* Subtle glow for the suffix to make it look "active" */
+  text-shadow: 0 0 8px rgba(74, 144, 226, 0.3);
+}
+
+/* Hover effect for the whole card to change the bar color */
+.event-card:hover .event-meta-item {
+  border-right-color: #4a90e2;
+  border-left-color: #4a90e2;
+  transition: border-color 0.4s ease;
+}
+
+
 .footer {
   padding: 3rem 2rem;
-  /* Keeping your dark theme colors */
   background: #05070a;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -651,13 +937,11 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: 2rem;
-  /* Increased gap slightly for better breathing room */
 }
 
 .footer-brand {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.5rem;
-  /* Slightly larger for elegance */
   font-weight: 600;
   color: #ffffff;
   letter-spacing: 0.05em;
@@ -666,7 +950,6 @@ body {
 .footer-text {
   font-size: 0.85rem;
   color: #a0a0a0;
-  /* Muted silver/gray */
 }
 
 .footer-links {
@@ -684,11 +967,9 @@ body {
 
 .footer-links a:hover {
   color: #6b8cce;
-  /* Accent blue from your hero section */
   transform: translateY(-2px);
 }
 
-/* Mobile Alignment */
 @media (max-width: 640px) {
   .footer-content {
     flex-direction: column;
@@ -697,15 +978,12 @@ body {
 
   .footer-links {
     order: -1;
-    /* Puts links above text on mobile */
   }
 }
 
-/* 11. CTA Section Modern Styling */
 .cta-section {
   padding: 8rem 2rem;
   background: var(--bg-primary);
-  /* White background to create contrast */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -715,7 +993,6 @@ body {
 
 .cta-content {
   background: #05070a;
-  /* Dark theme to match Hero and Footer */
   padding: 4rem 3rem;
   border-radius: 24px;
   max-width: 1000px;
@@ -727,7 +1004,6 @@ body {
   z-index: 1;
 }
 
-/* Decorative Glow behind the CTA card */
 .cta-content::before {
   content: '';
   position: absolute;
@@ -762,7 +1038,6 @@ body {
   padding: 1.25rem 3rem;
   font-size: 1.1rem;
   border-radius: 50px;
-  /* Rounded pill style for CTA */
   background: #6b8cce;
   border: none;
   box-shadow: 0 10px 25px rgba(107, 140, 206, 0.4);
@@ -783,7 +1058,6 @@ body {
   transform: translateX(5px);
 }
 
-/* Mobile adjustments */
 @media (max-width: 768px) {
   .navbar {
     padding: 1rem;
