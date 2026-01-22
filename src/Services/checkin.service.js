@@ -125,41 +125,74 @@ function hydrateParticipant(baseSlot, snapshotRow, dayId, slotLabel) {
 
 function mapButterflyParticipants(registration, snapshots, dayId) {
   const participants = [];
+  
+  // Snapshots are inserted in order: student1, student2, student3, student4
+  // So we can match by index directly instead of trying to match by name/email
   for (let i = 1; i <= 4; i++) {
+    const studentName = registration[`student${i}_name`];
+    
+    // Skip empty slots (some butterfly passes might have less than 4 students)
+    if (!studentName || !studentName.trim()) {
+      continue;
+    }
+
     const baseSlot = {
       studentNumber: i,
-      name: registration[`student${i}_name`],
+      name: studentName,
       branch: registration[`student${i}_branch`],
       rollNumber: registration[`student${i}_roll_number`],
       mobile: registration[`student${i}_mobile`],
       email: registration[`student${i}_email`]
     };
 
-    const slotSnapshot = findSnapshotForSlot(baseSlot, snapshots);
+    // Match snapshot by index (i-1 because array is 0-based)
+    // Or fallback to name/email matching if order is uncertain
+    let slotSnapshot = snapshots[i - 1] || null;
+    
+    // Verify this snapshot belongs to this student (sanity check)
+    if (slotSnapshot) {
+      const nameMatch = slotSnapshot.full_name?.toLowerCase().trim() === studentName.toLowerCase().trim();
+      const rollMatch = baseSlot.rollNumber && slotSnapshot.roll_number && 
+                        baseSlot.rollNumber.toLowerCase().trim() === slotSnapshot.roll_number.toLowerCase().trim();
+      const emailMatch = baseSlot.email && slotSnapshot.email && 
+                         baseSlot.email.toLowerCase().trim() === slotSnapshot.email.toLowerCase().trim();
+      
+      // If index doesn't match, try to find correct snapshot
+      if (!nameMatch && !rollMatch && !emailMatch) {
+        slotSnapshot = findSnapshotForSlot(baseSlot, snapshots);
+      }
+    } else {
+      // Fallback to matching
+      slotSnapshot = findSnapshotForSlot(baseSlot, snapshots);
+    }
+
     participants.push(hydrateParticipant(baseSlot, slotSnapshot, dayId, `Guest ${i}`));
   }
+  
   return participants;
 }
 
 function mapExternalParticipants(registration, snapshots, dayId) {
+  // External passes are individual - 1 person per registration
+  // There should be exactly 1 snapshot row for this registration
   if (!snapshots.length) {
     return [];
   }
 
-  return snapshots.map((snapshot, index) => {
-    const baseSlot = {
-      studentNumber: index + 1,
-      name: registration.full_name,
-      branch: null,
-      rollNumber: registration.identity_number,
-      mobile: registration.mobile,
-      email: registration.email,
-      institution: registration.institution,
-      department: registration.department
-    };
+  // Use the first (and typically only) snapshot
+  const snapshot = snapshots[0];
+  const baseSlot = {
+    studentNumber: 1,
+    name: registration.full_name,
+    branch: null,
+    rollNumber: registration.identity_number,
+    mobile: registration.mobile,
+    email: registration.email,
+    institution: registration.institution,
+    department: registration.department
+  };
 
-    return hydrateParticipant(baseSlot, snapshot, dayId, `Pass Holder`);
-  });
+  return [hydrateParticipant(baseSlot, snapshot, dayId, 'Pass Holder')];
 }
 
 function summarizeParticipants(participants) {
@@ -282,10 +315,12 @@ async function buildPayload(registrationId, dayId) {
   };
 }
 
-export async function lookupPass(rawToken, dayId) {
-  const registrationId = extractRegistrationId(rawToken);
+export async function lookupPass(rawToken, dayId, { skipExtract = false } = {}) {
+  const registrationId = skipExtract 
+    ? rawToken?.toString().trim().toUpperCase() 
+    : extractRegistrationId(rawToken);
   if (!registrationId) {
-    throw new CheckinError('QR token did not contain a registration ID', 400, 'TOKEN_MISSING');
+    throw new CheckinError('Registration ID is required', 400, 'TOKEN_MISSING');
   }
 
   return buildPayload(registrationId, dayId);
