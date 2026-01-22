@@ -35,26 +35,197 @@
       margin: 0 auto;
     }
 
-    header {
-      text-align: center;
-      padding: 20px 0;
+    /* ===== LOGIN SCREEN ===== */
+    .login-screen {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
 
-    header h1 {
+    .login-card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 32px 24px;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .login-header .logo {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    .login-header h1 {
       font-size: 1.5rem;
       font-weight: 700;
       margin-bottom: 4px;
     }
 
-    header p {
+    .login-header p {
       color: var(--muted);
       font-size: 0.875rem;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--muted);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--blue);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      background: var(--blue);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s;
+    }
+
+    .login-btn:hover {
+      opacity: 0.9;
+    }
+
+    .login-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .login-error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--red);
+      color: var(--red);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .login-divider {
+      display: flex;
+      align-items: center;
+      margin: 20px 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .login-divider span {
+      padding: 0 12px;
+    }
+
+    .google-btn {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: border-color 0.2s;
+    }
+
+    .google-btn:hover {
+      border-color: var(--blue);
+    }
+
+    .google-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ===== MAIN APP ===== */
+    .app-screen {
+      display: none;
+    }
+
+    .app-screen.active {
+      display: block;
+    }
+
+    header {
+      text-align: center;
+      padding: 16px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-left h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .header-left p {
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .logout-btn {
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+
+    .logout-btn:hover {
+      border-color: var(--red);
+      color: var(--red);
     }
 
     .day-selector {
       display: flex;
       gap: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       padding: 4px;
       background: var(--card);
       border-radius: 12px;
@@ -63,13 +234,13 @@
 
     .day-btn {
       flex: 1;
-      min-width: 60px;
-      padding: 10px 12px;
+      min-width: 50px;
+      padding: 10px 8px;
       border: none;
       border-radius: 8px;
       background: transparent;
       color: var(--muted);
-      font-size: 0.875rem;
+      font-size: 0.8rem;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
@@ -83,7 +254,7 @@
     .manual-lookup {
       display: flex;
       gap: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .manual-lookup input {
@@ -115,39 +286,23 @@
       border-radius: 12px;
       background: var(--blue);
       color: white;
-      font-size: 1.1rem;
+      font-size: 1rem;
       cursor: pointer;
-      transition: opacity 0.2s;
-    }
-
-    .btn-lookup:hover {
-      opacity: 0.9;
     }
 
     .scanner-container {
       background: var(--card);
       border-radius: 16px;
       overflow: hidden;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       position: relative;
+      min-height: 280px;
     }
 
-    #qr-reader {
-      width: 100%;
-      border: none;
-    }
-
-    #qr-reader video {
-      border-radius: 12px;
-    }
-
-    #qr-reader__scan_region {
-      background: transparent !important;
-    }
-
-    #qr-reader__dashboard {
-      display: none !important;
-    }
+    #qr-reader { width: 100%; border: none; }
+    #qr-reader video { border-radius: 12px; }
+    #qr-reader__scan_region { background: transparent !important; }
+    #qr-reader__dashboard { display: none !important; }
 
     .scanner-overlay {
       position: absolute;
@@ -162,9 +317,7 @@
       z-index: 10;
     }
 
-    .scanner-overlay.hidden {
-      display: none;
-    }
+    .scanner-overlay.hidden { display: none; }
 
     .scanner-overlay svg {
       width: 64px;
@@ -175,62 +328,27 @@
     .status-card {
       padding: 20px;
       border-radius: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       text-align: center;
       transition: all 0.3s;
     }
 
-    .status-card.idle {
-      background: var(--card);
-      border: 2px dashed var(--border);
-    }
+    .status-card.idle { background: var(--card); border: 2px dashed var(--border); }
+    .status-card.loading { background: var(--card); border: 2px solid var(--blue); }
+    .status-card.valid { background: rgba(34, 197, 94, 0.15); border: 2px solid var(--green); }
+    .status-card.partial { background: rgba(234, 179, 8, 0.15); border: 2px solid var(--yellow); }
+    .status-card.used { background: rgba(234, 179, 8, 0.15); border: 2px solid var(--yellow); }
+    .status-card.invalid { background: rgba(239, 68, 68, 0.15); border: 2px solid var(--red); }
 
-    .status-card.loading {
-      background: var(--card);
-      border: 2px solid var(--blue);
-    }
-
-    .status-card.valid {
-      background: rgba(34, 197, 94, 0.15);
-      border: 2px solid var(--green);
-    }
-
-    .status-card.partial {
-      background: rgba(234, 179, 8, 0.15);
-      border: 2px solid var(--yellow);
-    }
-
-    .status-card.used {
-      background: rgba(234, 179, 8, 0.15);
-      border: 2px solid var(--yellow);
-    }
-
-    .status-card.invalid {
-      background: rgba(239, 68, 68, 0.15);
-      border: 2px solid var(--red);
-    }
-
-    .status-icon {
-      font-size: 3rem;
-      margin-bottom: 12px;
-    }
-
-    .status-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .status-message {
-      color: var(--muted);
-      font-size: 0.875rem;
-    }
+    .status-icon { font-size: 2.5rem; margin-bottom: 8px; }
+    .status-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+    .status-message { color: var(--muted); font-size: 0.8rem; }
 
     .pass-info {
       background: var(--card);
       border-radius: 16px;
       padding: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .pass-header {
@@ -243,7 +361,7 @@
     }
 
     .pass-type {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -252,14 +370,14 @@
 
     .pass-id {
       font-family: monospace;
-      font-size: 0.875rem;
+      font-size: 0.8rem;
       color: var(--muted);
     }
 
     .guest-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     .guest-item {
@@ -284,36 +402,19 @@
       cursor: pointer;
     }
 
-    .guest-info {
-      flex: 1;
-    }
-
-    .guest-name {
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    .guest-meta {
-      font-size: 0.75rem;
-      color: var(--muted);
-    }
+    .guest-info { flex: 1; }
+    .guest-name { font-weight: 600; margin-bottom: 2px; font-size: 0.95rem; }
+    .guest-meta { font-size: 0.7rem; color: var(--muted); }
 
     .guest-badge {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 600;
       padding: 4px 10px;
       border-radius: 20px;
     }
 
-    .guest-badge.ready {
-      background: rgba(59, 130, 246, 0.2);
-      color: var(--blue);
-    }
-
-    .guest-badge.admitted {
-      background: rgba(34, 197, 94, 0.2);
-      color: var(--green);
-    }
+    .guest-badge.ready { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+    .guest-badge.admitted { background: rgba(34, 197, 94, 0.2); color: var(--green); }
 
     .actions {
       display: flex;
@@ -322,30 +423,18 @@
 
     .btn {
       flex: 1;
-      padding: 16px;
+      padding: 14px;
       border: none;
       border-radius: 12px;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
     }
 
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .btn-primary {
-      background: var(--green);
-      color: white;
-    }
-
-    .btn-secondary {
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--green); color: white; }
+    .btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); }
 
     .hidden { display: none !important; }
 
@@ -359,9 +448,7 @@
       margin: 0 auto 12px;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .error-box {
       background: rgba(239, 68, 68, 0.1);
@@ -369,78 +456,129 @@
       color: var(--red);
       padding: 12px 16px;
       border-radius: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       font-size: 0.875rem;
-    }
-
-    @media (max-width: 400px) {
-      .day-btn { min-width: 50px; padding: 8px; font-size: 0.75rem; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>🎫 Gate Check-In</h1>
-      <p>Scan QR codes to verify and admit guests</p>
-    </header>
+    
+    <!-- LOGIN SCREEN -->
+    <div class="login-screen" id="loginScreen">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="logo">🎫</div>
+          <h1>Gate Check-In</h1>
+          <p>Sign in with your staff account</p>
+        </div>
 
-    <div class="day-selector" id="daySelector"></div>
+        <div id="loginError" class="login-error hidden"></div>
 
-    <!-- Manual ID lookup -->
-    <div class="manual-lookup">
-      <input type="text" id="manualIdInput" placeholder="Enter Registration ID (e.g., BUTTERFLY001)" />
-      <button class="btn-lookup" onclick="manualLookup()">🔍</button>
-    </div>
-
-    <div class="scanner-container">
-      <div id="qr-reader"></div>
-      <div class="scanner-overlay" id="scannerOverlay">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/>
-          <rect x="7" y="7" width="10" height="10" rx="1"/>
-        </svg>
-        <p id="overlayText">Loading camera...</p>
-        <button class="btn btn-secondary" id="startCamBtn" onclick="initScanner()" style="display:none;">Start Camera</button>
+        <form id="loginForm" onsubmit="handleEmailLogin(event)">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="loginEmail" placeholder="staff@hitam.org" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="login-btn" id="loginBtn">Sign In</button>
+        </form>
       </div>
     </div>
 
-    <div id="errorBox" class="error-box hidden"></div>
+    <!-- MAIN APP SCREEN -->
+    <div class="app-screen" id="appScreen">
+      <header>
+        <div class="header-left">
+          <h1>🎫 Gate Check-In</h1>
+          <p id="userInfo">—</p>
+        </div>
+        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+      </header>
 
-    <div class="status-card idle" id="statusCard">
-      <div class="status-icon" id="statusIcon">📷</div>
-      <div class="status-title" id="statusTitle">Ready to Scan</div>
-      <div class="status-message" id="statusMessage">Point camera at a QR code</div>
-    </div>
+      <div class="day-selector" id="daySelector"></div>
 
-    <div id="passInfo" class="pass-info hidden">
-      <div class="pass-header">
-        <span class="pass-type" id="passType">—</span>
-        <span class="pass-id" id="passId">—</span>
+      <div class="manual-lookup">
+        <input type="text" id="manualIdInput" placeholder="Registration ID (e.g., BUTTERFLY001)" />
+        <button class="btn-lookup" onclick="manualLookup()">🔍</button>
       </div>
-      <div class="guest-list" id="guestList"></div>
-    </div>
 
-    <div class="actions">
-      <button class="btn btn-primary" id="admitBtn" onclick="admitSelected()" disabled>
-        ✓ Admit Selected
-      </button>
-      <button class="btn btn-secondary" id="scanNextBtn" onclick="resetAndScan()">
-        ↻ Scan Next
-      </button>
+      <div class="scanner-container">
+        <div id="qr-reader"></div>
+        <div class="scanner-overlay" id="scannerOverlay">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/>
+            <rect x="7" y="7" width="10" height="10" rx="1"/>
+          </svg>
+          <p id="overlayText">Loading camera...</p>
+          <button class="btn btn-secondary" id="startCamBtn" onclick="initScanner()" style="display:none;">Start Camera</button>
+        </div>
+      </div>
+
+      <div id="errorBox" class="error-box hidden"></div>
+
+      <div class="status-card idle" id="statusCard">
+        <div class="status-icon" id="statusIcon">📷</div>
+        <div class="status-title" id="statusTitle">Ready to Scan</div>
+        <div class="status-message" id="statusMessage">Point camera at a QR code</div>
+      </div>
+
+      <div id="passInfo" class="pass-info hidden">
+        <div class="pass-header">
+          <span class="pass-type" id="passType">—</span>
+          <span class="pass-id" id="passId">—</span>
+        </div>
+        <div class="guest-list" id="guestList"></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="admitBtn" onclick="admitSelected()" disabled>✓ Admit Selected</button>
+        <button class="btn btn-secondary" id="scanNextBtn" onclick="resetAndScan()">↻ Next</button>
+      </div>
     </div>
   </div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
   <script>
-    // State
+    // ===== FIREBASE CONFIG =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyBb8jN0YSs2C_Khzx9AHRqc5olB6vR41DY",
+      authDomain: "elysian-1f0e0.firebaseapp.com",
+      projectId: "elysian-1f0e0",
+      storageBucket: "elysian-1f0e0.firebasestorage.app",
+      messagingSenderId: "418734607706",
+      appId: "1:418734607706:web:34925d2deb1cba466f7763"
+    };
+
+    try {
+      firebase.initializeApp(firebaseConfig);
+    } catch (e) {
+      if (!/already exists/.test(e.message)) {
+        console.error('Firebase init error:', e);
+      }
+    }
+
+    // ===== STATE =====
     let scanner = null;
     let currentDay = 'day1';
     let currentResult = null;
     let selectedIds = new Set();
     let isScanning = false;
     let libLoaded = false;
+    let currentUser = null;
 
-    // Elements
+    // ===== ELEMENTS =====
+    const loginScreen = document.getElementById('loginScreen');
+    const appScreen = document.getElementById('appScreen');
+    const loginError = document.getElementById('loginError');
+    const loginBtn = document.getElementById('loginBtn');
+    const userInfo = document.getElementById('userInfo');
     const daySelector = document.getElementById('daySelector');
     const statusCard = document.getElementById('statusCard');
     const statusIcon = document.getElementById('statusIcon');
@@ -457,67 +595,148 @@
     const startCamBtn = document.getElementById('startCamBtn');
     const manualIdInput = document.getElementById('manualIdInput');
 
-    // Manual lookup by registration ID
-    async function manualLookup() {
-      const regId = manualIdInput.value.trim();
-      if (!regId) {
-        showError('Enter a registration ID');
+    // ===== AUTH =====
+    async function checkSession() {
+      try {
+        const res = await fetch('/api/checkin/session', { credentials: 'include' });
+        const data = await res.json();
+        if (data.success && data.authenticated) {
+          currentUser = data.user;
+          showApp();
+          return true;
+        }
+      } catch (e) {
+        console.warn('Session check failed:', e);
+      }
+      showLogin();
+      return false;
+    }
+
+    // Email/Password login via Firebase
+    async function handleEmailLogin(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) {
+        showLoginError('Enter email and password');
         return;
       }
 
-      // Stop scanner if running
-      await stopScanner();
-      scannerOverlay.classList.remove('hidden');
-      overlayText.textContent = 'Lookup in progress...';
-
-      setStatus('loading', '', 'Looking up...', regId.toUpperCase());
-      hideError();
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Signing in...';
+      hideLoginError();
 
       try {
-        const result = await apiCall('/api/checkin/lookup', {
-          method: 'POST',
-          body: JSON.stringify({ registrationId: regId, day: currentDay })
-        });
+        // Firebase email/password sign in
+        const result = await firebase.auth().signInWithEmailAndPassword(email, password);
+        const firebaseUser = result.user;
 
-        currentResult = result;
-        renderResult(result);
-        manualIdInput.value = '';
+        // Send to backend
+        await authenticateWithBackend(firebaseUser);
 
       } catch (err) {
-        setStatus('invalid', '❌', 'Not Found', err.message);
-        passInfo.classList.add('hidden');
-        admitBtn.disabled = true;
+        console.error('Login error:', err);
+        let msg = 'Login failed';
+        if (err.code === 'auth/user-not-found') msg = 'No account found with this email';
+        else if (err.code === 'auth/wrong-password') msg = 'Invalid password';
+        else if (err.code === 'auth/invalid-email') msg = 'Invalid email format';
+        else if (err.code === 'auth/too-many-requests') msg = 'Too many attempts. Try again later.';
+        else if (err.message) msg = err.message;
+        showLoginError(msg);
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Sign In';
       }
     }
 
-    // Allow Enter key to trigger lookup
-    manualIdInput?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        manualLookup();
-      }
-    });
+    // Google login via Firebase
+    async function handleGoogleLogin() {
+      hideLoginError();
 
-    // Load html5-qrcode library dynamically
-    function loadQrLib() {
-      return new Promise((resolve, reject) => {
-        if (typeof Html5Qrcode !== 'undefined') {
-          libLoaded = true;
-          resolve();
-          return;
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.addScope('email');
+        provider.addScope('profile');
+
+        const result = await firebase.auth().signInWithPopup(provider);
+        const firebaseUser = result.user;
+
+        await authenticateWithBackend(firebaseUser);
+
+      } catch (err) {
+        console.error('Google login error:', err);
+        if (err.code !== 'auth/popup-closed-by-user') {
+          showLoginError(err.message || 'Google login failed');
         }
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
-        script.onload = () => {
-          libLoaded = true;
-          resolve();
-        };
-        script.onerror = () => reject(new Error('Failed to load QR scanner library'));
-        document.head.appendChild(script);
-      });
+      }
     }
 
-    // API calls
+    // Send Firebase user to backend
+    async function authenticateWithBackend(firebaseUser) {
+      const res = await fetch('/api/checkin/login', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user: {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            displayName: firebaseUser.displayName,
+            photoURL: firebaseUser.photoURL
+          }
+        })
+      });
+
+      const data = await res.json();
+
+      if (data.success && data.user) {
+        currentUser = data.user;
+        showApp();
+      } else {
+        // Sign out from Firebase if backend rejects
+        await firebase.auth().signOut();
+        throw new Error(data.error || 'Access denied');
+      }
+    }
+
+    async function handleLogout() {
+      try {
+        await firebase.auth().signOut();
+        await fetch('/api/checkin/logout', { method: 'POST', credentials: 'include' });
+      } catch (e) {}
+      
+      currentUser = null;
+      await stopScanner();
+      showLogin();
+    }
+
+    function showLogin() {
+      loginScreen.style.display = 'flex';
+      appScreen.classList.remove('active');
+      document.getElementById('loginEmail').value = '';
+      document.getElementById('loginPassword').value = '';
+    }
+
+    function showApp() {
+      loginScreen.style.display = 'none';
+      appScreen.classList.add('active');
+      userInfo.textContent = currentUser?.email || '—';
+      loadConfig();
+      initScanner();
+    }
+
+    function showLoginError(msg) {
+      loginError.textContent = msg;
+      loginError.classList.remove('hidden');
+    }
+
+    function hideLoginError() {
+      loginError.classList.add('hidden');
+    }
+
+    // ===== API =====
     async function apiCall(url, options = {}) {
       const res = await fetch(url, {
         credentials: 'include',
@@ -525,21 +744,26 @@
         ...options
       });
       const data = await res.json();
+      
+      if (res.status === 401 || res.status === 403) {
+        showLogin();
+        throw new Error('Session expired');
+      }
+      
       if (!res.ok || data.success === false) {
         throw new Error(data.error || data.message || 'Request failed');
       }
       return data.result || data.config || data;
     }
 
-    // Load config and setup days
+    // ===== CONFIG =====
     async function loadConfig() {
       try {
         const config = await apiCall('/api/checkin/config');
         renderDaySelector(config.dayOptions, config.defaultDay);
         currentDay = config.defaultDay;
       } catch (err) {
-        console.warn('Config load failed, using fallback:', err.message);
-        // Fallback days
+        console.warn('Config load failed:', err.message);
         const fallbackDays = Array.from({length: 7}, (_, i) => ({id: `day${i+1}`, label: `D${i+1}`}));
         renderDaySelector(fallbackDays, 'day1');
       }
@@ -559,18 +783,31 @@
       document.querySelectorAll('.day-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.day === dayId);
       });
-      if (currentResult) {
-        resetAndScan();
-      }
+      if (currentResult) resetAndScan();
     }
 
-    // Scanner
+    // ===== QR SCANNER =====
+    function loadQrLib() {
+      return new Promise((resolve, reject) => {
+        if (typeof Html5Qrcode !== 'undefined') {
+          libLoaded = true;
+          resolve();
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
+        script.onload = () => { libLoaded = true; resolve(); };
+        script.onerror = () => reject(new Error('Failed to load QR library'));
+        document.head.appendChild(script);
+      });
+    }
+
     async function initScanner() {
       overlayText.textContent = 'Starting camera...';
       startCamBtn.style.display = 'none';
+      scannerOverlay.classList.remove('hidden');
 
       try {
-        // Load library if needed
         if (!libLoaded) {
           overlayText.textContent = 'Loading scanner...';
           await loadQrLib();
@@ -582,22 +819,17 @@
 
         const cameras = await Html5Qrcode.getCameras();
         if (!cameras || cameras.length === 0) {
-          throw new Error('No camera found on this device');
+          throw new Error('No camera found');
         }
 
-        // Prefer back camera on mobile
         const backCam = cameras.find(c => /back|rear|environment/i.test(c.label));
         const selectedCam = backCam || cameras[0];
 
         await scanner.start(
           selectedCam.id,
-          {
-            fps: 10,
-            qrbox: { width: 250, height: 250 },
-            aspectRatio: 1.0
-          },
+          { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
           onScanSuccess,
-          () => {} // Ignore errors during scanning
+          () => {}
         );
 
         isScanning = true;
@@ -605,7 +837,7 @@
         setStatus('idle', '📷', 'Ready to Scan', 'Point camera at a QR code');
 
       } catch (err) {
-        console.error('Scanner init error:', err);
+        console.error('Scanner error:', err);
         overlayText.textContent = err.message || 'Camera error';
         startCamBtn.style.display = 'block';
         showError('Camera: ' + err.message);
@@ -614,42 +846,60 @@
 
     async function stopScanner() {
       if (scanner && isScanning) {
-        try {
-          await scanner.stop();
-          isScanning = false;
-        } catch (e) {
-          console.warn('Stop scanner error:', e);
-        }
+        try { await scanner.stop(); isScanning = false; } catch (e) {}
       }
     }
 
     async function onScanSuccess(decodedText) {
       if (!isScanning) return;
-      
-      // Pause scanner
       await stopScanner();
-      
-      setStatus('loading', '', 'Verifying...', 'Looking up pass');
+      await doLookup(decodedText, false);
+    }
+
+    // ===== LOOKUP =====
+    async function manualLookup() {
+      const regId = manualIdInput.value.trim();
+      if (!regId) {
+        showError('Enter a registration ID');
+        return;
+      }
+      await stopScanner();
+      scannerOverlay.classList.remove('hidden');
+      overlayText.textContent = 'Looking up...';
+      await doLookup(regId, true);
+    }
+
+    async function doLookup(value, isDirect) {
+      setStatus('loading', '', 'Verifying...', value.toUpperCase());
       hideError();
 
       try {
+        const body = isDirect 
+          ? { registrationId: value, day: currentDay }
+          : { token: value, day: currentDay };
+
         const result = await apiCall('/api/checkin/lookup', {
           method: 'POST',
-          body: JSON.stringify({ token: decodedText, day: currentDay })
+          body: JSON.stringify(body)
         });
 
         currentResult = result;
         renderResult(result);
+        manualIdInput.value = '';
 
       } catch (err) {
-        setStatus('invalid', '❌', 'Invalid QR', err.message);
+        setStatus('invalid', '❌', 'Not Found', err.message);
         passInfo.classList.add('hidden');
         admitBtn.disabled = true;
       }
     }
 
+    manualIdInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); manualLookup(); }
+    });
+
+    // ===== RENDER =====
     function renderResult(result) {
-      // Set status based on result
       const statusMap = {
         'VALID': { cls: 'valid', icon: '✅', title: 'Valid Pass' },
         'PARTIAL': { cls: 'partial', icon: '⚠️', title: 'Partially Admitted' },
@@ -658,20 +908,15 @@
       const s = statusMap[result.status] || { cls: 'valid', icon: '✅', title: 'Valid' };
       setStatus(s.cls, s.icon, s.title, result.message || '');
 
-      // Show pass info
       passInfo.classList.remove('hidden');
       passType.textContent = result.meta?.passLabel || result.passType || 'Pass';
       passId.textContent = '#' + result.registrationId;
 
-      // Render guests
       selectedIds.clear();
       guestList.innerHTML = result.participants.map((p, i) => {
         const isAdmitted = p.status === 'admitted';
         const canSelect = p.canAdmit && p.attendanceId;
-        
-        if (canSelect) {
-          selectedIds.add(p.attendanceId);
-        }
+        if (canSelect) selectedIds.add(p.attendanceId);
 
         return `
           <div class="guest-item ${isAdmitted ? 'admitted' : ''}">
@@ -700,22 +945,18 @@
     }
 
     function toggleGuest(id, checked) {
-      if (checked) {
-        selectedIds.add(id);
-      } else {
-        selectedIds.delete(id);
-      }
+      if (checked) selectedIds.add(id);
+      else selectedIds.delete(id);
       updateAdmitButton();
     }
 
     function updateAdmitButton() {
       const count = selectedIds.size;
       admitBtn.disabled = count === 0;
-      admitBtn.textContent = count > 0 
-        ? `✓ Admit ${count} Guest${count > 1 ? 's' : ''}`
-        : '✓ Admit Selected';
+      admitBtn.textContent = count > 0 ? `✓ Admit ${count}` : '✓ Admit Selected';
     }
 
+    // ===== ADMIT =====
     async function admitSelected() {
       if (selectedIds.size === 0) return;
 
@@ -726,10 +967,7 @@
       try {
         const result = await apiCall('/api/checkin/admit', {
           method: 'POST',
-          body: JSON.stringify({
-            attendanceIds: Array.from(selectedIds),
-            day: currentDay
-          })
+          body: JSON.stringify({ attendanceIds: Array.from(selectedIds), day: currentDay })
         });
 
         currentResult = result;
@@ -750,12 +988,11 @@
       admitBtn.textContent = '✓ Admit Selected';
       hideError();
       setStatus('idle', '📷', 'Ready to Scan', 'Point camera at a QR code');
-      
-      // Show overlay while starting
       scannerOverlay.classList.remove('hidden');
       initScanner();
     }
 
+    // ===== HELPERS =====
     function setStatus(type, icon, title, message) {
       statusCard.className = 'status-card ' + type;
       statusIcon.innerHTML = type === 'loading' ? '<div class="spinner"></div>' : icon;
@@ -772,11 +1009,8 @@
       errorBox.classList.add('hidden');
     }
 
-    // Init
-    document.addEventListener('DOMContentLoaded', async () => {
-      await loadConfig();
-      initScanner();
-    });
+    // ===== INIT =====
+    document.addEventListener('DOMContentLoaded', checkSession);
   </script>
 </body>
 </html>
