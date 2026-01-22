@@ -25,7 +25,9 @@ const STATUS_LABELS = {
 
 const PASS_LABELS = {
   BUTTERFLY: 'Butterfly Pass',
-  EXTERNAL: 'External (HITAM Only)',
+  EXTERNAL: 'External Pass',
+  INTERNAL: 'Student Pass',
+  ALUMNI: 'Alumni Pass',
   FIRST_PHASE: 'First Phase Registration'
 };
 
@@ -196,6 +198,48 @@ function mapExternalParticipants(registration, snapshots, dayId) {
   return [hydrateParticipant(baseSlot, snapshot, dayId, 'Pass Holder')];
 }
 
+function mapInternalParticipants(registration, snapshots, dayId) {
+  // Internal student passes - 1 person per registration
+  if (!snapshots.length) {
+    return [];
+  }
+
+  const snapshot = snapshots[0];
+  const baseSlot = {
+    studentNumber: 1,
+    name: snapshot.full_name || registration.full_name,
+    branch: registration.branch,
+    rollNumber: registration.roll_number,
+    mobile: registration.mobile,
+    email: snapshot.email || null,
+    institution: null,
+    department: null
+  };
+
+  return [hydrateParticipant(baseSlot, snapshot, dayId, 'Pass Holder')];
+}
+
+function mapAlumniParticipants(registration, snapshots, dayId) {
+  // Alumni passes - 1 person per registration
+  if (!snapshots.length) {
+    return [];
+  }
+
+  const snapshot = snapshots[0];
+  const baseSlot = {
+    studentNumber: 1,
+    name: snapshot.full_name || registration.full_name,
+    branch: registration.branch,
+    rollNumber: null,
+    mobile: registration.mobile,
+    email: registration.email,
+    institution: null,
+    department: null
+  };
+
+  return [hydrateParticipant(baseSlot, snapshot, dayId, 'Pass Holder')];
+}
+
 function summarizeParticipants(participants) {
   const summary = {
     total: participants.length,
@@ -235,14 +279,44 @@ function buildMeta(passType, registration, summary) {
     };
   }
 
+  if (passType === 'EXTERNAL') {
+    return {
+      passLabel: PASS_LABELS.EXTERNAL,
+      ownerName: registration.full_name,
+      institution: registration.institution,
+      department: registration.department,
+      identityNumber: registration.identity_number,
+      paymentStatus: registration.payment_status,
+      totalAmount: Number(registration.total_amount),
+      counts: summary
+    };
+  }
+
+  if (passType === 'INTERNAL') {
+    return {
+      passLabel: PASS_LABELS.INTERNAL,
+      ownerName: registration.full_name,
+      branch: registration.branch,
+      rollNumber: registration.roll_number,
+      paymentStatus: registration.payment_status,
+      counts: summary
+    };
+  }
+
+  if (passType === 'ALUMNI') {
+    return {
+      passLabel: PASS_LABELS.ALUMNI,
+      ownerName: registration.full_name,
+      branch: registration.branch,
+      yearOfGraduation: registration.year_of_graduation,
+      paymentStatus: registration.payment_status,
+      counts: summary
+    };
+  }
+
   return {
-    passLabel: PASS_LABELS.EXTERNAL,
+    passLabel: passType,
     ownerName: registration.full_name,
-    institution: registration.institution,
-    department: registration.department,
-    identityNumber: registration.identity_number,
-    paymentStatus: registration.payment_status,
-    totalAmount: Number(registration.total_amount),
     counts: summary
   };
 }
@@ -350,7 +424,7 @@ async function buildPayload(registrationId, dayId) {
   const sourceTable = snapshots[0].source_table;
   const passType = SOURCE_TO_TYPE[sourceTable] || 'UNKNOWN';
 
-  if (!['BUTTERFLY', 'EXTERNAL'].includes(passType)) {
+  if (!['BUTTERFLY', 'EXTERNAL', 'INTERNAL', 'ALUMNI'].includes(passType)) {
     throw new CheckinError('Unsupported pass type for this validator', 400, 'UNSUPPORTED_PASS');
   }
 
@@ -366,9 +440,16 @@ async function buildPayload(registrationId, dayId) {
     }
   }
 
-  const participants = passType === 'BUTTERFLY'
-    ? mapButterflyParticipants(registration, snapshots, day.id)
-    : mapExternalParticipants(registration, snapshots, day.id);
+  let participants;
+  if (passType === 'BUTTERFLY') {
+    participants = mapButterflyParticipants(registration, snapshots, day.id);
+  } else if (passType === 'EXTERNAL') {
+    participants = mapExternalParticipants(registration, snapshots, day.id);
+  } else if (passType === 'INTERNAL') {
+    participants = mapInternalParticipants(registration, snapshots, day.id);
+  } else if (passType === 'ALUMNI') {
+    participants = mapAlumniParticipants(registration, snapshots, day.id);
+  }
 
   const summary = summarizeParticipants(participants);
   const meta = buildMeta(passType, registration, summary);
