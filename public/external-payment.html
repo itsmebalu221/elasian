@@ -455,18 +455,7 @@
           <div class="amount-value" id="amount-display">500</div>
           <div class="amount-note">One-time registration fee (non-refundable)</div>
           <div class="amount-breakdown" id="amount-breakdown" style="display: none;">
-            <div class="breakdown-row">
-              <span>Base Pass</span>
-              <span>₹500</span>
-            </div>
-            <div class="breakdown-row" id="addon-breakdown" style="display: none;">
-              <span>Sahitya + Prasasti Add-on</span>
-              <span>₹500</span>
-            </div>
-            <div class="breakdown-row" id="performance-breakdown" style="display: none;">
-              <span id="performance-breakdown-label">Performance Fee</span>
-              <span id="performance-breakdown-amount">₹0</span>
-            </div>
+            <!-- content populated by js -->
           </div>
         </div>
 
@@ -514,6 +503,20 @@
     let registrationData = null;
     let paymentSessionId = null;
     let cashfreeMode = null;
+
+    // Pricing constants to match backend
+    const PRICING = {
+      // Esparto pricing
+      ESPARTO_SOLO: 200,
+      ESPARTO_GROUP: 600,
+      // Sahitya pricing
+      SAHITYA_SOLO: 150,
+      SAHITYA_GROUP: 450,
+      // Prasasti pricing
+      PRASASTI_ATTENDEE: 300,
+      PRASASTI_SOLO: 150,
+      PRASASTI_GROUP: 350
+    };
 
     // Check authentication and get registration data
     async function init() {
@@ -585,22 +588,8 @@
         document.getElementById('amount-display').textContent = totalAmount;
         document.getElementById('btn-text').textContent = `Pay ₹${totalAmount} Securely`;
 
-        // Show breakdown if add-on is selected
-        if (registrationData.add_on_selected) {
-          document.getElementById('amount-breakdown').style.display = 'flex';
-          document.getElementById('addon-breakdown').style.display = 'flex';
-
-          // Show performance fee if applicable
-          const perfFee = registrationData.prasasti_performance_fee || 0;
-          if (perfFee > 0) {
-            const perfBreakdown = document.getElementById('performance-breakdown');
-            const perfLabel = document.getElementById('performance-breakdown-label');
-            const perfAmount = document.getElementById('performance-breakdown-amount');
-            if (perfBreakdown) perfBreakdown.style.display = 'flex';
-            if (perfLabel) perfLabel.textContent = `Performance Fee (${registrationData.prasasti_performance_type || 'Solo'})`;
-            if (perfAmount) perfAmount.textContent = `₹${perfFee}`;
-          }
-        }
+        // Update breakdown
+        updateBreakdown(registrationData);
 
       } catch (error) {
         console.error('Init error:', error);
@@ -618,6 +607,58 @@
       errorHtml += `</div>`;
       document.getElementById('error-container').innerHTML = errorHtml;
       console.error('Payment Error:', message, details);
+    }
+
+    function updateBreakdown(data) {
+      const container = document.getElementById('amount-breakdown');
+      if (!container) return;
+
+      let html = '';
+
+      // Esparto
+      if (data.esparto_selected) {
+        const isGroup = data.esparto_participant_type === 'group';
+        const label = isGroup ? 'Esparto (Group)' : 'Esparto (Solo)';
+        const amount = isGroup ? PRICING.ESPARTO_GROUP : PRICING.ESPARTO_SOLO;
+        html += `<div class="breakdown-row"><span>${label}</span><span>₹${amount}</span></div>`;
+      }
+
+      // Sahitya
+      if (data.sahitya_selected) {
+        const isGroup = data.sahitya_participant_type === 'group';
+        const label = isGroup ? 'Sahitya (Group of 4)' : 'Sahitya (Solo)';
+        const amount = isGroup ? PRICING.SAHITYA_GROUP : PRICING.SAHITYA_SOLO;
+        html += `<div class="breakdown-row"><span>${label}</span><span>₹${amount}</span></div>`;
+      }
+
+      // Prasasti
+      if (data.prasasti_selected) {
+        let label = 'Prasasti';
+        let amount = PRICING.PRASASTI_ATTENDEE;
+
+        // Determine mode/type
+        if (data.prasasti_mode === 'participant') {
+          if (data.prasasti_participant_type === 'group') {
+            label = 'Prasasti (Group)';
+            amount = PRICING.PRASASTI_GROUP;
+          } else {
+            label = 'Prasasti (Solo)';
+            amount = PRICING.PRASASTI_SOLO;
+          }
+        } else {
+          label = 'Prasasti (Attendee)';
+          amount = PRICING.PRASASTI_ATTENDEE;
+        }
+
+        html += `<div class="breakdown-row"><span>${label}</span><span>₹${amount}</span></div>`;
+      }
+
+      if (html) {
+        container.innerHTML = html;
+        container.style.display = 'flex';
+      } else {
+        container.style.display = 'none';
+      }
     }
 
     function showInfo(message) {
