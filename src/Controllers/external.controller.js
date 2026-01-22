@@ -7,7 +7,7 @@ const REUSE_WINDOW_MINUTES = 30;
 // Helper to parse selected_events JSON string to array
 function parseRegistrationEvents(registration) {
   if (!registration) return registration;
-  
+
   const parsed = { ...registration };
   if (typeof parsed.selected_events === 'string') {
     try {
@@ -26,9 +26,9 @@ export async function registerExternalParticipant(req, res) {
     // Use authenticated user's email
     const userEmail = req.user?.email;
     if (!userEmail) {
-      return res.status(401).json({ 
-        success: false, 
-        error: 'Authentication required' 
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required'
       });
     }
 
@@ -128,30 +128,30 @@ export async function createExternalOrder(req, res) {
     return res.json(result);
   } catch (error) {
     console.error('External order error:', error);
-    
+
     // Extract detailed error info for debugging
     let errorDetails = {
       message: error.message,
       code: error.code || 'UNKNOWN',
       name: error.name
     };
-    
+
     // Cashfree API errors have response data
     if (error.response?.data) {
       errorDetails.cashfreeError = error.response.data;
     }
-    
+
     // Axios errors have response info
     if (error.response) {
       errorDetails.statusCode = error.response.status;
       errorDetails.statusText = error.response.statusText;
     }
-    
+
     // Stack trace for debugging (only first 500 chars)
     if (error.stack) {
       errorDetails.stack = error.stack.substring(0, 500);
     }
-    
+
     return res.status(500).json({
       error: 'Failed to create payment order',
       message: error.message,
@@ -204,11 +204,11 @@ export async function getExternalPaymentStatus(req, res) {
       },
       payment: payment
         ? {
-            orderId: payment.order_id,
-            status: payment.status,
-            amount: payment.amount,
-            paidAt: payment.paid_at
-          }
+          orderId: payment.order_id,
+          status: payment.status,
+          amount: payment.amount,
+          paidAt: payment.paid_at
+        }
         : null,
       amount: registration.total_amount
     });
@@ -224,23 +224,41 @@ export async function getExternalRegistrationByEmail(req, res) {
     const email = req.user?.email;
 
     if (!email) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        error: 'Authentication required' 
+        error: 'Authentication required'
       });
     }
 
     const registration = await externalService.getExternalRegistrationByEmail(email.toLowerCase().trim());
 
     if (!registration) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        error: 'No registration found for this email' 
+        error: 'No registration found for this email'
       });
     }
 
     // Parse selected_events and hide registration_id if payment is not complete
     const responseData = parseRegistrationEvents(registration);
+
+    // Parse other JSON fields (same logic as identity search)
+    const jsonFields = [
+      'esparto_team_members', 'sahitya_team_members', 'prasasti_team_members',
+      'esparto_events', 'sahitya_events', 'prasasti_events'
+    ];
+
+    jsonFields.forEach(field => {
+      if (responseData[field] && typeof responseData[field] === 'string') {
+        try {
+          responseData[field] = JSON.parse(responseData[field]);
+        } catch (e) {
+          console.warn(`Failed to parse ${field}:`, e);
+          responseData[field] = [];
+        }
+      }
+    });
+
     if (registration.payment_status !== 'PAID') {
       delete responseData.registration_id;
     }
@@ -251,9 +269,62 @@ export async function getExternalRegistrationByEmail(req, res) {
     });
   } catch (error) {
     console.error('Get external registration by email error:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
-      error: 'Failed to fetch registration' 
+      error: 'Failed to fetch registration'
+    });
+  }
+}
+export async function getRegistrationByIdentity(req, res) {
+  try {
+    const { identityNumber } = req.params;
+
+    if (!identityNumber) {
+      return res.status(400).json({
+        success: false,
+        error: 'Identity number is required'
+      });
+    }
+
+    const registration = await externalService.getExternalRegistrationByIdentity(identityNumber);
+
+    if (!registration) {
+      return res.status(404).json({
+        success: false,
+        error: 'No registration found for this Identity Number'
+      });
+    }
+
+    // Parse specific JSON fields for the frontend
+    const responseData = parseRegistrationEvents(registration);
+
+    // Ideally mysql2 handles JSON columns, but for safety ensuring they are objects
+    const jsonFields = [
+      'esparto_team_members', 'sahitya_team_members', 'prasasti_team_members',
+      'esparto_events', 'sahitya_events', 'prasasti_events'
+    ];
+
+    jsonFields.forEach(field => {
+      if (responseData[field] && typeof responseData[field] === 'string') {
+        try {
+          responseData[field] = JSON.parse(responseData[field]);
+        } catch (e) {
+          console.warn(`Failed to parse ${field}:`, e);
+          responseData[field] = [];
+        }
+      }
+    });
+
+    return res.json({
+      success: true,
+      registration: responseData,
+      isPaid: registration.payment_status === 'PAID'
+    });
+  } catch (error) {
+    console.error('Get registration by identity error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch registration details'
     });
   }
 }

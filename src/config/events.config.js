@@ -169,3 +169,49 @@ export function groupEventsByType() {
     return acc;
   }, {});
 }
+
+// ============================================
+// CULTURAL EVENTS - Sahitya & Prasasti
+// ============================================
+
+// Performance fee pricing
+export const PRASASTI_SOLO_FEE = 150;
+export const PRASASTI_GROUP_FEE = 350;
+
+// Sahitya Events (Day 1 - Literary Fest)
+export const SAHITYA_EVENTS = [
+  { id: 'SAH_TREASURE_HUNT', name: 'Treasure Hunt' },
+  { id: 'SAH_PLAYS', name: 'Dramas / Play' },
+  { id: 'SAH_QUIZ', name: 'Quiz' },
+  { id: 'SAH_SLAM_POETRY', name: 'Slam Poetry' }
+];
+
+// Prasasti Events (Day 2 - Cultural Fest)
+// requiresPerformance: true means Solo/Group fee applies
+export const PRASASTI_EVENTS = [
+  { id: 'PRA_DANCE', name: 'Dance', description: 'Semi-Classical / Hip Hop / Freestyle / Social Message', requiresPerformance: true },
+  { id: 'PRA_SINGING', name: 'Singing', requiresPerformance: true },
+  { id: 'PRA_INSTRUMENTAL', name: 'Instrumental Music', requiresPerformance: true },
+  { id: 'PRA_BEATBOXING', name: 'Beatboxing', requiresPerformance: true },
+  { id: 'PRA_LIVE_PAINTING', name: 'Live Painting', requiresPerformance: false },
+  { id: 'PRA_CLOTH_PAINTING', name: 'Cloth Painting', requiresPerformance: false },
+  { id: 'PRA_ROLE_PLAY', name: 'Role Play', requiresPerformance: true },
+  { id: 'PRA_MIMICRY', name: 'Mimicry', requiresPerformance: true }
+];
+
+// Lookup maps for validation
+export const SAHITYA_EVENT_LOOKUP = new Map(SAHITYA_EVENTS.map(e => [e.id, e]));
+export const PRASASTI_EVENT_LOOKUP = new Map(PRASASTI_EVENTS.map(e => [e.id, e]));
+
+// Check if a Prasasti event requires performance fee
+export function prasastiRequiresPerformance(eventId) {
+  const event = PRASASTI_EVENT_LOOKUP.get(eventId);
+  return event?.requiresPerformance === true;
+}
+
+// Calculate performance fee based on event and type
+export function calculatePerformanceFee(prasastiEventId, performanceType) {
+  if (!prasastiEventId || !performanceType) return 0;
+  if (!prasastiRequiresPerformance(prasastiEventId)) return 0;
+  return performanceType === 'group' ? PRASASTI_GROUP_FEE : PRASASTI_SOLO_FEE;
+}

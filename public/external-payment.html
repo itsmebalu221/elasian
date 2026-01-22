@@ -463,6 +463,10 @@
               <span>Sahitya + Prasasti Add-on</span>
               <span>₹500</span>
             </div>
+            <div class="breakdown-row" id="performance-breakdown" style="display: none;">
+              <span id="performance-breakdown-label">Performance Fee</span>
+              <span id="performance-breakdown-amount">₹0</span>
+            </div>
           </div>
         </div>
 
@@ -501,7 +505,7 @@
           Secured by Cashfree Payments
         </div>
 
-        <a href="/external-form.html" class="back-link">← Back to Registration Form</a>
+        <a href="/external-form.html?edit=true" class="back-link">← Back to Edit Registration</a>
       </div>
     </div>
   </div>
@@ -585,6 +589,17 @@
         if (registrationData.add_on_selected) {
           document.getElementById('amount-breakdown').style.display = 'flex';
           document.getElementById('addon-breakdown').style.display = 'flex';
+
+          // Show performance fee if applicable
+          const perfFee = registrationData.prasasti_performance_fee || 0;
+          if (perfFee > 0) {
+            const perfBreakdown = document.getElementById('performance-breakdown');
+            const perfLabel = document.getElementById('performance-breakdown-label');
+            const perfAmount = document.getElementById('performance-breakdown-amount');
+            if (perfBreakdown) perfBreakdown.style.display = 'flex';
+            if (perfLabel) perfLabel.textContent = `Performance Fee (${registrationData.prasasti_performance_type || 'Solo'})`;
+            if (perfAmount) perfAmount.textContent = `₹${perfFee}`;
+          }
         }
 
       } catch (error) {

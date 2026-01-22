@@ -21,9 +21,32 @@ export const externalRegistrationSchema = z.object({
     .min(4, 'Identity number must be at least 4 characters')
     .max(100, 'Identity number must be less than 100 characters'),
   add_on_selected: z.boolean().optional(),
-  selected_events: z.array(z.string().min(1))
-    .min(1, 'Select at least one event')
-    .max(2, 'You can select up to two events')
+
+  // Events
+  esparto_selected: z.boolean().optional(),
+  esparto_mode: z.enum(['attendee', 'participant']).optional().nullable(),
+  esparto_participant_type: z.enum(['solo', 'group']).optional().nullable(),
+  esparto_team_members: z.string().optional().nullable(),
+  esparto_events: z.array(z.string().min(1)).optional().default([]),
+
+  sahitya_selected: z.boolean().optional(),
+  sahitya_events: z.array(z.string().min(1)).optional().default([]),
+  // Legacy fields removed/optional
+  sahitya_mode: z.enum(['attendee', 'participant']).optional().nullable(),
+  sahitya_participant_type: z.enum(['solo', 'group']).optional().nullable(),
+  sahitya_team_members: z.string().optional().nullable(),
+
+  prasasti_selected: z.boolean().optional(),
+  prasasti_mode: z.enum(['attendee', 'participant']).optional().nullable(),
+  prasasti_participant_type: z.enum(['solo', 'group']).optional().nullable(),
+  prasasti_events: z.array(z.string().min(1)).optional().default([]),
+  prasasti_team_members: z.string().optional().nullable(),
+
+  // Legacy fields kept for compatibility but not primary anymore
+  selected_events: z.array(z.string()).optional().default([]),
+  prasasti_event: z.string().max(50).optional().nullable(),
+  prasasti_performance_type: z.enum(['solo', 'group']).optional().nullable()
 });
 
 export default externalRegistrationSchema;
+

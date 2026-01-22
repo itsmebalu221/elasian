@@ -419,6 +419,51 @@
       color: #114021;
     }
 
+    /* Esparto - Blue/Tech theme */
+    .sidebar-info-esparto {
+      border-color: rgba(53, 101, 216, 0.3);
+      background: linear-gradient(135deg, rgba(53, 101, 216, 0.1) 0%, rgba(53, 101, 216, 0.03) 100%);
+    }
+
+    .sidebar-info-esparto .sidebar-addon-badge {
+      background: rgba(53, 101, 216, 0.2);
+      color: #1e3a8a;
+    }
+
+    .sidebar-info-esparto .sidebar-addon-price {
+      color: #1e3a8a;
+    }
+
+    /* Sahitya - Orange/Literary theme */
+    .sidebar-info-sahitya {
+      border-color: rgba(234, 179, 8, 0.4);
+      background: linear-gradient(135deg, rgba(234, 179, 8, 0.1) 0%, rgba(234, 179, 8, 0.03) 100%);
+    }
+
+    .sidebar-info-sahitya .sidebar-addon-badge {
+      background: rgba(234, 179, 8, 0.25);
+      color: #92400e;
+    }
+
+    .sidebar-info-sahitya .sidebar-addon-price {
+      color: #92400e;
+    }
+
+    /* Prasasti - Purple/Cultural theme */
+    .sidebar-info-prasasti {
+      border-color: rgba(168, 85, 247, 0.3);
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(168, 85, 247, 0.03) 100%);
+    }
+
+    .sidebar-info-prasasti .sidebar-addon-badge {
+      background: rgba(168, 85, 247, 0.2);
+      color: #581c87;
+    }
+
+    .sidebar-info-prasasti .sidebar-addon-price {
+      color: #581c87;
+    }
+
     .addon-promo {
       border: 1px solid rgba(53, 101, 216, 0.28);
       background: linear-gradient(135deg, rgba(53, 101, 216, 0.16) 0%, rgba(53, 101, 216, 0.06) 100%);
@@ -612,6 +657,214 @@
       }
     }
 
+    /* Cultural Events Section */
+    .cultural-events-section {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, rgba(53, 101, 216, 0.06) 0%, rgba(53, 101, 216, 0.02) 100%);
+      border: 1px solid rgba(53, 101, 216, 0.15);
+      border-radius: 16px;
+    }
+
+    .cultural-event-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    @media (max-width: 600px) {
+      .cultural-event-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .cultural-event-card {
+      padding: 0.875rem 1rem;
+      background: var(--bg-secondary);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .cultural-event-card:hover {
+      border-color: rgba(53, 101, 216, 0.35);
+      background: rgba(53, 101, 216, 0.04);
+    }
+
+    .cultural-event-card.selected {
+      border-color: var(--accent);
+      background: rgba(53, 101, 216, 0.1);
+      box-shadow: 0 4px 12px rgba(53, 101, 216, 0.15);
+    }
+
+    .cultural-event-card input {
+      display: none;
+    }
+
+    .cultural-event-check {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(53, 101, 216, 0.3);
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .cultural-event-card.selected .cultural-event-check {
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+
+    .cultural-event-check::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: transparent;
+      border-radius: 50%;
+      transition: background-color 0.2s ease;
+    }
+
+    .cultural-event-card.selected .cultural-event-check::after {
+      background: white;
+    }
+
+    .cultural-event-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .cultural-event-name {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .cultural-event-desc {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.125rem;
+    }
+
+    .cultural-event-badge {
+      font-size: 0.55rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .cultural-event-badge.stall {
+      background: rgba(245, 158, 11, 0.15);
+      color: #b45309;
+    }
+
+    .cultural-event-badge.performance {
+      background: rgba(139, 92, 246, 0.15);
+      color: #7c3aed;
+    }
+
+    /* Performance Type Options */
+    .performance-type-section {
+      margin-top: 1rem;
+    }
+
+    .performance-type-options {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    @media (max-width: 500px) {
+      .performance-type-options {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+    }
+
+    .performance-type-option {
+      flex: 1;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-subtle);
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.2s ease;
+    }
+
+    .performance-type-option:hover {
+      border-color: rgba(53, 101, 216, 0.35);
+    }
+
+    .performance-type-option:has(input:checked) {
+      border-color: var(--accent);
+      background: rgba(53, 101, 216, 0.08);
+    }
+
+    .performance-type-option input {
+      display: none;
+    }
+
+    .performance-type-check {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(53, 101, 216, 0.3);
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .performance-type-option:has(input:checked) .performance-type-check {
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+
+    .performance-type-check::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: transparent;
+      border-radius: 50%;
+      transition: background-color 0.2s ease;
+    }
+
+    .performance-type-option:has(input:checked) .performance-type-check::after {
+      background: white;
+    }
+
+    .performance-type-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+    }
+
+    .performance-type-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .performance-type-price {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
     .form-card {
       background: var(--bg-card);
       border: 1px solid var(--glass-border);
@@ -707,6 +960,25 @@
       font-size: 0.75rem;
       color: var(--text-muted);
       line-height: 1.4;
+    }
+
+    .event-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .event-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .event-group-title {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-subtle);
     }
 
     .event-group-grid {
@@ -1045,6 +1317,322 @@
         display: none !important;
       }
     }
+
+    /* Category Selection System */
+    .category-section {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-subtle);
+      border-radius: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .category-section.selected {
+      border-color: var(--accent);
+      background: rgba(53, 101, 216, 0.04);
+    }
+
+    .category-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      cursor: pointer;
+    }
+
+    .category-checkbox {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--border-subtle);
+      border-radius: 6px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      background: var(--bg-secondary);
+    }
+
+    .category-section.selected .category-checkbox {
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+
+    .category-checkbox::after {
+      content: '✓';
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .category-section.selected .category-checkbox::after {
+      opacity: 1;
+    }
+
+    .category-info {
+      flex: 1;
+    }
+
+    .category-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .category-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .category-price {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .category-content {
+      display: none;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .category-section.selected .category-content {
+      display: block;
+    }
+
+    /* Mode Selection (Attendee/Participant) */
+    .mode-options {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .mode-options {
+        flex-direction: column;
+      }
+    }
+
+    .mode-option {
+      flex: 1;
+      padding: 1rem;
+      background: var(--bg-primary);
+      border: 2px solid var(--border-subtle);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mode-option:hover {
+      border-color: rgba(53, 101, 216, 0.35);
+    }
+
+    .mode-option.selected {
+      border-color: var(--accent);
+      background: rgba(53, 101, 216, 0.08);
+    }
+
+    .mode-option-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .mode-radio {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-subtle);
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .mode-option.selected .mode-radio {
+      border-color: var(--accent);
+    }
+
+    .mode-radio::after {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: transparent;
+      border-radius: 50%;
+      transition: background 0.2s ease;
+    }
+
+    .mode-option.selected .mode-radio::after {
+      background: var(--accent);
+    }
+
+    .mode-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .mode-price {
+      margin-left: auto;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .mode-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      padding-left: 2rem;
+    }
+
+    /* Participant Sub-options (Solo/Group) */
+    .participant-options {
+      display: none;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: rgba(53, 101, 216, 0.04);
+      border-radius: 10px;
+    }
+
+    .participant-options.visible {
+      display: block;
+    }
+
+    .participant-type-row {
+      display: flex;
+      gap: 1rem;
+    }
+
+    @media (max-width: 500px) {
+      .participant-type-row {
+        flex-direction: column;
+      }
+    }
+
+    .participant-type {
+      flex: 1;
+      padding: 0.875rem;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-subtle);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .participant-type:hover {
+      border-color: rgba(53, 101, 216, 0.35);
+    }
+
+    .participant-type.selected {
+      border-color: var(--accent);
+      background: rgba(53, 101, 216, 0.08);
+    }
+
+    .participant-type.selected .mode-radio {
+      border-color: var(--accent);
+    }
+
+    .participant-type.selected .mode-radio::after {
+      background: var(--accent);
+    }
+
+    /* Team Members Input - Professional Structured Cards */
+    .team-members-section {
+      display: none;
+      margin-top: 1rem;
+    }
+
+    .team-members-section.visible {
+      display: block;
+    }
+
+    .team-members-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .team-members-title {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .team-members-count {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: rgba(53, 101, 216, 0.1);
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+    }
+
+    .team-members-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .team-member-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      position: relative;
+    }
+
+    @media (max-width: 500px) {
+      .team-member-card {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .team-member-card::before {
+      content: attr(data-member-label);
+      position: absolute;
+      top: -0.5rem;
+      left: 0.75rem;
+      background: var(--bg-secondary);
+      padding: 0 0.5rem;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .team-member-card label {
+      font-size: 0.8rem;
+    }
+
+    .team-member-card input {
+      padding: 0.7rem 0.875rem;
+      font-size: 0.85rem;
+      border-radius: 8px;
+    }
+
+    .team-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      background: rgba(53, 101, 216, 0.05);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
+    }
   </style>
 </head>
 
@@ -1088,25 +1676,38 @@
         </div>
 
         <div class="pricing-box" id="sidebar-pricing">
-          <div class="pricing-row">
-            <span>Esparto pass</span>
-            <strong>₹500</strong>
-          </div>
-          <div class="pricing-row" id="sidebar-pricing-addon" style="display: none;">
-            <span>Sahitya + Prasasti Add-on</span>
-            <strong>₹500</strong>
+          <div id="sidebar-pricing-rows">
+            <div class="pricing-row" style="color: var(--text-muted);">Select categories below</div>
           </div>
           <div class="pricing-total">
             <span>Total</span>
-            <strong id="sidebar-pricing-total">₹500</strong>
+            <strong id="sidebar-pricing-total">₹0</strong>
           </div>
         </div>
 
-        <div class="sidebar-addon">
-          <span class="sidebar-addon-badge">✦ Recommended</span>
-          <p class="sidebar-addon-title">Sahitya + Prasasti Cultural Access</p>
-          <p class="sidebar-addon-desc">Unlock the Sahitya and Prasasti showcases with this cultural add-on.</p>
-          <span class="sidebar-addon-price">+₹500</span>
+        <!-- Event Info Boxes -->
+        <div class="sidebar-addon sidebar-info-esparto">
+          <span class="sidebar-addon-badge">⚡ Technical Fest</span>
+          <p class="sidebar-addon-title">Esparto — 28-29 Jan 2026</p>
+          <p class="sidebar-addon-desc">Technical competitions, hackathons, workshops, and innovative challenges.
+            Showcase your problem-solving skills and technical expertise.</p>
+          <span class="sidebar-addon-price">₹500</span>
+        </div>
+
+        <div class="sidebar-addon sidebar-info-sahitya">
+          <span class="sidebar-addon-badge">📚 Literary Fest</span>
+          <p class="sidebar-addon-title">Sahitya — Day 1</p>
+          <p class="sidebar-addon-desc">Literary events including debates, quizzes, poetry slams, and theatrical
+            performances. Unleash your creative writing and speaking talents.</p>
+          <span class="sidebar-addon-price">₹200</span>
+        </div>
+
+        <div class="sidebar-addon sidebar-info-prasasti">
+          <span class="sidebar-addon-badge">🎭 Cultural Fest</span>
+          <p class="sidebar-addon-title">Prasasti — Day 2</p>
+          <p class="sidebar-addon-desc">Cultural extravaganza featuring dance, music, singing, and artistic
+            performances. Express yourself through art and entertainment.</p>
+          <span class="sidebar-addon-price">₹150 - ₹350</span>
         </div>
 
         <div class="support-copy">
@@ -1164,65 +1765,202 @@
             </div>
 
             <div class="form-section">
-              <div class="section-label">Event Selection (Required)</div>
-              <p class="event-hint">Select at least one event to continue with registration. You can still update your
-                choices later.</p>
-              <div class="event-groups" id="event-groups"></div>
+              <div class="section-label">Select Your Experience <span style="color: #dc2626;">*</span></div>
+              <p class="event-hint">Choose one or more experiences. Select at least one to continue.</p>
               <div class="field-error" id="events-error"></div>
-            </div>
 
-            <div class="selection-summary">
-              <div class="summary-title">Your Selection</div>
-              <div class="summary-list" id="selection-summary">
-                <div class="summary-empty">Select at least one event to continue</div>
+              <!-- Esparto Category -->
+              <div class="category-section" id="esparto-section" data-category="esparto">
+                <div class="category-header" onclick="toggleCategory('esparto')">
+                  <div class="category-checkbox"></div>
+                  <div class="category-info">
+                    <div class="category-title">Esparto — Technical Fest</div>
+                    <div class="category-desc">Compete in technical events and hackathons</div>
+                  </div>
+                  <div class="category-price" id="esparto-price">₹200</div>
+                </div>
+                <div class="category-content">
+                  <!-- Participant Options (Solo/Group) -->
+                  <div class="participant-options visible" id="esparto-participant-options">
+                    <div class="section-label" style="margin-bottom: 0.75rem;">Participation Type</div>
+                    <div class="participant-type-row">
+                      <div class="participant-type" data-type="solo" onclick="selectParticipantType('esparto', 'solo')">
+                        <div class="mode-radio"></div>
+                        <span class="mode-title">Solo</span>
+                        <span class="mode-price" style="margin-left: auto;">₹200</span>
+                      </div>
+                      <div class="participant-type" data-type="group"
+                        onclick="selectParticipantType('esparto', 'group')">
+                        <div class="mode-radio"></div>
+                        <span class="mode-title">Group</span>
+                        <span class="mode-price" style="margin-left: auto;">₹600</span>
+                      </div>
+                    </div>
+
+                    <!-- Team Members (for Group) -->
+                    <div class="team-members-section" id="esparto-team-section">
+                      <div class="team-members-header">
+                        <span class="team-members-title">Team Members</span>
+                        <span class="team-members-count">You + Others</span>
+                      </div>
+                      <div class="team-members-list" id="esparto-members-list"></div>
+                      <p class="team-hint">You are automatically the team lead. Add details for your other team members
+                        above.</p>
+                    </div>
+
+                    <p class="event-hint" style="margin-top: 1rem;">Select the technical events you want to participate
+                      in:</p>
+                    <div class="event-groups" id="esparto-events"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sahitya Category -->
+              <div class="category-section" id="sahitya-section" data-category="sahitya">
+                <div class="category-header" onclick="toggleCategory('sahitya')">
+                  <div class="category-checkbox"></div>
+                  <div class="category-info">
+                    <div class="category-title">Sahitya — Literary Fest (Day 1)</div>
+                    <div class="category-desc">Participate in literary events and competitions</div>
+                  </div>
+                  <div class="category-price" id="sahitya-price">₹150</div>
+                </div>
+                <div class="category-content">
+                  <!-- Participant Options (Solo/Group) -->
+                  <div class="participant-options visible" id="sahitya-participant-options">
+                    <div class="section-label" style="margin-bottom: 0.75rem;">Participation Type</div>
+                    <div class="participant-type-row">
+                      <div class="participant-type" data-type="solo" onclick="selectParticipantType('sahitya', 'solo')">
+                        <div class="mode-radio"></div>
+                        <span class="mode-title">Solo</span>
+                        <span class="mode-price" style="margin-left: auto;">₹150</span>
+                      </div>
+                      <div class="participant-type" data-type="group"
+                        onclick="selectParticipantType('sahitya', 'group')">
+                        <div class="mode-radio"></div>
+                        <span class="mode-title">Group of 4</span>
+                        <span class="mode-price" style="margin-left: auto;">₹450</span>
+                      </div>
+                    </div>
+
+                    <!-- Team Members (for Group) -->
+                    <div class="team-members-section" id="sahitya-team-section">
+                      <div class="team-members-header">
+                        <span class="team-members-title">Team Members (Group of 4)</span>
+                        <span class="team-members-count">You + 3 Others</span>
+                      </div>
+                      <div class="team-members-list" id="sahitya-members-list"></div>
+                      <p class="team-hint">You are Member 1. Enter details for 3 additional team members to complete
+                        your group of 4.</p>
+                    </div>
+
+                    <p class="event-hint" style="margin-top: 1rem;">Select the literary events you want to participate
+                      in:</p>
+                    <div class="cultural-event-grid" id="sahitya-events-grid"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Prasasti Category -->
+              <div class="category-section" id="prasasti-section" data-category="prasasti">
+                <div class="category-header" onclick="toggleCategory('prasasti')">
+                  <div class="category-checkbox"></div>
+                  <div class="category-info">
+                    <div class="category-title">Prasasti — Cultural Fest (Day 2)</div>
+                    <div class="category-desc">Showcase your talent in cultural performances</div>
+                  </div>
+                  <div class="category-price" id="prasasti-price">₹300</div>
+                </div>
+                <div class="category-content">
+                  <!-- Mode Selection -->
+                  <div class="mode-options">
+                    <div class="mode-option" data-mode="attendee" onclick="selectMode('prasasti', 'attendee')">
+                      <div class="mode-option-header">
+                        <div class="mode-radio"></div>
+                        <span class="mode-title">Attendee</span>
+                        <span class="mode-price">₹300</span>
+                      </div>
+                      <div class="mode-desc">General access to all Prasasti events</div>
+                    </div>
+                    <div class="mode-option" data-mode="participant" onclick="selectMode('prasasti', 'participant')">
+                      <div class="mode-option-header">
+                        <div class="mode-radio"></div>
+                        <span class="mode-title">Participant</span>
+                        <span class="mode-price"></span>
+                      </div>
+                      <div class="mode-desc">Perform on stage (Solo ₹150 / Group ₹350)</div>
+                    </div>
+                  </div>
+
+                  <!-- Participant Options (Solo/Group) -->
+                  <div class="participant-options" id="prasasti-participant-options">
+                    <div class="section-label" style="margin-bottom: 0.75rem;">Participation Type</div>
+                    <div class="participant-type-row">
+                      <div class="participant-type" data-type="solo"
+                        onclick="selectParticipantType('prasasti', 'solo')">
+                        <div class="mode-radio"></div>
+                        <span class="mode-title">Solo</span>
+                        <span class="mode-price" style="margin-left: auto;">₹150</span>
+                      </div>
+                      <div class="participant-type" data-type="group"
+                        onclick="selectParticipantType('prasasti', 'group')">
+                        <div class="mode-radio"></div>
+                        <span class="mode-title">Group</span>
+                        <span class="mode-price" style="margin-left: auto;">₹350</span>
+                      </div>
+                    </div>
+
+                    <!-- Team Members (for Group) -->
+                    <div class="team-members-section" id="prasasti-team-section">
+                      <div class="team-members-header">
+                        <span class="team-members-title">Team Members</span>
+                        <span class="team-members-count">You + Others</span>
+                      </div>
+                      <div class="team-members-list" id="prasasti-members-list"></div>
+                      <p class="team-hint">You are automatically the team lead. Add details for your other team members
+                        above.</p>
+                      <p class="team-hint"
+                        style="margin-top: 0.5rem; background: rgba(220, 38, 38, 0.05); border-left-color: #dc2626;">
+                        <strong>Note:</strong> If your group has more than 4 members, please contact us at
+                        <a href="mailto:elysian@hitam.org"
+                          style="color: var(--accent); font-weight: 600;">elysian@hitam.org</a>
+                      </p>
+                    </div>
+
+                    <!-- Prasasti Events Grid -->
+                    <div class="section-label" style="margin-top: 1.5rem;">Select Events to Participate</div>
+                    <div class="cultural-event-grid" id="prasasti-events-grid"></div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- Mobile Bottom Panel: Pricing -->
+            <!-- Pricing Summary -->
+            <div class="selection-summary">
+              <div class="summary-title">Your Registration Summary</div>
+              <div class="summary-list" id="selection-summary">
+                <div class="summary-empty">Select at least one experience to continue</div>
+              </div>
+            </div>
+
+            <!-- Mobile Pricing Box -->
             <div class="mobile-bottom-panel">
               <div class="pricing-box" id="mobile-pricing-box">
-                <div class="pricing-row">
-                  <span>Esparto pass</span>
-                  <strong>₹500</strong>
-                </div>
-                <div class="pricing-row" id="mobile-pricing-addon" style="display: none;">
-                  <span>Sahitya + Prasasti Add-on</span>
-                  <strong>₹500</strong>
-                </div>
+                <div id="mobile-pricing-rows"></div>
                 <div class="pricing-total">
                   <span>Total payable</span>
-                  <strong id="mobile-pricing-total">₹500</strong>
+                  <strong id="mobile-pricing-total">₹0</strong>
                 </div>
               </div>
             </div>
 
-            <!-- Desktop Pricing (hidden on mobile via sidebar) -->
+            <!-- Desktop Pricing Box -->
             <div class="pricing-box desktop-only" id="pricing-box" style="margin-top: 1.5rem;">
-              <div class="pricing-row">
-                <span>Esparto pass</span>
-                <strong>₹500</strong>
-              </div>
-              <div class="pricing-row" id="pricing-addon" style="display: none;">
-                <span>Cultural Events Add-on</span>
-                <strong>₹500</strong>
-              </div>
+              <div id="desktop-pricing-rows"></div>
               <div class="pricing-total">
                 <span>Total payable</span>
-                <strong id="pricing-total">₹500</strong>
+                <strong id="pricing-total">₹0</strong>
               </div>
-            </div>
-
-            <!-- Cultural Add-On Selection (Bottom Position) -->
-            <div class="section-label" style="margin-top: 2rem;">Cultural Add-On (Optional)</div>
-            <div class="addon-toggle" id="addon-toggle" tabindex="0">
-              <div class="addon-toggle-check"></div>
-              <div class="addon-toggle-content">
-                <span class="addon-toggle-badge">✦ Recommended</span>
-                <p class="addon-toggle-title">Be part of Sahitya + Prasasti</p>
-                <p class="addon-toggle-desc">Experience the Sahitya and Prasasti cultural celebrations for just ₹500
-                  more.</p>
-              </div>
-              <span class="addon-toggle-price">+₹500</span>
             </div>
 
             <div class="form-actions" style="margin-top: 1.5rem;">
@@ -1243,58 +1981,659 @@
   </div> <!-- End page-wrapper -->
 
   <script>
-    const EXTERNAL_BASE_AMOUNT = 500;
-    const EXTERNAL_ADD_ON_AMOUNT = 500;
-    const CULTURAL_EVENT_ID = 'EVT_CULTURAL_SAHITYA_PRASASTI';
+    // ========== PRICING CONSTANTS ==========
+    const PRICING = {
+      // Esparto pricing
+      ESPARTO_SOLO: 200,
+      ESPARTO_GROUP: 600,
+      // Sahitya pricing (now with solo/group)
+      SAHITYA_SOLO: 150,
+      SAHITYA_GROUP: 450,  // Group of 4
+      // Prasasti pricing
+      PRASASTI_ATTENDEE: 300,
+      PRASASTI_SOLO: 150,
+      PRASASTI_GROUP: 350
+    };
 
+    // ========== EVENT DEFINITIONS ==========
+    const SAHITYA_EVENTS = [
+      { id: 'SAH_TREASURE_HUNT', name: 'Treasure Hunt' },
+      { id: 'SAH_PLAYS', name: 'Dramas / Play' },
+      { id: 'SAH_QUIZ', name: 'Quiz' },
+      { id: 'SAH_SLAM_POETRY', name: 'Slam Poetry' }
+    ];
+
+    const PRASASTI_EVENTS = [
+      { id: 'PRA_DANCE', name: 'Dance', description: 'Semi-Classical / Hip Hop / Freestyle' },
+      { id: 'PRA_SINGING', name: 'Singing' },
+      { id: 'PRA_INSTRUMENTAL', name: 'Instrumental Music' },
+      { id: 'PRA_BEATBOXING', name: 'Beatboxing' },
+      { id: 'PRA_LIVE_PAINTING', name: 'Live Painting' },
+      { id: 'PRA_CLOTH_PAINTING', name: 'Cloth Painting' },
+      { id: 'PRA_ROLE_PLAY', name: 'Role Play' },
+      { id: 'PRA_MIMICRY', name: 'Mimicry' }
+    ];
+
+    // ... (State initialization is below, already updated)
+
+    // ... (DOM Elements and Category/Mode Toggles are below, already updated)
+
+    // ========== PRICING ==========
+    function calculateTotal() {
+      let total = 0;
+
+      if (state.esparto.selected) {
+        if (state.esparto.participantType === 'group') {
+          total += PRICING.ESPARTO_GROUP;
+        } else {
+          total += PRICING.ESPARTO_SOLO;
+        }
+      }
+
+      if (state.sahitya.selected) {
+        if (state.sahitya.participantType === 'group') {
+          total += PRICING.SAHITYA_GROUP;
+        } else {
+          total += PRICING.SAHITYA_SOLO;
+        }
+      }
+
+      if (state.prasasti.selected) {
+        if (state.prasasti.mode === 'attendee') {
+          total += PRICING.PRASASTI_ATTENDEE;
+        } else if (state.prasasti.mode === 'participant') {
+          if (state.prasasti.participantType === 'solo') {
+            total += PRICING.PRASASTI_SOLO;
+          } else if (state.prasasti.participantType === 'group') {
+            total += PRICING.PRASASTI_GROUP;
+          } else {
+            total += PRICING.PRASASTI_SOLO;
+          }
+        } else {
+          total += PRICING.PRASASTI_ATTENDEE;
+        }
+      }
+
+      return total;
+    }
+
+    function updatePricing() {
+      const total = calculateTotal();
+      const totalText = `₹${total}`;
+
+      // Build pricing rows
+      let rows = '';
+
+      if (state.esparto.selected) {
+        const label = state.esparto.participantType === 'group' ? 'Esparto (Group)' : 'Esparto (Solo)';
+        const amount = state.esparto.participantType === 'group' ? PRICING.ESPARTO_GROUP : PRICING.ESPARTO_SOLO;
+        rows += `<div class="pricing-row"><span>${label}</span><strong>₹${amount}</strong></div>`;
+      }
+
+      if (state.sahitya.selected) {
+        const label = state.sahitya.participantType === 'group' ? 'Sahitya (Group of 4)' : 'Sahitya (Solo)';
+        const amount = state.sahitya.participantType === 'group' ? PRICING.SAHITYA_GROUP : PRICING.SAHITYA_SOLO;
+        rows += `<div class="pricing-row"><span>${label}</span><strong>₹${amount}</strong></div>`;
+      }
+
+      if (state.prasasti.selected) {
+        let label = 'Prasasti';
+        let amount = PRICING.PRASASTI_ATTENDEE;
+
+        if (state.prasasti.mode === 'attendee') {
+          label = 'Prasasti (Attendee)';
+          amount = PRICING.PRASASTI_ATTENDEE;
+        } else if (state.prasasti.mode === 'participant') {
+          if (state.prasasti.participantType === 'group') {
+            label = 'Prasasti (Group)';
+            amount = PRICING.PRASASTI_GROUP;
+          } else {
+            label = 'Prasasti (Solo)';
+            amount = PRICING.PRASASTI_SOLO;
+          }
+        }
+
+        rows += `<div class="pricing-row"><span>${label}</span><strong>₹${amount}</strong></div>`;
+      }
+
+      if (rows === '') {
+        rows = '<div class="pricing-row" style="color: var(--text-muted);">Select categories below</div>';
+      }
+
+      // Update UI
+      const desktopRows = document.getElementById('desktop-pricing-rows');
+      const mobileRows = document.getElementById('mobile-pricing-rows');
+      const sidebarRows = document.getElementById('sidebar-pricing-rows');
+
+      const desktopTotal = document.getElementById('pricing-total');
+      const mobileTotal = document.getElementById('mobile-pricing-total');
+      const sidebarTotal = document.getElementById('sidebar-pricing-total');
+
+      if (desktopRows) desktopRows.innerHTML = rows;
+      if (mobileRows) mobileRows.innerHTML = rows;
+      if (sidebarRows) sidebarRows.innerHTML = rows;
+
+      if (desktopTotal) desktopTotal.textContent = totalText;
+      if (mobileTotal) mobileTotal.textContent = totalText;
+      if (sidebarTotal) sidebarTotal.textContent = totalText;
+    }
+
+    function updateCategoryPrice(category) {
+      const priceEl = document.getElementById(`${category}-price`);
+      if (!priceEl) return;
+
+      let price = 0;
+      if (category === 'esparto') {
+        if (state.esparto.participantType === 'group') price = PRICING.ESPARTO_GROUP;
+        else price = PRICING.ESPARTO_SOLO;
+      }
+      if (category === 'sahitya') {
+        if (state.sahitya.participantType === 'group') price = PRICING.SAHITYA_GROUP;
+        else price = PRICING.SAHITYA_SOLO;
+      }
+
+      if (category === 'prasasti') {
+        if (state.prasasti.mode === 'attendee') price = PRICING.PRASASTI_ATTENDEE;
+        else if (state.prasasti.mode === 'participant') {
+          if (state.prasasti.participantType === 'group') price = PRICING.PRASASTI_GROUP;
+          else price = PRICING.PRASASTI_SOLO;
+        } else {
+          price = PRICING.PRASASTI_ATTENDEE;
+        }
+      }
+
+      priceEl.textContent = `₹${price}`;
+    }
+
+    // ========== STATE ==========
+    const state = {
+      // Category selections
+      esparto: {
+        selected: false,
+        mode: null,
+        participantType: null,
+        events: new Set(),
+        teamMembers: ''
+      },
+      sahitya: {
+        selected: false,
+        mode: null, // 'attendee' | 'participant'
+        participantType: null, // 'solo' | 'group'
+        events: new Set(),
+        teamMembers: ''
+      },
+      prasasti: {
+        selected: false,
+        mode: null,
+        participantType: null,
+        events: new Set(),
+        teamMembers: ''
+      },
+      // API events for Esparto
+      espartoEventCatalog: [],
+      espartoEventLookup: new Map()
+    };
+
+    // ========== DOM ELEMENTS ==========
     const formEl = document.getElementById('external-form');
-    const eventsContainer = document.getElementById('event-groups');
-    const eventsErrorEl = document.getElementById('events-error');
-    const summaryContainer = document.getElementById('selection-summary');
     const messageBox = document.getElementById('form-message');
     const submitBtn = document.getElementById('submit-btn');
     const submitText = document.getElementById('submit-text');
+    const eventsErrorEl = document.getElementById('events-error');
+    const summaryContainer = document.getElementById('selection-summary');
 
-    // All pricing elements
-    const pricingAddonRow = document.getElementById('pricing-addon');
-    const pricingTotal = document.getElementById('pricing-total');
-    const sidebarPricingAddon = document.getElementById('sidebar-pricing-addon');
-    const sidebarPricingTotal = document.getElementById('sidebar-pricing-total');
-    const mobilePricingAddon = document.getElementById('mobile-pricing-addon');
-    const mobilePricingTotal = document.getElementById('mobile-pricing-total');
+    // ========== CATEGORY TOGGLE ==========
+    function toggleCategory(category) {
+      const section = document.getElementById(`${category}-section`);
+      state[category].selected = !state[category].selected;
 
-    const EVENT_TYPES_ENUM = {
-      MULTI_DAY: 'MULTI_DAY',
-      DAY_1_ONLY: 'DAY_1_ONLY',
-      DAY_2_ONLY: 'DAY_2_ONLY',
-      OPTIONAL: 'OPTIONAL'
-    };
+      if (state[category].selected) {
+        section.classList.add('selected');
+        // Esparto and Sahitya default to participant mode (implicit) with solo selection
+        if (category === 'esparto' || category === 'sahitya') {
+          state[category].mode = 'participant';
+          // Default to solo to show state clearly
+          if (!state[category].participantType) {
+            selectParticipantType(category, 'solo');
+          }
+          updateModeUI(category);
+        }
+      } else {
+        section.classList.remove('selected');
+        // Reset sub-selections when deselecting
+        state[category].mode = null;
+        state[category].participantType = null;
+        state[category].events.clear();
+        state[category].teamMembers = '';
+        updateModeUI(category);
+      }
 
-    const EVENT_TYPE_LABELS = {
-      MULTI_DAY: 'Multi-day',
-      DAY_1_ONLY: 'Day 1 Only',
-      DAY_2_ONLY: 'Day 2 Only',
-      OPTIONAL: 'Optional Add-on'
-    };
+      updatePricing();
+      updateSummary();
+      clearEventsError();
+    }
 
-    let eventCatalog = [];
-    let eventLookup = new Map();
-    const selectedEvents = new Set();
-    let activeRegistration = null;
-    let culturalAddOnSelected = false;
+    // ========== MODE SELECTION (Attendee/Participant) ==========
+    function selectMode(category, mode) {
+      if (!state[category].selected) return;
 
-    function syncCulturalToggleUI() {
-      const toggle = document.getElementById('addon-toggle');
-      if (!toggle) {
+      state[category].mode = mode;
+
+      // Reset participant type when switching modes
+      if (mode === 'attendee') {
+        state[category].participantType = null;
+        state[category].events.clear();
+        state[category].teamMembers = '';
+      }
+
+      updateModeUI(category);
+      updatePricing();
+      updateSummary();
+    }
+
+    function updateModeUI(category) {
+      const section = document.getElementById(`${category}-section`);
+      const participantOptions = document.getElementById(`${category}-participant-options`);
+
+      // Update mode option selections
+      section.querySelectorAll('.mode-option').forEach(opt => {
+        opt.classList.toggle('selected', opt.dataset.mode === state[category].mode);
+      });
+
+      // Show/hide participant options
+      if (participantOptions) {
+        participantOptions.classList.toggle('visible', state[category].mode === 'participant');
+      }
+
+      // Update participant type UI
+      updateParticipantTypeUI(category);
+
+      // Update price display
+      updateCategoryPrice(category);
+    }
+
+    // ========== PARTICIPANT TYPE (Solo/Group) ==========
+    function selectParticipantType(category, type) {
+      // For Esparto and Sahitya, ensure mode is always set to 'participant' since they're always participant mode
+      if (category === 'esparto' || category === 'sahitya') {
+        state[category].mode = 'participant';
+      } else if (state[category].mode !== 'participant') {
+        // For other categories like Prasasti, require participant mode to be selected first
         return;
       }
-      if (selectedEvents.has(CULTURAL_EVENT_ID)) {
-        toggle.classList.add('selected');
-      } else {
-        toggle.classList.remove('selected');
+
+      state[category].participantType = type;
+
+      // Reset team members if switching to solo
+      if (type === 'solo') {
+        state[category].teamMembers = '';
+      }
+
+      updateParticipantTypeUI(category);
+      updateCategoryPrice(category);
+      updatePricing();
+      updateSummary();
+    }
+
+    function updateParticipantTypeUI(category) {
+      const participantOptions = document.getElementById(`${category}-participant-options`);
+      const teamSection = document.getElementById(`${category}-team-section`);
+
+      if (!participantOptions) return;
+
+      // Update type selections
+      participantOptions.querySelectorAll('.participant-type').forEach(opt => {
+        opt.classList.toggle('selected', opt.dataset.type === state[category].participantType);
+      });
+
+      // Show/hide team members input
+      if (teamSection) {
+        const isGroup = state[category].participantType === 'group';
+        teamSection.classList.toggle('visible', isGroup);
+        if (isGroup) {
+          let initialData = [];
+          try {
+            const stored = state[category].teamMembers;
+            if (stored && Array.isArray(stored)) initialData = stored;
+            else if (stored && typeof stored === 'string') initialData = JSON.parse(stored);
+          } catch (e) { console.error('Error parsing stored team members', e); }
+
+          renderTeamMemberCards(category, initialData);
+        }
       }
     }
 
+    // ========== TEAM MEMBER CARDS ==========
+    function getTeamMemberCount(category) {
+      // Sahitya is group of 4 (you + 3 others)
+      if (category === 'sahitya') return 3;
+      // Esparto and Prasasti - default to 3 members
+      return 3;
+    }
+
+    function renderTeamMemberCards(category, initialData = []) {
+      const listEl = document.getElementById(`${category}-members-list`);
+      if (!listEl) return;
+
+      const memberCount = getTeamMemberCount(category);
+      let html = '';
+
+      for (let i = 1; i <= memberCount; i++) {
+        const memberLabel = category === 'sahitya' ? `Member ${i + 1}` : `Team Member ${i}`;
+        const memberData = initialData[i - 1] || {};
+        const nameValue = memberData.name || '';
+        const mobileValue = memberData.mobile || '';
+
+        html += `
+          <div class="team-member-card" data-member-label="${memberLabel}">
+            <label>
+              Full Name <span style="color: #dc2626;">*</span>
+              <input type="text" 
+                     id="${category}-member-${i}-name" 
+                     placeholder="Enter full name"
+                     value="${nameValue}"
+                     required>
+            </label>
+            <label>
+              Mobile Number <span style="color: #dc2626;">*</span>
+              <input type="tel" 
+                     id="${category}-member-${i}-mobile"
+                     placeholder="10-digit mobile number"
+                     pattern="[6-9][0-9]{9}"
+                     maxlength="10"
+                     value="${mobileValue}"
+                     required>
+            </label>
+          </div>
+        `;
+      }
+
+      listEl.innerHTML = html;
+    }
+
+    function collectTeamMembersData(category) {
+      const memberCount = getTeamMemberCount(category);
+      const members = [];
+
+      for (let i = 1; i <= memberCount; i++) {
+        const nameEl = document.getElementById(`${category}-member-${i}-name`);
+        const mobileEl = document.getElementById(`${category}-member-${i}-mobile`);
+
+        if (nameEl && mobileEl) {
+          const name = nameEl.value.trim();
+          const mobile = mobileEl.value.trim();
+          if (name || mobile) {
+            members.push({ name, mobile });
+          }
+        }
+      }
+
+      return members;
+    }
+
+    function formatTeamMembersForStorage(members) {
+      // Format as JSON string for storage
+      return JSON.stringify(members);
+    }
+
+    // ========== EVENT SELECTION ==========
+    function toggleEventSelection(category, eventId) {
+      const events = state[category].events;
+      if (events.has(eventId)) {
+        events.delete(eventId);
+      } else {
+        events.add(eventId);
+      }
+      renderCulturalEvents(category);
+      updateSummary();
+    }
+
+    function renderCulturalEvents(category) {
+      const gridId = `${category}-events-grid`;
+      const grid = document.getElementById(gridId);
+      if (!grid) return;
+
+      const eventsList = category === 'sahitya' ? SAHITYA_EVENTS : PRASASTI_EVENTS;
+      const selectedEvents = state[category].events;
+
+      grid.innerHTML = eventsList.map(event => {
+        const isSelected = selectedEvents.has(event.id);
+        return `
+          <label class="cultural-event-card ${isSelected ? 'selected' : ''}" 
+                 onclick="toggleEventSelection('${category}', '${event.id}')">
+            <div class="cultural-event-check"></div>
+            <div class="cultural-event-info">
+              <div class="cultural-event-name">${event.name}</div>
+              ${event.description ? `<div class="cultural-event-desc">${event.description}</div>` : ''}
+            </div>
+          </label>
+        `;
+      }).join('');
+    }
+
+    // ========== ESPARTO EVENTS (from API) ==========
+    async function fetchEspartoEvents() {
+      try {
+        const response = await fetch('/api/events/catalog');
+        if (!response.ok) throw new Error('Failed to fetch events');
+
+        const data = await response.json();
+        if (data.success && Array.isArray(data.events)) {
+          state.espartoEventCatalog = data.events;
+          state.espartoEventLookup = new Map(data.events.map(e => [e.id, e]));
+          renderEspartoEvents();
+        }
+      } catch (error) {
+        console.warn('Could not fetch Esparto events:', error);
+        document.getElementById('esparto-events').innerHTML =
+          '<p class="summary-empty">Events will be announced soon.</p>';
+      }
+    }
+
+    function renderEspartoEvents() {
+      const container = document.getElementById('esparto-events');
+      if (!container || !state.espartoEventCatalog.length) return;
+
+      // Group events by type with descriptions
+      const groups = {
+        'MULTI_DAY': {
+          title: 'Both Days (28-29 Jan)',
+          description: 'Spans both fest days. Select any events you want to participate in.',
+          events: []
+        },
+        'DAY_1_ONLY': {
+          title: '28 Jan 2026',
+          description: 'Events happening on 28 Jan 2026. Select as many as you like.',
+          events: []
+        },
+        'DAY_2_ONLY': {
+          title: '29 Jan 2026',
+          description: 'Events happening on 29 Jan 2026. Select as many as you like.',
+          events: []
+        }
+      };
+
+      state.espartoEventCatalog.forEach(event => {
+        const type = event.type || 'MULTI_DAY';
+        if (groups[type]) {
+          groups[type].events.push(event);
+        } else {
+          groups['MULTI_DAY'].events.push(event);
+        }
+      });
+
+      // Render grouped events in specific order: Multi-day first, Day 1, Day 2
+      const order = ['MULTI_DAY', 'DAY_1_ONLY', 'DAY_2_ONLY'];
+      let html = '';
+
+      for (const type of order) {
+        const group = groups[type];
+        if (!group || group.events.length === 0) continue;
+
+        const cardsHtml = group.events.map(event => {
+          const isSelected = state.esparto.events.has(event.id);
+          const scheduleLabel = [
+            event.dayLabel,
+            event.startTime && event.endTime
+              ? `${event.startTime} - ${event.endTime}`
+              : event.startTime || event.endTime || null
+          ].filter(Boolean).join(' · ');
+
+          return `
+            <label class="event-card ${isSelected ? 'selected' : ''}" 
+                   data-event-id="${event.id}" onclick="toggleEspartoEvent('${event.id}')">
+              <div class="event-card-check"></div>
+              <div class="event-type-badge">${group.title}</div>
+              <div class="event-name">${event.name}</div>
+              ${event.organizer ? `<div class="event-organizer">${event.organizer}</div>` : event.venue ? `<div class="event-organizer">${event.venue}</div>` : ''}
+              ${scheduleLabel ? `<div class="event-meta">${scheduleLabel}</div>` : ''}
+              ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
+            </label>
+          `;
+        }).join('');
+
+        html += `
+          <section class="event-group">
+            <header class="event-group-header">
+              <h3 class="event-group-title">${group.title}</h3>
+              <p class="event-group-description">${group.description}</p>
+            </header>
+            <div class="event-group-grid">${cardsHtml}</div>
+          </section>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function toggleEspartoEvent(eventId) {
+      if (state.esparto.events.has(eventId)) {
+        state.esparto.events.delete(eventId);
+      } else {
+        state.esparto.events.add(eventId);
+      }
+      renderEspartoEvents();
+      updateSummary();
+    }
+
+    // ========== SUMMARY ==========
+    function updateSummary() {
+      const items = [];
+
+      if (state.esparto.selected) {
+        const eventCount = state.esparto.events.size;
+        items.push({
+          name: 'Esparto — Technical Fest',
+          meta: eventCount > 0 ? `${eventCount} event(s) selected` : 'No events selected yet'
+        });
+      }
+
+      if (state.sahitya.selected) {
+        const type = state.sahitya.participantType || 'solo';
+        const eventCount = state.sahitya.events.size;
+        const typeLabel = type === 'group' ? 'Group of 4' : 'Solo';
+        items.push({
+          name: 'Sahitya — Literary Fest',
+          meta: `${typeLabel}` + (eventCount > 0 ? ` — ${eventCount} event(s)` : '')
+        });
+      }
+
+      if (state.prasasti.selected) {
+        let meta = 'Select participation mode';
+        if (state.prasasti.mode === 'attendee') {
+          meta = 'Attendee — General access';
+        } else if (state.prasasti.mode === 'participant') {
+          const type = state.prasasti.participantType || 'Select type';
+          const eventCount = state.prasasti.events.size;
+          meta = `Participant (${type})` + (eventCount > 0 ? ` — ${eventCount} event(s)` : '');
+        }
+        items.push({ name: 'Prasasti — Cultural Fest', meta });
+      }
+
+      if (items.length === 0) {
+        summaryContainer.innerHTML = '<div class="summary-empty">Select at least one experience to continue</div>';
+        return;
+      }
+
+      summaryContainer.innerHTML = items.map(item => `
+        <div class="summary-item">
+          <span class="summary-name">${item.name}</span>
+          <span class="summary-meta">${item.meta}</span>
+        </div>
+      `).join('');
+    }
+
+    // ========== VALIDATION ==========
+    function validateSelection() {
+      // At least one category must be selected
+      if (!state.esparto.selected && !state.sahitya.selected && !state.prasasti.selected) {
+        return { ok: false, reason: 'Please select at least one experience (Esparto, Sahitya, or Prasasti).' };
+      }
+
+      // Esparto validation
+      if (state.esparto.selected) {
+        if (state.esparto.participantType === 'group') {
+          const members = collectTeamMembersData('esparto');
+          const validMembers = members.filter(m => m.name && m.mobile);
+          if (validMembers.length === 0) {
+            return { ok: false, reason: 'Please enter at least one team member with name and mobile for Esparto group participation.' };
+          }
+          // Validate mobile numbers
+          for (const member of validMembers) {
+            if (!/^[6-9]\d{9}$/.test(member.mobile)) {
+              return { ok: false, reason: `Invalid mobile number for "${member.name}" in Esparto team. Please enter a valid 10-digit number.` };
+            }
+          }
+          state.esparto.teamMembers = formatTeamMembersForStorage(validMembers);
+        }
+      }
+
+      // Sahitya validation
+      if (state.sahitya.selected) {
+        if (state.sahitya.participantType === 'group') {
+          const members = collectTeamMembersData('sahitya');
+          const validMembers = members.filter(m => m.name && m.mobile);
+          if (validMembers.length < 3) {
+            return { ok: false, reason: 'Please enter all 3 team members with name and mobile for Sahitya group of 4.' };
+          }
+          // Validate mobile numbers
+          for (const member of validMembers) {
+            if (!/^[6-9]\d{9}$/.test(member.mobile)) {
+              return { ok: false, reason: `Invalid mobile number for "${member.name}" in Sahitya team. Please enter a valid 10-digit number.` };
+            }
+          }
+          state.sahitya.teamMembers = formatTeamMembersForStorage(validMembers);
+        }
+      }
+
+      // Prasasti validation
+      if (state.prasasti.selected) {
+        if (!state.prasasti.mode) {
+          return { ok: false, reason: 'Please select Attendee or Participant for Prasasti.' };
+        }
+        if (state.prasasti.mode === 'participant' && !state.prasasti.participantType) {
+          return { ok: false, reason: 'Please select Solo or Group participation for Prasasti.' };
+        }
+        if (state.prasasti.participantType === 'group') {
+          const members = collectTeamMembersData('prasasti');
+          const validMembers = members.filter(m => m.name && m.mobile);
+          if (validMembers.length === 0) {
+            return { ok: false, reason: 'Please enter at least one team member with name and mobile for Prasasti group participation.' };
+          }
+          // Validate mobile numbers
+          for (const member of validMembers) {
+            if (!/^[6-9]\d{9}$/.test(member.mobile)) {
+              return { ok: false, reason: `Invalid mobile number for "${member.name}" in Prasasti team. Please enter a valid 10-digit number.` };
+            }
+          }
+          state.prasasti.teamMembers = formatTeamMembersForStorage(validMembers);
+        }
+      }
+
+      return { ok: true };
+    }
+
+    // ========== FORM HELPERS ==========
     function resetMessage() {
       messageBox.className = 'message-box';
       messageBox.style.display = 'none';
@@ -1313,374 +2652,15 @@
     }
 
     function showEventsError(message) {
-      if (eventsErrorEl) {
-        eventsErrorEl.textContent = message || '';
-      }
+      if (eventsErrorEl) eventsErrorEl.textContent = message || '';
     }
 
     function clearEventsError() {
       showEventsError('');
     }
 
-    function updatePricing() {
-      const hasAddOn = selectedEvents.has(CULTURAL_EVENT_ID);
-      culturalAddOnSelected = hasAddOn;
-      const total = EXTERNAL_BASE_AMOUNT + (hasAddOn ? EXTERNAL_ADD_ON_AMOUNT : 0);
-      const totalText = `₹${total}`;
-
-      // Update all pricing displays (desktop, sidebar, mobile)
-      if (pricingAddonRow) pricingAddonRow.style.display = hasAddOn ? 'flex' : 'none';
-      if (pricingTotal) pricingTotal.textContent = totalText;
-
-      if (sidebarPricingAddon) sidebarPricingAddon.style.display = hasAddOn ? 'flex' : 'none';
-      if (sidebarPricingTotal) sidebarPricingTotal.textContent = totalText;
-
-      if (mobilePricingAddon) mobilePricingAddon.style.display = hasAddOn ? 'flex' : 'none';
-      if (mobilePricingTotal) mobilePricingTotal.textContent = totalText;
-
-      syncCulturalToggleUI();
-      return hasAddOn;
-    }
-
-    function toggleCulturalAddOn() {
-      toggleEventSelection(CULTURAL_EVENT_ID);
-    }
-
-    function getCashfreeMode() {
-      const host = window.location.hostname;
-      if (host === 'localhost' || host === '127.0.0.1') {
-        return 'sandbox';
-      }
-      return 'production';
-    }
-
-    function groupEventsByType(events = []) {
-      return events.reduce((acc, event) => {
-        if (!acc[event.type]) {
-          acc[event.type] = [];
-        }
-        acc[event.type].push(event);
-        return acc;
-      }, {});
-    }
-
-    function validateSelection(selectedIds = []) {
-      const normalized = Array.from(new Set((selectedIds || []).filter(value => typeof value === 'string' && value.trim().length > 0)));
-
-      if (normalized.length === 0) {
-        return { ok: false, reason: 'Select at least one event to continue.' };
-      }
-
-      if (normalized.length !== (selectedIds || []).filter(Boolean).length) {
-        return { ok: false, reason: 'Duplicate events cannot be selected.' };
-      }
-
-      const stats = {
-        [EVENT_TYPES_ENUM.MULTI_DAY]: 0,
-        [EVENT_TYPES_ENUM.DAY_1_ONLY]: 0,
-        [EVENT_TYPES_ENUM.DAY_2_ONLY]: 0,
-        [EVENT_TYPES_ENUM.OPTIONAL]: 0
-      };
-
-      const primarySelections = [];
-
-      for (const id of normalized) {
-        const event = eventLookup.get(id);
-        if (!event) {
-          return { ok: false, reason: 'Unknown event selected.' };
-        }
-        stats[event.type] += 1;
-        if (event.type !== EVENT_TYPES_ENUM.OPTIONAL) {
-          primarySelections.push(event.id);
-        }
-      }
-
-      // Allow optional add-ons without primary events
-      if (primarySelections.length === 0 && stats[EVENT_TYPES_ENUM.OPTIONAL] > 0) {
-        return { ok: true };
-      }
-
-      if (stats[EVENT_TYPES_ENUM.MULTI_DAY] > 0) {
-        if (stats[EVENT_TYPES_ENUM.MULTI_DAY] > 1) {
-          return { ok: false, reason: 'Choose only one multi-day experience.' };
-        }
-        if (primarySelections.length > 1) {
-          return { ok: false, reason: 'Multi-day events cannot be combined with other primary selections.' };
-        }
-      }
-
-      if (stats[EVENT_TYPES_ENUM.DAY_1_ONLY] > 1) {
-        return { ok: false, reason: 'Only one Day 1 event can be selected at a time.' };
-      }
-
-      if (stats[EVENT_TYPES_ENUM.DAY_2_ONLY] > 1) {
-        return { ok: false, reason: 'Only one Day 2 event can be selected at a time.' };
-      }
-
-      if (
-        stats[EVENT_TYPES_ENUM.MULTI_DAY] > 0 &&
-        (stats[EVENT_TYPES_ENUM.DAY_1_ONLY] > 0 || stats[EVENT_TYPES_ENUM.DAY_2_ONLY] > 0)
-      ) {
-        return { ok: false, reason: 'Multi-day events block Day 1 and Day 2 selections.' };
-      }
-
-      return { ok: true };
-    }
-
-    function isEventDisabled(event, selectedIds = []) {
-      if (event.type === EVENT_TYPES_ENUM.OPTIONAL) {
-        return false;
-      }
-
-      if (selectedIds.includes(event.id)) {
-        return false;
-      }
-
-      if (selectedIds.length === 0) {
-        return false;
-      }
-
-      const selectedTypes = selectedIds
-        .map(id => eventLookup.get(id)?.type)
-        .filter(Boolean);
-      const hasMultiDay = selectedTypes.includes(EVENT_TYPES_ENUM.MULTI_DAY);
-      const day1Count = selectedTypes.filter(type => type === EVENT_TYPES_ENUM.DAY_1_ONLY).length;
-      const day2Count = selectedTypes.filter(type => type === EVENT_TYPES_ENUM.DAY_2_ONLY).length;
-
-      if (hasMultiDay) {
-        return true;
-      }
-
-      if (
-        event.type === EVENT_TYPES_ENUM.MULTI_DAY &&
-        (day1Count > 0 || day2Count > 0 || selectedTypes.includes(EVENT_TYPES_ENUM.MULTI_DAY))
-      ) {
-        return true;
-      }
-
-      if (event.type === EVENT_TYPES_ENUM.DAY_1_ONLY && day1Count > 0) {
-        return true;
-      }
-
-      if (event.type === EVENT_TYPES_ENUM.DAY_2_ONLY && day2Count > 0) {
-        return true;
-      }
-
-      return false;
-    }
-
-    function renderEvents() {
-      if (!eventsContainer) {
-        return;
-      }
-
-      if (!eventCatalog.length) {
-        eventsContainer.innerHTML = '<p class="summary-empty">Event catalog will be announced shortly. You can still complete your registration now.</p>';
-        return;
-      }
-
-      const selectedIds = Array.from(selectedEvents);
-      const grouped = groupEventsByType(eventCatalog);
-      const typeOrder = [
-        EVENT_TYPES_ENUM.MULTI_DAY,
-        EVENT_TYPES_ENUM.DAY_1_ONLY,
-        EVENT_TYPES_ENUM.DAY_2_ONLY,
-        EVENT_TYPES_ENUM.OPTIONAL
-      ].filter(type => grouped[type] && grouped[type].length);
-
-      const html = typeOrder.map(type => {
-        const events = grouped[type];
-        const title = EVENT_TYPE_LABELS[type] || type;
-        let description = '';
-
-        switch (type) {
-          case EVENT_TYPES_ENUM.MULTI_DAY:
-            description = 'Spans both fest days. Choosing this locks every other primary option.';
-            break;
-          case EVENT_TYPES_ENUM.DAY_1_ONLY:
-            description = 'Day 1 experiences. Pick at most one from this set.';
-            break;
-          case EVENT_TYPES_ENUM.DAY_2_ONLY:
-            description = 'Day 2 experiences. Pick at most one from this set.';
-            break;
-          case EVENT_TYPES_ENUM.OPTIONAL:
-            description = 'Sahitya and Prasasti cultural events. Adds ₹500 when selected.';
-            break;
-          default:
-            description = '';
-        }
-
-        const cards = events.map(event => {
-          const selected = selectedEvents.has(event.id);
-          const disabled = !selected && isEventDisabled(event, selectedIds);
-          const scheduleLabel = [
-            event.dayLabel,
-            event.startTime && event.endTime
-              ? `${event.startTime} - ${event.endTime}`
-              : event.startTime || event.endTime || null
-          ].filter(Boolean).join(' · ');
-
-          return `
-            <label class="event-card ${selected ? 'selected' : ''} ${disabled ? 'disabled' : ''}" data-event-id="${event.id}" tabindex="0">
-              <input type="checkbox" ${selected ? 'checked' : ''} ${disabled ? 'disabled' : ''}>
-              <div class="event-card-check"></div>
-              <div class="event-type-badge">${title}</div>
-              <div class="event-name">${event.name}</div>
-              ${event.organizer ? `<div class="event-organizer">${event.organizer}</div>` : ''}
-              ${scheduleLabel ? `<div class="event-meta">${scheduleLabel}</div>` : ''}
-              ${event.description ? `<div class="event-description">${event.description}</div>` : ''}
-            </label>
-          `;
-        }).join('');
-
-        return `
-          <section class="event-group">
-            <header class="event-group-header">
-              <h3 class="event-group-title">${title}</h3>
-              <p class="event-group-description">${description}</p>
-            </header>
-            <div class="event-group-grid">
-              ${cards}
-            </div>
-          </section>
-        `;
-      }).join('');
-
-      eventsContainer.innerHTML = html;
-
-      eventsContainer.querySelectorAll('[data-event-id]').forEach(card => {
-        card.addEventListener('click', handleEventCardClick);
-        card.addEventListener('keydown', handleEventCardKeydown);
-      });
-
-      updatePricing();
-    }
-
-    function handleEventCardClick(event) {
-      const card = event.target.closest('[data-event-id]');
-      if (!card || card.classList.contains('disabled')) {
-        return;
-      }
-
-      event.preventDefault();
-      const eventId = card.getAttribute('data-event-id');
-      toggleEventSelection(eventId);
-    }
-
-    function handleEventCardKeydown(event) {
-      if (event.key !== 'Enter' && event.key !== ' ') {
-        return;
-      }
-
-      const card = event.target.closest('[data-event-id]');
-      if (!card || card.classList.contains('disabled')) {
-        return;
-      }
-
-      event.preventDefault();
-      const eventId = card.getAttribute('data-event-id');
-      toggleEventSelection(eventId);
-    }
-
-    function updateSummary() {
-      const selectedIds = Array.from(selectedEvents);
-
-      if (selectedIds.length === 0) {
-        summaryContainer.innerHTML = '<div class="summary-empty">Select at least one event to continue</div>';
-        return;
-      }
-
-      const rows = selectedIds.map(id => {
-        const event = eventLookup.get(id);
-        if (!event) {
-          return '';
-        }
-
-        const metaParts = [
-          EVENT_TYPE_LABELS[event.type] || 'Event',
-          event.dayLabel || null
-        ].filter(Boolean);
-
-        return `
-          <div class="summary-item">
-            <span class="summary-name">${event.name}</span>
-            ${metaParts.length ? `<span class="summary-meta">${metaParts.join(' · ')}</span>` : ''}
-          </div>
-        `;
-      }).join('');
-
-      // Show add-on in summary if selected via toggle
-      let addOnRow = '';
-      if (culturalAddOnSelected) {
-        addOnRow = `
-          <div class="summary-item">
-            <span class="summary-name">Sahitya + Prasasti Cultural Access</span>
-            <span class="summary-meta">Optional Add-On · +₹500</span>
-          </div>
-        `;
-      }
-
-      const allContent = addOnRow + rows;
-      summaryContainer.innerHTML = allContent || '<div class="summary-empty">Select at least one event to continue</div>';
-    }
-
-    function toggleEventSelection(eventId) {
-      if (!eventLookup.has(eventId)) {
-        return;
-      }
-
-      if (selectedEvents.has(eventId)) {
-        selectedEvents.delete(eventId);
-        culturalAddOnSelected = selectedEvents.has(CULTURAL_EVENT_ID);
-        if (selectedEvents.size === 0) {
-          showEventsError('Select at least one event to continue.');
-        } else {
-          clearEventsError();
-        }
-        renderEvents();
-        updateSummary();
-        return;
-      }
-
-      const nextSelection = Array.from(selectedEvents);
-      nextSelection.push(eventId);
-
-      const validation = validateSelection(nextSelection);
-      if (!validation.ok) {
-        showEventsError(validation.reason);
-        return;
-      }
-
-      selectedEvents.add(eventId);
-      clearEventsError();
-      culturalAddOnSelected = selectedEvents.has(CULTURAL_EVENT_ID);
-      renderEvents();
-      updateSummary();
-    }
-
-    async function fetchEvents() {
-      try {
-        const response = await fetch('/api/events/catalog');
-        if (!response.ok) {
-          throw new Error('Unable to load event catalog');
-        }
-
-        const data = await response.json();
-        if (data.success && Array.isArray(data.events)) {
-          eventCatalog = data.events;
-          eventLookup = new Map(eventCatalog.map(event => [event.id, event]));
-          renderEvents();
-          updateSummary();
-        }
-      } catch (error) {
-        console.warn('Event catalog fetch failed:', error);
-        eventsContainer.innerHTML = '<p class="summary-empty">Unable to load events. Please refresh the page.</p>';
-      }
-    }
-
     function validateForm(formData) {
       const errors = [];
-
       const email = formData.get('email')?.trim();
       const mobile = formData.get('mobile')?.trim();
       const identity = formData.get('identity_number')?.trim();
@@ -1689,22 +2669,19 @@
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         errors.push('Please enter a valid email address.');
       }
-
       if (!mobile || !/^[6-9]\d{9}$/.test(mobile)) {
         errors.push('Enter a valid 10-digit Indian mobile number.');
       }
-
       if (!identity || identity.length < 4) {
         errors.push('Identity number must be at least 4 characters.');
       }
-
       if (!Number.isInteger(year) || year < 1 || year > 6) {
         errors.push('Select a valid study year.');
       }
-
       return errors;
     }
 
+    // ========== FORM SUBMISSION ==========
     async function submitForm(event) {
       event.preventDefault();
       resetMessage();
@@ -1718,14 +2695,11 @@
         return;
       }
 
-      const selectedIds = Array.from(selectedEvents);
-      const validation = validateSelection(selectedIds);
-      if (!validation.ok) {
-        showEventsError(validation.reason);
+      const selectionValidation = validateSelection();
+      if (!selectionValidation.ok) {
+        showEventsError(selectionValidation.reason);
         return;
       }
-
-      const addOnSelected = selectedEvents.has(CULTURAL_EVENT_ID);
 
       const payload = {
         full_name: formData.get('full_name').trim(),
@@ -1735,8 +2709,22 @@
         department: formData.get('department').trim(),
         year_of_study: Number(formData.get('year_of_study')),
         identity_number: formData.get('identity_number').trim(),
-        add_on_selected: addOnSelected,
-        selected_events: selectedIds
+        // New category-based selections
+        esparto_selected: state.esparto.selected,
+        esparto_mode: state.esparto.mode,
+        esparto_participant_type: state.esparto.participantType,
+        esparto_events: Array.from(state.esparto.events),
+        esparto_team_members: state.esparto.teamMembers,
+        sahitya_selected: state.sahitya.selected,
+        sahitya_participant_type: state.sahitya.participantType,
+        sahitya_team_members: state.sahitya.teamMembers,
+        sahitya_events: Array.from(state.sahitya.events),
+        prasasti_selected: state.prasasti.selected,
+        prasasti_mode: state.prasasti.mode,
+        prasasti_participant_type: state.prasasti.participantType,
+        prasasti_events: Array.from(state.prasasti.events),
+        prasasti_team_members: state.prasasti.teamMembers,
+        total_amount: calculateTotal()
       };
 
       try {
@@ -1755,70 +2743,36 @@
           throw new Error(result.error || 'Registration failed. Please try again.');
         }
 
-        activeRegistration = result.registration;
-
-        console.log('Registration response:', {
-          isPaid: result.isPaid,
-          isExisting: result.isExisting,
-          registrationId: activeRegistration.id
-        });
-
-        // Don't show registration ID before payment - redirect to payment page
         if (result.isPaid) {
-          console.log('Registration already paid, redirecting to dashboard');
           window.location.href = '/dashboard.html';
           return;
         }
 
-        // Redirect to external payment page for confirmation and payment
-        console.log('Redirecting to payment confirmation');
         window.location.href = '/external-payment.html';
       } catch (error) {
         console.error('External registration error:', error);
-        showMessage('error', error.message || 'Failed to register. Please try again in a moment.');
+        showMessage('error', error.message || 'Failed to register. Please try again.');
         setLoading(false);
       }
     }
 
-    formEl.addEventListener('submit', submitForm);
-
-    // Cultural add-on toggle
-    const addonToggle = document.getElementById('addon-toggle');
-    addonToggle.addEventListener('click', toggleCulturalAddOn);
-    addonToggle.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        toggleCulturalAddOn();
-      }
-    });
-
-    // Check authentication on page load
+    // ========== AUTH CHECK ==========
     async function checkAuth() {
       try {
-        const response = await fetch('/api/auth/status', {
-          credentials: 'include'
-        });
+        const response = await fetch('/api/auth/status', { credentials: 'include' });
         const data = await response.json();
 
         if (!data.isAuthenticated || !data.user) {
-          // Not logged in - redirect to login
           window.location.href = '/login.html';
           return false;
         }
 
-        // Check if internal user trying to access external form
         if (data.user.userType === 'HITAMONLY') {
           window.location.href = data.user.hasSubmittedForm ? '/dashboard.html' : '/form.html';
           return false;
         }
 
-        // If external user already submitted, redirect to dashboard
-        if (data.user.hasSubmittedForm) {
-          window.location.href = '/dashboard.html';
-          return false;
-        }
-
-        // Populate header with user info
+        // Populate user info
         const avatarEl = document.getElementById('user-avatar');
         const nameEl = document.getElementById('user-name');
         const emailEl = document.getElementById('user-email');
@@ -1828,14 +2782,9 @@
         } else {
           avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name || 'U')}&background=3565d8&color=fff`;
         }
-        if (data.user.name) {
-          nameEl.textContent = data.user.name;
-        }
-        if (data.user.email && emailEl) {
-          emailEl.textContent = data.user.email;
-        }
+        if (data.user.name) nameEl.textContent = data.user.name;
+        if (data.user.email && emailEl) emailEl.textContent = data.user.email;
 
-        // Pre-fill email from auth
         const emailInput = document.getElementById('email');
         if (emailInput && data.user.email) {
           emailInput.value = data.user.email;
@@ -1850,18 +2799,174 @@
       }
     }
 
-    // Initialize page
+    async function fetchRegistrationByEmail() {
+      try {
+        setLoading(true, 'Checking existing application...');
+        const response = await fetch('/api/external/registration/by-email');
+        const result = await response.json();
+
+        if (response.ok && result.success && result.registration) {
+          populateForm(result.registration);
+          showMessage('success', 'Welcome back! We found your existing application and loaded your details.');
+        }
+      } catch (error) {
+        console.error('Auto-fetch by email error:', error);
+      } finally {
+        setLoading(false, 'Submit & Continue to Payment');
+      }
+    }
+
+    // ========== RESUME APPLICATION LOGIC ==========
+    async function fetchRegistrationByIdentity(identityNumber) {
+      try {
+        setLoading(true, 'Checking existing registration...');
+        const response = await fetch(`/api/external/registration/${encodeURIComponent(identityNumber)}`);
+        const result = await response.json();
+
+        if (response.ok && result.success && result.registration) {
+          populateForm(result.registration);
+          showMessage('success', 'Registration details loaded successfully. You can update your application.');
+        } else if (response.status === 404) {
+          // Not found is fine, new registration
+          // Optionally clear form if needed, but safer to leave as is
+        } else {
+          console.warn('Error fetching registration:', result.error);
+        }
+      } catch (error) {
+        console.error('Fetch registration error:', error);
+      } finally {
+        setLoading(false, 'Submit & Continue to Payment');
+      }
+    }
+
+    function populateForm(data) {
+      if (!data) return;
+
+      // 1. Personal Details
+      const updates = {
+        'full_name': data.full_name,
+        'email': data.email,
+        'mobile': data.mobile,
+        'institution': data.institution,
+        'department': data.department,
+        'year_of_study': data.year_of_study,
+      };
+
+      for (const [id, value] of Object.entries(updates)) {
+        const el = document.getElementById(id);
+        if (el && value) el.value = value;
+      }
+
+      // 2. Categories & Modes
+      // Esparto
+      if (data.esparto_selected) {
+        if (!state.esparto.selected) toggleCategory('esparto');
+
+        if (data.esparto_mode) selectMode('esparto', data.esparto_mode);
+        if (data.esparto_participant_type) selectParticipantType('esparto', data.esparto_participant_type);
+
+        // Populate Team Members
+        if (data.esparto_team_members) {
+          state.esparto.teamMembers = data.esparto_team_members;
+          // Re-trigger UI update to render cards with data
+          updateParticipantTypeUI('esparto');
+        }
+
+        // Populate Events
+        if (data.esparto_events && Array.isArray(data.esparto_events)) {
+          state.esparto.events = new Set(data.esparto_events);
+          renderEspartoEvents(); // Re-render to show ticks
+        }
+      }
+
+      // Sahitya
+      if (data.sahitya_selected) {
+        if (!state.sahitya.selected) toggleCategory('sahitya');
+
+        if (data.sahitya_mode) selectMode('sahitya', data.sahitya_mode);
+        if (data.sahitya_participant_type) selectParticipantType('sahitya', data.sahitya_participant_type);
+
+        // Populate Team Members
+        if (data.sahitya_team_members) {
+          state.sahitya.teamMembers = data.sahitya_team_members;
+          updateParticipantTypeUI('sahitya');
+        }
+
+        // Populate Events
+        if (data.sahitya_events && Array.isArray(data.sahitya_events)) {
+          state.sahitya.events = new Set(data.sahitya_events);
+          renderCulturalEvents('sahitya');
+        }
+      }
+
+      // Prasasti
+      if (data.prasasti_selected) {
+        if (!state.prasasti.selected) toggleCategory('prasasti');
+
+        if (data.prasasti_mode) selectMode('prasasti', data.prasasti_mode);
+        // Note: Prasasti participant_type logic depends on backend column consistency fix
+        const pType = data.prasasti_participant_type || data.prasasti_performance_type;
+        if (pType) selectParticipantType('prasasti', pType);
+
+        // Populate Team Members
+        if (data.prasasti_team_members) {
+          state.prasasti.teamMembers = data.prasasti_team_members;
+          updateParticipantTypeUI('prasasti');
+        }
+
+        // Populate Events
+        if (data.prasasti_events && Array.isArray(data.prasasti_events)) {
+          state.prasasti.events = new Set(data.prasasti_events);
+          renderCulturalEvents('prasasti');
+        }
+      }
+
+      updatePricing();
+      updateSummary();
+
+      // Update UI for Edit Mode
+      submitText.textContent = 'Update & Continue to Payment';
+    }
+
+    function setupIdentitySearch() {
+      const identityInput = document.getElementById('identity_number');
+      if (!identityInput) return;
+
+      identityInput.addEventListener('blur', (e) => {
+        const val = e.target.value.trim();
+        if (val.length >= 4) {
+          fetchRegistrationByIdentity(val);
+        }
+      });
+    }
+
+    // ========== INITIALIZATION ==========
     async function initPage() {
       const isAuthenticated = await checkAuth();
       if (!isAuthenticated) return;
 
-      fetchEvents();
-      updateSummary();
+      // Initialize event grids
+      renderCulturalEvents('sahitya');
+      renderCulturalEvents('prasasti');
+      fetchEspartoEvents();
+
       updatePricing();
+      updateSummary();
+
+      // Setup resume application listener
+      setupIdentitySearch();
+
+      // Auto-fetch details if logged in (Email Resume)
+      fetchRegistrationByEmail();
     }
 
+    // Attach form submit
+    formEl.addEventListener('submit', submitForm);
+
+    // Start
     initPage();
   </script>
+
 
   <!-- Floating WhatsApp Button -->
   <a href="https://wa.me/919640040089?text=Hi%2C%20I%20have%20a%20query%20regarding%20Elysian%20%2726%20registration."
@@ -1876,10 +2981,13 @@
     </svg>
   </a>
 
+
   <footer
     style="background: #f8fafc; border-top: 1px solid rgba(148, 163, 184, 0.35); padding: 1.75rem; text-align: center;">
-    <p style="margin: 0; color: #64748b; font-size: 0.8rem;">© 2026 ROYAL EDUCATIONAL SOCIETY. All rights reserved.</p>
+    <p style="margin: 0; color: #64748b; font-size: 0.8rem;">© 2026 ROYAL EDUCATIONAL SOCIETY. All rights reserved.
+    </p>
   </footer>
+
 </body>
 
 </html>

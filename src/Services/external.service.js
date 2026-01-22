@@ -1,10 +1,28 @@
 import crypto from 'crypto';
 import db from '../db/mysql.js';
+import {
+  SAHITYA_EVENT_LOOKUP,
+  PRASASTI_EVENT_LOOKUP,
+  calculatePerformanceFee
+} from '../config/events.config.js';
 
 export const EXTERNAL_BASE_AMOUNT = 500;
 export const EXTERNAL_ADD_ON_AMOUNT = 500;
-const MAX_SELECTED_EVENTS = 2;
-const CULTURAL_EVENT_ID = 'EVT_CULTURAL_SAHITYA_PRASASTI';
+export const PRASASTI_SOLO_FEE = 150;
+export const PRASASTI_GROUP_FEE = 350;
+const MAX_SELECTED_EVENTS = 20; // Increased limit
+const PRICING = {
+  // Esparto pricing
+  ESPARTO_SOLO: 200,
+  ESPARTO_GROUP: 600,
+  // Sahitya pricing (new solo/group structure)
+  SAHITYA_SOLO: 150,
+  SAHITYA_GROUP: 450,  // Group of 4
+  // Prasasti pricing
+  PRASASTI_ATTENDEE: 300,
+  PRASASTI_SOLO: 150,
+  PRASASTI_GROUP: 350
+};
 
 function generateExternalRegistrationId() {
   const year = new Date().getFullYear().toString().slice(-2);
@@ -36,19 +54,69 @@ export async function createExternalRegistration(payload) {
     department,
     year_of_study,
     identity_number,
-    add_on_selected = false,
-    selected_events = []
+    // Esparto fields
+    esparto_selected = false,
+    esparto_mode = null,
+    esparto_participant_type = null,
+    esparto_team_members = null,
+    esparto_events = [],
+    // Sahitya fields (now with solo/group)
+    sahitya_selected = false,
+    sahitya_participant_type = null,
+    sahitya_team_members = null,
+    sahitya_events = [],
+    // Prasasti fields
+    prasasti_selected = false,
+    prasasti_mode = null,
+    prasasti_participant_type = null,
+    prasasti_events = [],
+    prasasti_team_members = null
   } = payload;
 
-  const sanitizedEvents = sanitizeEventIds(selected_events);
-  const hasCulturalEvent = sanitizedEvents.includes(CULTURAL_EVENT_ID);
-  const addOnSelected = Boolean(add_on_selected || hasCulturalEvent);
-  const totalAmount = EXTERNAL_BASE_AMOUNT + (addOnSelected ? EXTERNAL_ADD_ON_AMOUNT : 0);
-  const selectedEventsJson = sanitizedEvents.length > 0 ? JSON.stringify(sanitizedEvents) : null;
+  // 1. Calculate Total Amount Server-side
+  let totalAmount = 0;
+  let addOnSelected = false; // Flag to legacy support
 
+  if (esparto_selected) {
+    if (esparto_participant_type === 'group') {
+      totalAmount += PRICING.ESPARTO_GROUP;
+    } else {
+      totalAmount += PRICING.ESPARTO_SOLO;
+    }
+  }
+
+  if (sahitya_selected) {
+    addOnSelected = true;
+    if (sahitya_participant_type === 'group') {
+      totalAmount += PRICING.SAHITYA_GROUP;
+    } else {
+      totalAmount += PRICING.SAHITYA_SOLO;
+    }
+  }
+
+  if (prasasti_selected && prasasti_mode) {
+    addOnSelected = true;
+    if (prasasti_mode === 'attendee') {
+      totalAmount += PRICING.PRASASTI_ATTENDEE;
+    } else if (prasasti_participant_type === 'solo') {
+      totalAmount += PRICING.PRASASTI_SOLO;
+    } else if (prasasti_participant_type === 'group') {
+      totalAmount += PRICING.PRASASTI_GROUP;
+    } else {
+      // Default fallback
+      totalAmount += PRICING.PRASASTI_SOLO;
+    }
+  }
+
+  // 2. Format JSON fields
+  const espartoEventsJson = sanitizeEventIds(esparto_events).length > 0 ? JSON.stringify(sanitizeEventIds(esparto_events)) : null;
+  const sahityaEventsJson = sanitizeEventIds(sahitya_events).length > 0 ? JSON.stringify(sanitizeEventIds(sahitya_events)) : null;
+  const prasastiEventsJson = sanitizeEventIds(prasasti_events).length > 0 ? JSON.stringify(sanitizeEventIds(prasasti_events)) : null;
+
+  // 3. Check for existing registration
   const [existingRows] = await db.query(
-    'SELECT * FROM external_registrations WHERE identity_number = ?',
-    [identity_number]
+    'SELECT * FROM external_registrations WHERE email = ?',
+    [email]
   );
 
   if (existingRows.length > 0) {
@@ -62,12 +130,6 @@ export async function createExternalRegistration(payload) {
       };
     }
 
-    const updateSanitizedEvents = sanitizeEventIds(selected_events);
-    const updateHasCulturalEvent = updateSanitizedEvents.includes(CULTURAL_EVENT_ID);
-    const updateAddOnSelected = Boolean(add_on_selected || updateHasCulturalEvent);
-    const updateTotalAmount = EXTERNAL_BASE_AMOUNT + (updateAddOnSelected ? EXTERNAL_ADD_ON_AMOUNT : 0);
-    const updateEventsJson = updateSanitizedEvents.length > 0 ? JSON.stringify(updateSanitizedEvents) : null;
-
     await db.query(
       `UPDATE external_registrations
        SET full_name = ?,
@@ -78,7 +140,20 @@ export async function createExternalRegistration(payload) {
            year_of_study = ?,
            add_on_selected = ?,
            total_amount = ?,
-           selected_events = ?,
+           esparto_selected = ?,
+           esparto_events = ?,
+           esparto_mode = ?,
+           esparto_participant_type = ?,
+           esparto_team_members = ?,
+           sahitya_selected = ?,
+           sahitya_participant_type = ?,
+           sahitya_team_members = ?,
+           sahitya_events = ?,
+           prasasti_selected = ?,
+           prasasti_events = ?,
+           prasasti_mode = ?,
+           prasasti_participant_type = ?,
+           prasasti_team_members = ?,
            updated_at = NOW()
        WHERE id = ?`,
       [
@@ -88,9 +163,22 @@ export async function createExternalRegistration(payload) {
         institution,
         department,
         year_of_study,
-        updateAddOnSelected,
-        updateTotalAmount,
-        updateEventsJson,
+        addOnSelected,
+        totalAmount,
+        esparto_selected,
+        espartoEventsJson,
+        esparto_mode,
+        esparto_participant_type,
+        esparto_team_members,
+        sahitya_selected,
+        sahitya_participant_type,
+        sahitya_team_members,
+        sahityaEventsJson,
+        prasasti_selected,
+        prasastiEventsJson,
+        prasasti_mode,
+        prasasti_participant_type,
+        prasasti_team_members,
         existing.id
       ]
     );
@@ -107,6 +195,7 @@ export async function createExternalRegistration(payload) {
     };
   }
 
+  // 4. Create new registration
   const registrationId = generateExternalRegistrationId();
   const [result] = await db.query(
     `INSERT INTO external_registrations (
@@ -120,8 +209,21 @@ export async function createExternalRegistration(payload) {
       identity_number,
       add_on_selected,
       total_amount,
-      selected_events
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      esparto_selected,
+      esparto_events,
+      esparto_mode,
+      esparto_participant_type,
+      esparto_team_members,
+      sahitya_selected,
+      sahitya_participant_type,
+      sahitya_team_members,
+      sahitya_events,
+      prasasti_selected,
+      prasasti_events,
+      prasasti_mode,
+      prasasti_participant_type,
+      prasasti_team_members
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     , [
       registrationId,
       full_name,
@@ -133,7 +235,20 @@ export async function createExternalRegistration(payload) {
       identity_number,
       addOnSelected,
       totalAmount,
-      selectedEventsJson
+      esparto_selected,
+      espartoEventsJson,
+      esparto_mode,
+      esparto_participant_type,
+      esparto_team_members,
+      sahitya_selected,
+      sahitya_participant_type,
+      sahitya_team_members,
+      sahityaEventsJson,
+      prasasti_selected,
+      prasastiEventsJson,
+      prasasti_mode,
+      prasasti_participant_type,
+      prasasti_team_members
     ]
   );
 

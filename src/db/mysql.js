@@ -153,6 +153,16 @@ export async function initializeDatabase() {
         add_on_selected BOOLEAN DEFAULT FALSE,
         total_amount DECIMAL(10, 2) NOT NULL,
         selected_events JSON NULL,
+        esparto_events JSON NULL,
+        sahitya_events JSON NULL,
+        sahitya_mode ENUM('attendee', 'participant') NULL,
+        sahitya_team_members TEXT NULL,
+        prasasti_mode ENUM('attendee', 'participant') NULL,
+        prasasti_team_members TEXT NULL,
+        prasasti_events JSON NULL,
+        prasasti_event VARCHAR(50) NULL,
+        prasasti_performance_type ENUM('solo', 'group') NULL,
+        prasasti_performance_fee INT DEFAULT 0,
         payment_status ENUM('PENDING','PAID','FAILED') DEFAULT 'PENDING',
         payment_id INT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -258,6 +268,46 @@ export async function initializeDatabase() {
     `);
 
     // Step 9: Add any missing columns to existing tables
+    // External Registrations columns
+    console.log('🔄 Ensuring external_registrations has detailed event columns...');
+    const extRegColumns = [
+      // Category selection flags
+      { name: 'esparto_selected', type: 'BOOLEAN DEFAULT FALSE' },
+      { name: 'sahitya_selected', type: 'BOOLEAN DEFAULT FALSE' },
+      { name: 'prasasti_selected', type: 'BOOLEAN DEFAULT FALSE' },
+      // Esparto columns
+      { name: 'esparto_events', type: 'JSON NULL' },
+      { name: 'esparto_mode', type: "ENUM('attendee', 'participant') NULL" },
+      { name: 'esparto_participant_type', type: "ENUM('solo', 'group') NULL" },
+      { name: 'esparto_team_members', type: 'JSON NULL' },  // Changed to JSON for structured member data
+      // Sahitya columns
+      { name: 'sahitya_events', type: 'JSON NULL' },
+      { name: 'sahitya_mode', type: "ENUM('attendee', 'participant') NULL" },
+      { name: 'sahitya_participant_type', type: "ENUM('solo', 'group') NULL" },
+      { name: 'sahitya_team_members', type: 'JSON NULL' },  // Changed to JSON for structured member data
+      // Prasasti columns
+      { name: 'prasasti_mode', type: "ENUM('attendee', 'participant') NULL" },
+      { name: 'prasasti_participant_type', type: "ENUM('solo', 'group') NULL" },  // Added for form consistency
+      { name: 'prasasti_team_members', type: 'JSON NULL' },  // Changed to JSON for structured member data
+      { name: 'prasasti_events', type: 'JSON NULL' },
+      // Legacy columns (kept for backwards compatibility)
+      { name: 'prasasti_event', type: 'VARCHAR(50) NULL' },
+      { name: 'prasasti_performance_type', type: "ENUM('solo', 'group') NULL" },
+      { name: 'prasasti_performance_fee', type: 'INT DEFAULT 0' }
+    ];
+
+    for (const col of extRegColumns) {
+      const [existingCol] = await connection.query(
+        `SHOW COLUMNS FROM external_registrations LIKE '${col.name}'`
+      );
+      if (existingCol.length === 0) {
+        await connection.query(
+          `ALTER TABLE external_registrations ADD COLUMN ${col.name} ${col.type}`
+        );
+        console.log(`  ✓ Added ${col.name} column to external_registrations`);
+      }
+    }
+
     console.log('🔄 Ensuring student_forms has selected_events column...');
     const [selectedEventsColumn] = await connection.query(
       "SHOW COLUMNS FROM student_forms LIKE 'selected_events'"

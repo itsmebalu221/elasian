@@ -1604,6 +1604,50 @@
       background: rgba(77, 176, 60, 0.08);
       box-shadow: 0 8px 18px rgba(47, 111, 55, 0.12);
     }
+
+    .event-category-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    }
+
+    .event-category-card h3 {
+      margin-top: 0;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+    }
+
+    .category-details p {
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .event-list ul {
+      list-style-type: none;
+      padding-left: 0;
+      margin-top: 0.5rem;
+    }
+
+    .event-list li {
+      padding: 0.25rem 0;
+      padding-left: 1.5rem;
+      position: relative;
+      color: var(--text-primary);
+    }
+
+    .event-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0.5rem;
+      color: var(--accent);
+    }
   </style>
 </head>
 
@@ -2573,6 +2617,90 @@
       }
     }
 
+    function displayExternalEvents(registration) {
+      const eventsContainer = document.getElementById('events-container');
+      if (!eventsContainer) return;
+
+      let html = '';
+
+      // --- Esparto Section ---
+      if (registration.esparto_selected) {
+        html += `
+        <div class="event-category-card">
+          <h3>Esparto</h3>
+          <div class="category-details">
+            <p><strong>Participation Mode:</strong> ${registration.esparto_mode === 'TEAM' ? 'Team Participation' : 'Individual'}</p>
+            ${registration.esparto_events && registration.esparto_events.length > 0 ?
+            `<div class="event-list">
+                <h4>Selected Events:</h4>
+                <ul>
+                  ${registration.esparto_events.map(eventId => {
+              const evt = eventLookup.get(eventId);
+              return `<li>${evt ? evt.name : eventId}</li>`;
+            }).join('')}
+                </ul>
+              </div>` : '<p>No specific events selected.</p>'
+          }
+          </div>
+        </div>`;
+      }
+
+      // --- Sahitya Section ---
+      if (registration.sahitya_selected) {
+        html += `
+        <div class="event-category-card">
+          <h3>Sahitya</h3>
+          <div class="category-details">
+            <p><strong>Participation Mode:</strong> ${registration.sahitya_mode === 'TEAM' ? 'Team Participation' : 'Individual'}</p>
+            ${registration.sahitya_events && registration.sahitya_events.length > 0 ?
+            `<div class="event-list">
+                <h4>Selected Events:</h4>
+                <ul>
+                  ${registration.sahitya_events.map(eventId => {
+              const evt = eventLookup.get(eventId);
+              return `<li>${evt ? evt.name : eventId}</li>`;
+            }).join('')}
+                </ul>
+              </div>` : '<p>No specific events selected.</p>'
+          }
+          </div>
+        </div>`;
+      }
+
+      // --- Prasasti Section ---
+      if (registration.prasasti_selected) {
+        // Determine participant type label
+        let pType = registration.prasasti_participant_type || 'Individual';
+        if (pType === 'TEAM_SMALL') pType = 'Small Team';
+        if (pType === 'TEAM_LARGE') pType = 'Large Team';
+
+        html += `
+        <div class="event-category-card">
+          <h3>Prasasti</h3>
+          <div class="category-details">
+            <p><strong>Participant Type:</strong> ${pType}</p>
+            ${registration.prasasti_events && registration.prasasti_events.length > 0 ?
+            `<div class="event-list">
+                <h4>Selected Events:</h4>
+                <ul>
+                  ${registration.prasasti_events.map(eventId => {
+              const evt = eventLookup.get(eventId);
+              return `<li>${evt ? evt.name : eventId}</li>`;
+            }).join('')}
+                </ul>
+              </div>` : '<p>No specific events selected.</p>'
+          }
+          </div>
+        </div>`;
+      }
+
+      if (html === '') {
+        html = '<div class="no-events">No events registered.</div>';
+      }
+
+      eventsContainer.innerHTML = html;
+    }
+
     async function displayExternalRegistration(registration) {
       await loadEventCatalog();
 
@@ -2622,7 +2750,8 @@
       document.getElementById('qr-display-branch').textContent = registration.institution || '—';
 
       // Display events
-      displayEvents(registration);
+      // Display events - specialized for external to show categories
+      displayExternalEvents(registration);
 
       // Populate print pass for external user
       populatePrintPassExternal(registration, hasPaid);
@@ -2714,7 +2843,10 @@
               <p>Complete payment of ₹${amount} to download your event pass</p>
             </div>
           </div>
-          <a href="/external-payment.html" class="btn-pay-now">Pay ₹${amount} Now</a>
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <a href="/external-form.html" style="text-decoration: none; color: var(--text-secondary); font-size: 0.875rem; font-weight: 500; padding: 0.5rem 1rem; border: 1px solid var(--border); border-radius: 20px; background: rgba(255,255,255,0.5); transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.8)'; this.style.borderColor='var(--text-secondary)'" onmouseout="this.style.background='rgba(255,255,255,0.5)'; this.style.borderColor='var(--border)'">Edit Details</a>
+            <a href="/external-payment.html" class="btn-pay-now">Pay ₹${amount} Now</a>
+          </div>
         `;
 
         // Disable download button
