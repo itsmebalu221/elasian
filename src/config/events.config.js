@@ -86,14 +86,7 @@ export const EVENT_DEFINITIONS = [
     dayLabel: '1st Day Event, Time : 10:00 AM - 2:00 PM',
     description: "Creative marketing challenge to pitch unconventional products."
   },
-  {
-    id: 'EVT_CULTURAL_SAHITYA_PRASASTI',
-    name: 'Sahitya + Prasasti Cultural Access',
-    organizer: 'Cultural Committee',
-    type: EVENT_TYPES.OPTIONAL,
-    dayLabel: 'Cultural Add-on',
-    description: 'Exclusive access to the Sahitya literature showcase and Prasasti cultural celebrations.'
-  }
+
 ];
 
 export const EVENT_LOOKUP = new Map(EVENT_DEFINITIONS.map(event => [event.id, event]));
