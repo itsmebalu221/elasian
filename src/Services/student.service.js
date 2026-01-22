@@ -19,10 +19,18 @@ export async function submitStudentForm(studentId, formData) {
     roll_number,
     mobile,
     year_of_study,
-    selected_events
+    selected_events,
+    sahitya_selected = false,
+    sahitya_events = []
   } = formData;
 
   const selectedEventsJson = JSON.stringify(selected_events);
+  const sahityaSelected = Boolean(sahitya_selected);
+  const normalizedSahityaType = sahityaSelected ? 'solo' : null;
+  const sahityaEventsJson = Array.isArray(sahitya_events) && sahitya_events.length > 0
+    ? JSON.stringify(Array.from(new Set(sahitya_events)))
+    : null;
+  const sahityaTeamMembersJson = null;
   const connection = await pool.getConnection();
 
   try {
@@ -43,18 +51,47 @@ export async function submitStudentForm(studentId, formData) {
       await connection.query(
         `UPDATE student_forms SET 
           full_name = ?, branch = ?, roll_number = ?, mobile = ?,
-          year_of_study = ?, selected_events = ?, updated_at = NOW()
+          year_of_study = ?, selected_events = ?,
+          sahitya_selected = ?, sahitya_participant_type = ?,
+          sahitya_team_members = ?, sahitya_events = ?,
+          updated_at = NOW()
         WHERE student_id = ?`,
-        [full_name, branch, roll_number, mobile, year_of_study, selectedEventsJson, studentId]
+        [
+          full_name,
+          branch,
+          roll_number,
+          mobile,
+          year_of_study,
+          selectedEventsJson,
+          sahityaSelected,
+          normalizedSahityaType,
+          sahityaTeamMembersJson,
+          sahityaEventsJson,
+          studentId
+        ]
       );
     } else {
       registrationId = generateRegistrationId();
 
       const [result] = await connection.query(
         `INSERT INTO student_forms 
-          (student_id, registration_id, full_name, branch, roll_number, mobile, year_of_study, selected_events, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
-        [studentId, registrationId, full_name, branch, roll_number, mobile, year_of_study, selectedEventsJson]
+          (student_id, registration_id, full_name, branch, roll_number, mobile, year_of_study, selected_events,
+           sahitya_selected, sahitya_participant_type, sahitya_team_members, sahitya_events, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+        [
+          studentId,
+          registrationId,
+          full_name,
+          branch,
+          roll_number,
+          mobile,
+          year_of_study,
+          selectedEventsJson,
+          sahityaSelected,
+          normalizedSahityaType,
+          sahityaTeamMembersJson,
+          sahityaEventsJson
+        ]
       );
 
       formId = result.insertId;
@@ -102,6 +139,18 @@ export async function getStudentForm(studentId) {
     form.selected_events = form.selected_events ? JSON.parse(form.selected_events) : [];
   } catch {
     form.selected_events = [];
+  }
+
+  try {
+    form.sahitya_events = form.sahitya_events ? JSON.parse(form.sahitya_events) : [];
+  } catch {
+    form.sahitya_events = [];
+  }
+
+  try {
+    form.sahitya_team_members = form.sahitya_team_members ? JSON.parse(form.sahitya_team_members) : null;
+  } catch {
+    form.sahitya_team_members = null;
   }
 
   const [registrations] = await pool.query(

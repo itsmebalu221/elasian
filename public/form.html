@@ -901,6 +901,226 @@
       padding: 1rem;
     }
 
+    /* Sahitya Section */
+    .sahitya-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .sahitya-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .sahitya-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .sahitya-description {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .sahitya-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .sahitya-switch input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .sahitya-switch-slider {
+      width: 40px;
+      height: 22px;
+      background: var(--border);
+      border-radius: 999px;
+      position: relative;
+      transition: background 0.2s ease;
+    }
+
+    .sahitya-switch-slider::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .sahitya-switch input:checked + .sahitya-switch-slider {
+      background: var(--accent);
+    }
+
+    .sahitya-switch input:checked + .sahitya-switch-slider::after {
+      transform: translateX(18px);
+    }
+
+    .sahitya-switch-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .sahitya-details {
+      display: none;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .sahitya-details.active {
+      display: flex;
+    }
+
+    .sahitya-note {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .sahitya-pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .sahitya-pill {
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .sahitya-pill.active {
+      border-color: var(--accent);
+      background: var(--accent-muted);
+      color: var(--text-primary);
+    }
+
+    .sahitya-team {
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .sahitya-team-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .sahitya-team-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 800px) {
+      .sahitya-team-grid {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+      }
+    }
+
+    .sahitya-team-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .sahitya-team-card input {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fff;
+      font-size: 0.8rem;
+    }
+
+    .sahitya-events {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .sahitya-event-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 640px) {
+      .sahitya-event-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .sahitya-event-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem;
+      background: var(--bg-primary);
+      cursor: pointer;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+      width: 100%;
+      text-align: left;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .sahitya-event-card:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .sahitya-event-card.selected {
+      border-color: var(--accent);
+      background: var(--accent-muted);
+    }
+
+    .sahitya-event-name {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .sahitya-error {
+      font-size: 0.75rem;
+      color: var(--error);
+    }
+
+    .is-hidden {
+      display: none !important;
+    }
+
     /* Loading State */
     .loading-state {
       display: flex;
@@ -1077,6 +1297,34 @@
             </div>
           </div>
 
+          <!-- Sahitya Selection -->
+          <div class="form-section" id="sahitya-section">
+            <div class="section-label">Sahitya — Literary Fest (Optional)</div>
+            <div class="sahitya-card">
+              <div class="sahitya-header">
+                <div>
+                  <div class="sahitya-title">Want to Participate in Sahitya Literary Fest ?</div>
+                  <p class="sahitya-description">Register for literary showcases like Slam Poetry, Treasure Hunt, Quiz, and more.</p>
+                </div>
+                <label class="sahitya-switch">
+                  <input type="checkbox" id="sahitya-toggle">
+                  <span class="sahitya-switch-slider"></span>
+                  <span class="sahitya-switch-label">Participate</span>
+                </label>
+              </div>
+              <div class="sahitya-details" id="sahitya-details">
+                <p class="sahitya-note">Sahitya registrations are solo only for HITAM students. This add-on simply informs the cultural team and does not change your pass fee.</p>
+
+                <div class="sahitya-events">
+                  <p class="sahitya-team-title">Select Literary Events</p>
+                  <div class="sahitya-event-grid" id="sahitya-event-grid"></div>
+                </div>
+
+                <div class="sahitya-error" id="sahitya-error"></div>
+              </div>
+            </div>
+          </div>
+
           <!-- Payment Info -->
           <div class="payment-info">
             <div class="payment-info-header">
@@ -1125,6 +1373,20 @@
     const summaryContainer = document.getElementById('selection-summary');
     const DEFAULT_AVATAR_SRC = '/assets/Hitam-logo-greenbg.png';
     const userAvatarEl = document.getElementById('user-avatar');
+    const SAHITYA_EVENTS = [
+      { id: 'SAH_TREASURE_HUNT', name: 'Treasure Hunt' },
+      { id: 'SAH_PLAYS', name: 'Dramas / Play' },
+      { id: 'SAH_QUIZ', name: 'Quiz' },
+      { id: 'SAH_SLAM_POETRY', name: 'Slam Poetry' }
+    ];
+    const sahityaState = {
+      selected: false,
+      events: new Set()
+    };
+    const sahityaToggleEl = document.getElementById('sahitya-toggle');
+    const sahityaDetailsEl = document.getElementById('sahitya-details');
+    const sahityaEventGrid = document.getElementById('sahitya-event-grid');
+    const sahityaErrorEl = document.getElementById('sahitya-error');
 
     if (userAvatarEl) {
       userAvatarEl.onerror = () => {
@@ -1143,6 +1405,107 @@
       }
 
       return DEFAULT_AVATAR_SRC;
+    }
+
+    if (sahityaToggleEl && sahityaDetailsEl) {
+      sahityaToggleEl.addEventListener('change', () => {
+        setSahityaSelected(sahityaToggleEl.checked);
+      });
+    }
+
+    if (sahityaEventGrid) {
+      sahityaEventGrid.addEventListener('click', (event) => {
+        const card = event.target.closest('[data-sahitya-event]');
+        if (!card) {
+          return;
+        }
+        const eventId = card.getAttribute('data-sahitya-event');
+        toggleSahityaEvent(eventId);
+      });
+    }
+
+    function setSahityaSelected(selected) {
+      sahityaState.selected = Boolean(selected);
+      if (sahityaDetailsEl) {
+        sahityaDetailsEl.classList.toggle('active', sahityaState.selected);
+      }
+      if (!sahityaState.selected) {
+        sahityaState.events.clear();
+        clearSahityaError();
+      } else {
+        clearSahityaError();
+      }
+      renderSahityaEventsGrid();
+      updateSummary();
+    }
+
+    function renderSahityaEventsGrid() {
+      if (!sahityaEventGrid) {
+        return;
+      }
+
+      sahityaEventGrid.innerHTML = SAHITYA_EVENTS.map(event => {
+        const selected = sahityaState.events.has(event.id);
+        return `
+          <button type="button" class="sahitya-event-card ${selected ? 'selected' : ''}" data-sahitya-event="${event.id}">
+            <span class="sahitya-event-name">${event.name}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function toggleSahityaEvent(eventId) {
+      if (!sahityaState.selected || !eventId) {
+        return;
+      }
+
+      if (sahityaState.events.has(eventId)) {
+        sahityaState.events.delete(eventId);
+      } else {
+        sahityaState.events.add(eventId);
+      }
+
+      clearSahityaError();
+      renderSahityaEventsGrid();
+      updateSummary();
+    }
+
+    function showSahityaError(message) {
+      if (sahityaErrorEl) {
+        sahityaErrorEl.textContent = message || '';
+      }
+    }
+
+    function clearSahityaError() {
+      showSahityaError('');
+    }
+
+    function validateSahityaSelection() {
+      if (!sahityaState.selected) {
+        clearSahityaError();
+        return { ok: true };
+      }
+
+      if (sahityaState.events.size === 0) {
+        showSahityaError('Select at least one Sahitya event.');
+        return { ok: false };
+      }
+
+      clearSahityaError();
+      return { ok: true };
+    }
+
+    function buildSahityaSummaryRow() {
+      const typeLabel = 'Solo';
+      const eventCount = sahityaState.events.size;
+      const eventLabel = eventCount > 0 ? `${eventCount} event${eventCount > 1 ? 's' : ''}` : 'No events selected';
+      return `
+        <div class="summary-item">
+          <span class="summary-day">Sahitya</span>
+          <span class="summary-slot">${typeLabel}</span>
+          <span class="summary-event">${eventLabel}</span>
+        </div>
+      `;
     }
 
     let EVENT_TYPES_ENUM = {
@@ -1360,14 +1723,12 @@
     }
 
     function updateSummary() {
-      const selectedIds = Array.from(selectedEvents);
-
-      if (selectedIds.length === 0) {
-        summaryContainer.innerHTML = '<div class="summary-empty">No events selected yet</div>';
+      if (!summaryContainer) {
         return;
       }
 
-      const rows = selectedIds.map(id => {
+      const selectedIds = Array.from(selectedEvents);
+      const baseRows = selectedIds.map(id => {
         const event = eventLookup.get(id);
         if (!event) {
           return '';
@@ -1381,8 +1742,12 @@
         `;
       }).join('');
 
-      if (!rows) {
-        summaryContainer.innerHTML = '<div class="summary-empty">No events selected yet</div>';
+      if (!baseRows) {
+        let fallback = '<div class="summary-empty">No events selected yet</div>';
+        if (sahityaState.selected) {
+          fallback += buildSahityaSummaryRow();
+        }
+        summaryContainer.innerHTML = fallback;
         return;
       }
 
@@ -1391,9 +1756,17 @@
         return event && event.type !== EVENT_TYPES_ENUM.OPTIONAL;
       });
 
-      summaryContainer.innerHTML = hasPrimary
-        ? rows
-        : `${rows}<div class="summary-empty">Add a primary event to continue.</div>`;
+      let finalRows = baseRows;
+
+      if (!hasPrimary) {
+        finalRows += '<div class="summary-empty">Add a primary event to continue.</div>';
+      }
+
+      if (sahityaState.selected) {
+        finalRows += buildSahityaSummaryRow();
+      }
+
+      summaryContainer.innerHTML = finalRows;
     }
 
     function showEventsError(message) {
@@ -1544,7 +1917,11 @@
         roll_number: document.getElementById('roll_number').value.trim(),
         mobile: document.getElementById('mobile').value.trim(),
         year_of_study: parseInt(document.getElementById('year_of_study').value),
-        selected_events: Array.from(selectedEvents)
+        selected_events: Array.from(selectedEvents),
+        sahitya_selected: sahityaState.selected,
+        sahitya_participant_type: sahityaState.selected ? 'solo' : null,
+        sahitya_team_members: null,
+        sahitya_events: sahityaState.selected ? Array.from(sahityaState.events) : []
       };
 
       console.log('Submitting formData:', formData);
@@ -1565,6 +1942,14 @@
 
       if (!hasPrimaryEvent) {
         showEventsError('Select at least one primary event. Optional add-ons do not count.');
+        submitBtn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = 'Continue to Payment';
+        return;
+      }
+
+      const sahityaValidation = validateSahityaSelection();
+      if (!sahityaValidation.ok) {
         submitBtn.disabled = false;
         spinner.style.display = 'none';
         btnText.textContent = 'Continue to Payment';
@@ -1618,6 +2003,8 @@
       eventsContainer.addEventListener('click', handleEventCardClick);
       eventsContainer.addEventListener('keydown', handleEventCardKeydown);
     }
+
+    renderSahityaEventsGrid();
 
     // Initialize
     checkAuth();

@@ -1,10 +1,11 @@
-import { EVENT_DEFINITIONS } from '../config/events.config.js';
+import { EVENT_DEFINITIONS, SAHITYA_EVENTS } from '../config/events.config.js';
 
 const BRANCH_OPTIONS = ['CSE', 'EEE', 'ECE', 'MECH', 'CSC', 'CSD', 'CSO', 'CSM', 'ITP'];
 const VALID_BRANCHES = new Set(BRANCH_OPTIONS);
 const DEFAULT_BRANCH = BRANCH_OPTIONS[0];
 // Force redeploy: 2026-01-08-v2
 const VALID_EVENT_IDS = new Set(EVENT_DEFINITIONS.map(e => e.id));
+const SAHITYA_EVENT_IDS = new Set((SAHITYA_EVENTS || []).map(e => e.id));
 
 export function validateStudentForm(data) {
   const errors = [];
@@ -58,6 +59,8 @@ export function validateStudentForm(data) {
     }
   }
 
+  const sahityaSelection = parseSahityaPayload(data, errors);
+
   if (errors.length > 0) {
     return { valid: false, errors };
   }
@@ -70,9 +73,49 @@ export function validateStudentForm(data) {
       roll_number: data.roll_number.trim(),
       mobile: data.mobile.trim(),
       year_of_study: year,
-      selected_events: data.selected_events
+      selected_events: data.selected_events,
+      ...sahityaSelection
     }
   };
+}
+
+function parseSahityaPayload(data, errors) {
+  const response = {
+    sahitya_selected: false,
+    sahitya_participant_type: null,
+    sahitya_events: []
+  };
+
+  if (!data || typeof data !== 'object') {
+    return response;
+  }
+
+  const selected = data.sahitya_selected === true || data.sahitya_selected === 'true';
+  if (!selected) {
+    return response;
+  }
+
+  response.sahitya_selected = true;
+
+  response.sahitya_participant_type = 'solo';
+
+  const rawEvents = Array.isArray(data.sahitya_events) ? data.sahitya_events : [];
+  const normalizedEvents = rawEvents
+    .map(id => (typeof id === 'string' ? id.trim() : ''))
+    .filter(id => id.length > 0);
+
+  if (normalizedEvents.length === 0) {
+    errors.push({ field: 'sahitya_events', message: 'Select at least one Sahitya event.' });
+  } else {
+    const invalidEvents = normalizedEvents.filter(id => !SAHITYA_EVENT_IDS.has(id));
+    if (invalidEvents.length > 0) {
+      errors.push({ field: 'sahitya_events', message: 'Invalid Sahitya event selection.' });
+    } else {
+      response.sahitya_events = Array.from(new Set(normalizedEvents));
+    }
+  }
+
+  return response;
 }
 
 export default validateStudentForm;

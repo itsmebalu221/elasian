@@ -79,6 +79,10 @@ export async function initializeDatabase() {
         father_name VARCHAR(255),
         address TEXT,
         selected_events JSON NULL,
+        sahitya_selected BOOLEAN DEFAULT FALSE,
+        sahitya_participant_type ENUM('solo','group') NULL,
+        sahitya_team_members JSON NULL,
+        sahitya_events JSON NULL,
         payment_status ENUM('PENDING','PAID','FAILED') DEFAULT 'PENDING',
         payment_id INT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -317,6 +321,27 @@ export async function initializeDatabase() {
         "ALTER TABLE student_forms ADD COLUMN selected_events JSON NULL AFTER address"
       );
       console.log('  ✓ Added selected_events column to student_forms');
+    }
+
+    console.log('🔄 Ensuring student_forms has Sahitya fields...');
+    const studentSahityaColumns = [
+      { name: 'sahitya_selected', type: 'BOOLEAN DEFAULT FALSE', after: 'selected_events' },
+      { name: 'sahitya_participant_type', type: "ENUM('solo','group') NULL", after: 'sahitya_selected' },
+      { name: 'sahitya_team_members', type: 'JSON NULL', after: 'sahitya_participant_type' },
+      { name: 'sahitya_events', type: 'JSON NULL', after: 'sahitya_team_members' }
+    ];
+
+    for (const col of studentSahityaColumns) {
+      const [existingCol] = await connection.query(
+        `SHOW COLUMNS FROM student_forms LIKE '${col.name}'`
+      );
+      if (existingCol.length === 0) {
+        const afterClause = col.after ? ` AFTER ${col.after}` : '';
+        await connection.query(
+          `ALTER TABLE student_forms ADD COLUMN ${col.name} ${col.type}${afterClause}`
+        );
+        console.log(`  ✓ Added ${col.name} column to student_forms`);
+      }
     }
 
     console.log('🔄 Ensuring student_forms has payment status columns...');

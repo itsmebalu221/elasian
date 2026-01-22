@@ -1624,6 +1624,49 @@
       font-size: 1.4rem;
     }
 
+    .sahitya-highlight {
+      border-color: rgba(53, 101, 216, 0.25);
+      background: linear-gradient(135deg, rgba(53, 101, 216, 0.08), rgba(255, 255, 255, 0.96));
+    }
+
+    .sahitya-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--accent);
+      background: rgba(53, 101, 216, 0.12);
+      border-radius: 999px;
+      padding: 0.35rem 0.85rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .sahitya-event-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .sahitya-event-chip {
+      border: 1px solid rgba(53, 101, 216, 0.35);
+      border-radius: 999px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      background: rgba(53, 101, 216, 0.08);
+    }
+
+    .dashboard-sahitya-note {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0;
+    }
+
     .category-details p {
       color: var(--text-secondary);
       margin-bottom: 0.5rem;
@@ -1881,6 +1924,12 @@
     };
 
     const FALLBACK_EVENT_TYPE = 'OTHER';
+    const SAHITYA_LABELS = new Map([
+      ['SAH_TREASURE_HUNT', 'Treasure Hunt'],
+      ['SAH_PLAYS', 'Dramas / Play'],
+      ['SAH_QUIZ', 'Quiz'],
+      ['SAH_SLAM_POETRY', 'Slam Poetry']
+    ]);
 
     let EVENT_TYPES_ENUM = {
       MULTI_DAY: 'MULTI_DAY',
@@ -2183,6 +2232,39 @@
       `;
 
       container.innerHTML = html;
+
+      if (formData.sahitya_selected) {
+        const sahityaMarkup = renderSahityaCard(formData);
+        if (sahityaMarkup) {
+          container.innerHTML += sahityaMarkup;
+        }
+      }
+    }
+
+    function renderSahityaCard(formData) {
+      const rawEvents = Array.isArray(formData.sahitya_events) ? formData.sahitya_events : [];
+      const eventList = Array.from(new Set(rawEvents));
+
+      if (eventList.length === 0) {
+        return '';
+      }
+
+      const chips = eventList.map(id => {
+        const label = SAHITYA_LABELS.get(id) || id;
+        return `<span class="sahitya-event-chip">${escapeHtml(label)}</span>`;
+      }).join('');
+
+      return `
+        <div class="event-category-card sahitya-highlight">
+          <div class="category-details">
+            <div class="sahitya-badge">Sahitya — Day 1</div>
+            <div class="sahitya-event-grid">
+              ${chips}
+            </div>
+            <p class="dashboard-sahitya-note">Solo showcases only. The cultural team will email your reporting time.</p>
+          </div>
+        </div>
+      `;
     }
 
     function generateQRCode(registrationId, size = 180, color = '1f2a21') {
