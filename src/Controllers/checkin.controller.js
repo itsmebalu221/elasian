@@ -58,9 +58,9 @@ export async function lookupRegistration(req, res) {
 
 export async function admitGuests(req, res) {
   try {
-    const { attendanceIds, day } = req.body || {};
+    const { attendanceIds, day, passType } = req.body || {};
     const operator = req.user?.email || 'system';
-    const result = await admitSelection({ attendanceIds, dayId: day, operator });
+    const result = await admitSelection({ attendanceIds, dayId: day, operator, passType });
 
     return res.json({
       success: true,

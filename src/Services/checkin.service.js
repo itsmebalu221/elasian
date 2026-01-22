@@ -25,7 +25,8 @@ const STATUS_LABELS = {
 
 const PASS_LABELS = {
   BUTTERFLY: 'Butterfly Pass',
-  EXTERNAL: 'External (HITAM Only)'
+  EXTERNAL: 'External (HITAM Only)',
+  FIRST_PHASE: 'First Phase Registration'
 };
 
 export class CheckinError extends Error {
@@ -262,11 +263,87 @@ async function fetchRegistration(table, id) {
   return rows[0] || null;
 }
 
+async function fetchFirstPhaseRegistration(registrationId) {
+  const [rows] = await db.query(
+    'SELECT * FROM first_phase_registrations WHERE registration_id = ? ORDER BY id',
+    [registrationId]
+  );
+  return rows;
+}
+
+function mapFirstPhaseParticipants(registrations, dayId) {
+  return registrations.map((reg, index) => {
+    const status = normalizeStatus(reg[dayId]);
+    return {
+      attendanceId: reg.id,
+      slotLabel: registrations.length === 1 ? 'Pass Holder' : `Participant ${index + 1}`,
+      studentNumber: index + 1,
+      name: reg.full_name,
+      branch: reg.branch || null,
+      rollNumber: reg.roll_number || null,
+      email: reg.email || null,
+      mobile: reg.mobile || null,
+      institution: null,
+      department: null,
+      status,
+      statusLabel: STATUS_LABELS[status] || status,
+      canAdmit: status === 'unattended',
+      history: buildHistory(reg)
+    };
+  });
+}
+
+function buildFirstPhaseMeta(registration, summary) {
+  return {
+    passLabel: PASS_LABELS.FIRST_PHASE,
+    ownerName: registration.full_name,
+    email: registration.email,
+    rollNumber: registration.roll_number,
+    counts: summary
+  };
+}
+
+async function buildFirstPhasePayload(registrationId, dayId) {
+  const day = resolveDay(dayId);
+  const registrations = await fetchFirstPhaseRegistration(registrationId);
+
+  if (!registrations.length) {
+    return null; // Not found in first_phase_registrations either
+  }
+
+  const participants = mapFirstPhaseParticipants(registrations, day.id);
+  const summary = summarizeParticipants(participants);
+  const meta = buildFirstPhaseMeta(registrations[0], summary);
+  const message = summary.pending
+    ? `${summary.pending} participant(s) ready to admit`
+    : summary.admitted === summary.total && summary.total > 0
+      ? 'All participants already admitted'
+      : 'No participants available to admit';
+
+  return {
+    status: summary.status,
+    passType: 'FIRST_PHASE',
+    registrationId,
+    day: day.id,
+    dayLabel: day.label,
+    canAdmit: participants.some(p => p.canAdmit),
+    participants,
+    meta,
+    message,
+    scannedAt: new Date().toISOString()
+  };
+}
+
 async function buildPayload(registrationId, dayId) {
   const day = resolveDay(dayId);
   const snapshots = await fetchSnapshots(registrationId);
 
+  // If not found in attendance_snapshot, check first_phase_registrations
   if (!snapshots.length) {
+    const firstPhasePayload = await buildFirstPhasePayload(registrationId, dayId);
+    if (firstPhasePayload) {
+      return firstPhasePayload;
+    }
     throw new CheckinError('Registration not found or not eligible for this gate', 404, 'NOT_FOUND');
   }
 
@@ -326,7 +403,7 @@ export async function lookupPass(rawToken, dayId, { skipExtract = false } = {}) 
   return buildPayload(registrationId, dayId);
 }
 
-export async function admitSelection({ attendanceIds, dayId, operator }) {
+export async function admitSelection({ attendanceIds, dayId, operator, passType }) {
   const day = resolveDay(dayId);
 
   if (!Array.isArray(attendanceIds) || attendanceIds.length === 0) {
@@ -341,11 +418,14 @@ export async function admitSelection({ attendanceIds, dayId, operator }) {
   const connection = await db.getConnection();
   const placeholders = uniqueIds.map(() => '?').join(',');
 
+  // Determine which table to update based on passType
+  const tableName = passType === 'FIRST_PHASE' ? 'first_phase_registrations' : 'attendance_snapshot';
+
   try {
     await connection.beginTransaction();
 
     const [rows] = await connection.query(
-      `SELECT id, registration_id, ${day.id} AS day_status FROM attendance_snapshot WHERE id IN (${placeholders}) FOR UPDATE`,
+      `SELECT id, registration_id, ${day.id} AS day_status FROM ${tableName} WHERE id IN (${placeholders}) FOR UPDATE`,
       uniqueIds
     );
 
@@ -364,7 +444,7 @@ export async function admitSelection({ attendanceIds, dayId, operator }) {
     }
 
     await connection.query(
-      `UPDATE attendance_snapshot SET ${day.id} = 'admitted', updated_at = NOW() WHERE id IN (${placeholders})`,
+      `UPDATE ${tableName} SET ${day.id} = 'admitted', updated_at = NOW() WHERE id IN (${placeholders})`,
       uniqueIds
     );
 
@@ -374,7 +454,9 @@ export async function admitSelection({ attendanceIds, dayId, operator }) {
       registrationId,
       day: day.id,
       count: uniqueIds.length,
-      operator
+      operator,
+      passType,
+      table: tableName
     });
 
     const payload = await buildPayload(registrationId, day.id);
@@ -401,6 +483,6 @@ export function getCheckinConfig() {
     filters: {
       externalInstitutionContains: INSTITUTION_FILTER || null
     },
-    supportedPasses: ['BUTTERFLY', 'EXTERNAL']
+    supportedPasses: ['BUTTERFLY', 'EXTERNAL', 'FIRST_PHASE']
   };
 }

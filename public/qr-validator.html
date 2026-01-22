@@ -967,7 +967,11 @@
       try {
         const result = await apiCall('/api/checkin/admit', {
           method: 'POST',
-          body: JSON.stringify({ attendanceIds: Array.from(selectedIds), day: currentDay })
+          body: JSON.stringify({ 
+            attendanceIds: Array.from(selectedIds), 
+            day: currentDay,
+            passType: currentResult?.passType || null
+          })
         });
 
         currentResult = result;

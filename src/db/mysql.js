@@ -719,6 +719,35 @@ export async function initializeDatabase() {
       WHERE ar.payment_status = 'PAID'
     `);
 
+    // Copy existing data from first_phase_registrations if table exists
+    console.log('🔄 Checking for first_phase_registrations data...');
+    try {
+      const [tableExists] = await connection.query(`
+        SELECT COUNT(*) as count FROM information_schema.tables 
+        WHERE table_schema = ? AND table_name = 'first_phase_registrations'
+      `, [DB_NAME]);
+      
+      if (tableExists[0].count > 0) {
+        const [inserted] = await connection.query(`
+          INSERT INTO attendance_snapshot (
+            registration_id, full_name, roll_number, email, mobile,
+            user_type, source_table, source_id,
+            day1, day2, day3, day4, day5, day6, day7
+          )
+          SELECT 
+            registration_id, full_name, roll_number, email, mobile,
+            user_type, source_table, source_id,
+            day1, day2, day3, day4, day5, day6, day7
+          FROM first_phase_registrations
+        `);
+        console.log(`   ✅ Imported ${inserted.affectedRows} records from first_phase_registrations`);
+      } else {
+        console.log('   ℹ️ No first_phase_registrations table found, skipping...');
+      }
+    } catch (fpErr) {
+      console.warn('   ⚠️ Could not import first_phase_registrations:', fpErr.message);
+    }
+
     connection.release();
     await tempPool.end();
 
