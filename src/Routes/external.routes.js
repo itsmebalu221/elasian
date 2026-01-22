@@ -39,4 +39,5 @@ export function externalRoutes(app) {
   app.get('/api/external/payment/status', requireExternalAuth, externalController.getExternalPaymentStatus);
   app.get('/api/external/registration/by-email', requireExternalAuth, externalController.getExternalRegistrationByEmail);
   app.get('/api/external/registration/:identityNumber', requireExternalAuth, externalController.getRegistrationByIdentity);
+  app.get('/api/external/registration/code/:elysianId', requireExternalAuth, externalController.getRegistrationByElysianId);
 }

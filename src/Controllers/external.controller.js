@@ -328,3 +328,55 @@ export async function getRegistrationByIdentity(req, res) {
     });
   }
 }
+
+export async function getRegistrationByElysianId(req, res) {
+  try {
+    const { elysianId } = req.params;
+
+    if (!elysianId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Elysian ID is required'
+      });
+    }
+
+    const formattedId = elysianId.trim().toUpperCase();
+    const registration = await externalService.getExternalRegistrationByCode(formattedId);
+
+    if (!registration) {
+      return res.status(404).json({
+        success: false,
+        error: 'No registration found for this Elysian ID'
+      });
+    }
+
+    const responseData = parseRegistrationEvents(registration);
+    const jsonFields = [
+      'esparto_team_members', 'sahitya_team_members', 'prasasti_team_members',
+      'esparto_events', 'sahitya_events', 'prasasti_events'
+    ];
+
+    jsonFields.forEach(field => {
+      if (responseData[field] && typeof responseData[field] === 'string') {
+        try {
+          responseData[field] = JSON.parse(responseData[field]);
+        } catch (e) {
+          console.warn(`Failed to parse ${field}:`, e);
+          responseData[field] = [];
+        }
+      }
+    });
+
+    return res.json({
+      success: true,
+      registration: responseData,
+      isPaid: registration.payment_status === 'PAID'
+    });
+  } catch (error) {
+    console.error('Get registration by Elysian ID error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch registration details'
+    });
+  }
+}

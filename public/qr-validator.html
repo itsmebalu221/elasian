@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Gate Check-In Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #030712;
+      --panel: rgba(7, 16, 41, 0.85);
+      --muted: #7c8db5;
+      --green: #25d366;
+      --yellow: #f5c451;
+      --red: #ff4d4f;
+      --blue: #3b82f6;
+      --shadow: 0 24px 60px rgba(2, 6, 23, 0.65);
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont;
+      color: #f4f6ff;
+      background: radial-gradient(circle at 20% -10%, rgba(59, 130, 246, 0.35), transparent 45%),
+        radial-gradient(circle at 80% 0%, rgba(16, 185, 129, 0.28), transparent 50%),
+        var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(16px, 4vw, 32px);
+    }
+
+    main {
+      width: min(540px, 100%);
+      background: var(--panel);
+      border-radius: 28px;
+      padding: clamp(20px, 4vw, 32px);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    header.console-header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .eyebrow {
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+    }
+
+    .header-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .day-picker {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      flex: 1;
+    }
+
+    select {
+      appearance: none;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(12, 18, 45, 0.9);
+      color: inherit;
+      font-weight: 600;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 160ms ease;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #refresh-config {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .scanner-shell {
+      border-radius: 24px;
+      overflow: hidden;
+      background: #060d20;
+      border: 1px solid var(--border);
+    }
+
+    #qr-reader {
+      width: 100%;
+      min-height: 310px;
+    }
+
+    .status-card {
+      border-radius: 22px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: background 200ms ease, border-color 200ms ease, color 200ms ease;
+    }
+
+    .status-card span.label {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .status-card strong {
+      font-size: 1.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    .status-card.status-valid {
+      border-color: rgba(37, 211, 102, 0.6);
+      color: var(--green);
+      background: rgba(37, 211, 102, 0.14);
+    }
+
+    .status-card.status-used {
+      border-color: rgba(245, 196, 81, 0.6);
+      color: var(--yellow);
+      background: rgba(245, 196, 81, 0.12);
+    }
+
+    .status-card.status-invalid {
+      border-color: rgba(255, 77, 79, 0.6);
+      color: var(--red);
+      background: rgba(255, 77, 79, 0.12);
+    }
+
+    .summary,
+    .participants {
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      padding: 20px;
+      background: rgba(5, 11, 30, 0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .stat-block {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 16px;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .stat-block span {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .stat-block strong {
+      display: block;
+      font-size: 1.1rem;
+      margin-top: 4px;
+    }
+
+    .participants header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    #participant-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .participant {
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 18px;
+      padding: 12px;
+      background: rgba(9, 15, 35, 0.9);
+    }
+
+    .participant label {
+      display: flex;
+      gap: 14px;
+      align-items: stretch;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .participant-checkbox {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--blue);
+      margin-top: 4px;
+    }
+
+    .participant-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .participant-headline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .slot-tag {
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .participant-name {
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .status-chip {
+      border-radius: 999px;
+      font-size: 0.75rem;
+      padding: 2px 10px;
+      font-weight: 600;
+    }
+
+    .chip-ready {
+      background: rgba(59, 130, 246, 0.18);
+      color: var(--blue);
+    }
+
+    .chip-admitted {
+      background: rgba(37, 211, 102, 0.18);
+      color: var(--green);
+    }
+
+    .chip-blocked {
+      background: rgba(255, 77, 79, 0.18);
+      color: var(--red);
+    }
+
+    .participant-meta {
+      font-size: 0.85rem;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    @media (min-width: 520px) {
+      .actions {
+        flex-direction: row;
+      }
+    }
+
+    #admit-btn {
+      background: var(--green);
+      color: #041b0d;
+      flex: 1.2;
+    }
+
+    #resume-btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      flex: 1;
+    }
+
+    #flip-btn {
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      flex: 1;
+    }
+
+    .meta {
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.4);
+      text-align: center;
+      margin: 0;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+  <script src="https://unpkg.com/html5-qrcode@2.3.9/html5-qrcode.min.js" integrity="sha384-lw9iEUeQFIscIzT81IBAU7kASfyBZix2yEKGQjGaK2CgyfIFpqZuhG5i5/GjLnxL" crossorigin="anonymous"></script>
+</head>
+<body>
+  <main>
+    <header class="console-header">
+      <div class="title-block">
+        <p class="eyebrow">Elysian 2026</p>
+        <h1>Gate Check-In Console</h1>
+      </div>
+      <div class="header-controls">
+        <label class="day-picker">
+          <span>Day Window</span>
+          <select id="day-select"></select>
+        </label>
+        <button id="refresh-config" type="button">Reload Config</button>
+      </div>
+    </header>
+
+    <section class="scanner-shell">
+      <div id="qr-reader" role="img" aria-label="QR scanner viewport"></div>
+    </section>
+
+    <section class="status-card status-pending" id="status-card">
+      <span class="label">Status</span>
+      <strong id="status-title">Waiting for scan</strong>
+      <p id="status-message">Align any Butterfly or HITAM-only external QR inside the frame</p>
+    </section>
+
+    <section id="pass-summary" class="summary hidden">
+      <div class="summary-grid">
+        <div class="stat-block">
+          <span>Pass</span>
+          <strong id="summary-pass">—</strong>
+        </div>
+        <div class="stat-block">
+          <span>Registration ID</span>
+          <strong id="summary-id">—</strong>
+        </div>
+        <div class="stat-block">
+          <span>Owner</span>
+          <strong id="summary-owner">—</strong>
+        </div>
+        <div class="stat-block">
+          <span>Context</span>
+          <strong id="summary-context">—</strong>
+        </div>
+      </div>
+      <div class="summary-grid">
+        <div class="stat-block">
+          <span>Total</span>
+          <strong id="summary-total">0</strong>
+        </div>
+        <div class="stat-block">
+          <span>Admitted</span>
+          <strong id="summary-admitted">0</strong>
+        </div>
+        <div class="stat-block">
+          <span>Ready</span>
+          <strong id="summary-pending">0</strong>
+        </div>
+      </div>
+    </section>
+
+    <section id="participants-panel" class="participants hidden">
+      <header>
+        <h2>Group Members</h2>
+        <p id="panel-hint" style="color: var(--muted); font-size: 0.85rem; margin: 0;">Select members to admit</p>
+      </header>
+      <ul id="participant-list"></ul>
+    </section>
+
+    <div class="actions">
+      <button id="admit-btn" type="button" disabled>Admit Selected</button>
+      <button id="resume-btn" type="button" disabled>Scan Next</button>
+      <button id="flip-btn" type="button">Flip Camera</button>
+    </div>
+
+    <p class="meta">All validation happens on the /api/checkin APIs; this console only relays tokens securely.</p>
+  </main>
+
+  <template id="participant-template">
+    <li class="participant">
+      <label>
+        <input type="checkbox" class="participant-checkbox" />
+        <div class="participant-card">
+          <div class="participant-headline">
+            <span class="slot-tag"></span>
+            <span class="participant-name"></span>
+            <span class="status-chip"></span>
+          </div>
+          <div class="participant-meta"></div>
+        </div>
+      </label>
+    </li>
+  </template>
+
+  <script>
+    const API_PATHS = {
+      config: '/api/checkin/config',
+      lookup: '/api/checkin/lookup',
+      admit: '/api/checkin/admit'
+    };
+
+    const statusCard = document.getElementById('status-card');
+    const statusTitle = document.getElementById('status-title');
+    const statusMessage = document.getElementById('status-message');
+    const daySelect = document.getElementById('day-select');
+    const refreshConfigBtn = document.getElementById('refresh-config');
+    const passSummary = document.getElementById('pass-summary');
+    const summaryPass = document.getElementById('summary-pass');
+    const summaryId = document.getElementById('summary-id');
+    const summaryOwner = document.getElementById('summary-owner');
+    const summaryContext = document.getElementById('summary-context');
+    const summaryTotal = document.getElementById('summary-total');
+    const summaryAdmitted = document.getElementById('summary-admitted');
+    const summaryPending = document.getElementById('summary-pending');
+    const participantsPanel = document.getElementById('participants-panel');
+    const participantList = document.getElementById('participant-list');
+    const panelHint = document.getElementById('panel-hint');
+    const participantTemplate = document.getElementById('participant-template');
+    const admitBtn = document.getElementById('admit-btn');
+    const resumeBtn = document.getElementById('resume-btn');
+    const flipBtn = document.getElementById('flip-btn');
+
+    const CARD_STATE = {
+      PENDING: 'status-pending',
+      VALID: 'status-valid',
+      PARTIAL: 'status-used',
+      ALREADY_USED: 'status-used',
+      INVALID: 'status-invalid',
+      ERROR: 'status-invalid'
+    };
+
+    const state = {
+      selectedDay: 'day1',
+      dayOptions: [],
+      selection: new Set(),
+      currentResult: null,
+      scanner: null,
+      activeCameraId: null,
+      isProcessing: false
+    };
+
+    function setStatus(key, title, message) {
+      const className = CARD_STATE[key] || CARD_STATE.PENDING;
+      statusCard.className = `status-card ${className}`;
+      statusTitle.textContent = title;
+      statusMessage.textContent = message;
+    }
+
+    function clearPanels() {
+      passSummary.classList.add('hidden');
+      participantsPanel.classList.add('hidden');
+      participantList.innerHTML = '';
+      state.selection.clear();
+      updateActions();
+    }
+
+    function updateActions() {
+      admitBtn.disabled = state.selection.size === 0;
+      resumeBtn.disabled = !state.scanner || !state.isProcessing;
+    }
+
+    async function apiRequest(url, options = {}) {
+      const payload = {
+        credentials: 'include',
+        ...options
+      };
+
+      if (payload.body && typeof payload.body !== 'string') {
+        payload.body = JSON.stringify(payload.body);
+      }
+
+      if (payload.body && !payload.headers) {
+        payload.headers = { 'Content-Type': 'application/json' };
+      }
+
+      const response = await fetch(url, payload);
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || data.success === false) {
+        const error = new Error(data.error || data.message || 'Request failed');
+        error.status = response.status;
+        throw error;
+      }
+
+      if (Object.prototype.hasOwnProperty.call(data, 'config')) {
+        return data.config;
+      }
+
+      if (Object.prototype.hasOwnProperty.call(data, 'result')) {
+        return data.result;
+      }
+
+      return data;
+    }
+
+    function populateDaySelect(options, selected) {
+      daySelect.innerHTML = '';
+      options.forEach(option => {
+        const opt = document.createElement('option');
+        opt.value = option.id;
+        opt.textContent = `${option.label}`;
+        daySelect.appendChild(opt);
+      });
+
+      daySelect.value = selected || options[0]?.id || 'day1';
+      state.selectedDay = daySelect.value;
+    }
+
+    async function loadConfig() {
+      try {
+        const config = await apiRequest(API_PATHS.config);
+        state.dayOptions = config.dayOptions || [];
+        populateDaySelect(state.dayOptions, config.defaultDay);
+        setStatus('PENDING', 'Ready', 'Align the QR within the frame');
+      } catch (error) {
+        setStatus('ERROR', 'Config error', error.message || 'Unable to load gate config');
+        throw error;
+      }
+    }
+
+    function renderSummary(result) {
+      passSummary.classList.remove('hidden');
+      summaryPass.textContent = result.meta?.passLabel || result.passType;
+      summaryId.textContent = result.registrationId;
+      summaryOwner.textContent = result.meta?.ownerName || result.meta?.primaryEmail || '—';
+
+      if (result.passType === 'BUTTERFLY') {
+        summaryContext.textContent = `${result.meta?.counts?.total || 0} guests • ${result.meta?.paymentStatus || '—'}`;
+      } else {
+        const institution = result.meta?.institution || '—';
+        const department = result.meta?.department;
+        summaryContext.textContent = department ? `${institution} • ${department}` : institution;
+      }
+
+      summaryTotal.textContent = result.meta?.counts?.total ?? 0;
+      summaryAdmitted.textContent = result.meta?.counts?.admitted ?? 0;
+      summaryPending.textContent = result.meta?.counts?.pending ?? 0;
+    }
+
+    function renderParticipants(participants = []) {
+      participantList.innerHTML = '';
+      state.selection.clear();
+
+      if (!participants.length) {
+        participantsPanel.classList.add('hidden');
+        updateActions();
+        return;
+      }
+
+      participantsPanel.classList.remove('hidden');
+
+      participants.forEach(person => {
+        const node = participantTemplate.content.cloneNode(true);
+        const checkbox = node.querySelector('.participant-checkbox');
+        const slotTag = node.querySelector('.slot-tag');
+        const nameEl = node.querySelector('.participant-name');
+        const chip = node.querySelector('.status-chip');
+        const meta = node.querySelector('.participant-meta');
+
+        slotTag.textContent = person.slotLabel || `Guest ${person.studentNumber || ''}`;
+        nameEl.textContent = person.name || '—';
+
+        const statusClass = person.status === 'admitted'
+          ? 'chip-admitted'
+          : person.status === 'unattended'
+            ? 'chip-ready'
+            : 'chip-blocked';
+        chip.className = `status-chip ${statusClass}`;
+        chip.textContent = person.statusLabel || person.status;
+
+        const details = [];
+        if (person.rollNumber) {
+          details.push(`Roll: ${person.rollNumber}`);
+        }
+        if (person.branch) {
+          details.push(person.branch);
+        }
+        if (person.institution) {
+          details.push(person.institution);
+        }
+        if (person.department) {
+          details.push(person.department);
+        }
+        meta.textContent = details.join(' • ') || (person.email || '—');
+
+        checkbox.dataset.attendanceId = person.attendanceId || '';
+        checkbox.disabled = !person.canAdmit;
+        checkbox.checked = person.canAdmit && !!person.attendanceId;
+
+        if (person.canAdmit && person.attendanceId) {
+          state.selection.add(String(person.attendanceId));
+        }
+
+        participantList.appendChild(node);
+      });
+
+      panelHint.textContent = state.selection.size
+        ? 'Ready to admit selected guests'
+        : 'No guests available to admit';
+
+      updateActions();
+    }
+
+    async function lookupToken(token) {
+      const payload = await apiRequest(API_PATHS.lookup, {
+        method: 'POST',
+        body: {
+          token,
+          day: state.selectedDay
+        }
+      });
+      return payload;
+    }
+
+    async function admitSelected() {
+      if (!state.selection.size) {
+        return;
+      }
+
+      try {
+        setStatus('PENDING', 'Updating gate log', 'Hold on...');
+        admitBtn.disabled = true;
+        const result = await apiRequest(API_PATHS.admit, {
+          method: 'POST',
+          body: {
+            attendanceIds: Array.from(state.selection, id => Number(id)),
+            day: state.selectedDay
+          }
+        });
+
+        state.currentResult = result;
+        renderSummary(result);
+        renderParticipants(result.participants);
+        const statusKey = result.status === 'ALREADY_USED' ? 'ALREADY_USED' : 'VALID';
+        setStatus(statusKey, 'Admission updated', result.message || 'Guests admitted');
+      } catch (error) {
+        setStatus('ERROR', 'Admit failed', error.message || 'Unable to update gate log');
+      } finally {
+        updateActions();
+      }
+    }
+
+    function pauseScanner() {
+      if (!state.scanner) {
+        return;
+      }
+      try {
+        state.scanner.pause(true);
+      } catch (_) {
+        // html5-qrcode may throw if already paused.
+      }
+      state.isProcessing = true;
+      updateActions();
+    }
+
+    async function resumeScanner() {
+      if (!state.scanner) {
+        return;
+      }
+      try {
+        await state.scanner.resume();
+        state.isProcessing = false;
+        state.currentResult = null;
+        clearPanels();
+        setStatus('PENDING', 'Ready', 'Align the QR within the frame');
+      } catch (error) {
+        setStatus('ERROR', 'Camera unavailable', error.message || 'Unable to resume camera');
+      } finally {
+        updateActions();
+      }
+    }
+
+    async function handleScan(decodedText) {
+      if (state.isProcessing) {
+        return;
+      }
+
+      pauseScanner();
+      clearPanels();
+      setStatus('PENDING', 'Validating', 'Hold on...');
+
+      try {
+        const result = await lookupToken(decodedText);
+        state.currentResult = result;
+        renderSummary(result);
+        renderParticipants(result.participants);
+        const cardState = CARD_STATE[result.status] ? result.status : 'VALID';
+        setStatus(cardState, result.passType === 'BUTTERFLY' ? 'Butterfly pass' : 'External pass', result.message || 'Ready');
+        resumeBtn.disabled = false;
+      } catch (error) {
+        clearPanels();
+        const title = error.status === 401 ? 'Login required' : 'Verification failed';
+        const message = error.message || 'Server rejected the request';
+        setStatus('ERROR', title, message);
+      }
+    }
+
+    async function initScanner() {
+      try {
+        const cameras = await Html5Qrcode.getCameras();
+        if (!cameras.length) {
+          throw new Error('No camera detected');
+        }
+
+        state.activeCameraId = cameras[0].id;
+        state.scanner = new Html5Qrcode('qr-reader', { formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE] });
+
+        await state.scanner.start(
+          { deviceId: { exact: state.activeCameraId } },
+          {
+            fps: 10,
+            qrbox: (vw, vh) => {
+              const minEdge = Math.min(vw, vh);
+              return { width: minEdge * 0.8, height: minEdge * 0.8 };
+            }
+          },
+          decodedText => handleScan(decodedText),
+          error => {
+            if (String(error).includes('NotAllowedError')) {
+              setStatus('ERROR', 'Camera blocked', 'Allow camera access to scan');
+            }
+          }
+        );
+      } catch (error) {
+        setStatus('ERROR', 'Scanner error', error.message || 'Unable to start camera');
+      }
+    }
+
+    async function flipCamera() {
+      if (!state.scanner) {
+        return;
+      }
+
+      try {
+        const cameras = await Html5Qrcode.getCameras();
+        if (cameras.length < 2) {
+          setStatus('ERROR', 'Single camera', 'No alternative camera found');
+          return;
+        }
+
+        const currentIndex = cameras.findIndex(cam => cam.id === state.activeCameraId);
+        const nextCamera = cameras[(currentIndex + 1) % cameras.length];
+        state.activeCameraId = nextCamera.id;
+
+        await state.scanner.stop();
+        await state.scanner.start({ deviceId: { exact: state.activeCameraId } }, { fps: 10, qrbox: 240 }, handleScan, console.warn);
+        setStatus('PENDING', 'Ready', `Using ${nextCamera.label || 'new camera'}`);
+      } catch (error) {
+        setStatus('ERROR', 'Flip failed', error.message || 'Retry flip');
+      }
+    }
+
+    participantList.addEventListener('change', event => {
+      if (!event.target.classList.contains('participant-checkbox')) {
+        return;
+      }
+      const id = event.target.dataset.attendanceId;
+      if (!id) {
+        event.target.checked = false;
+        return;
+      }
+      if (event.target.checked) {
+        state.selection.add(id);
+      } else {
+        state.selection.delete(id);
+      }
+      updateActions();
+    });
+
+    admitBtn.addEventListener('click', admitSelected);
+    resumeBtn.addEventListener('click', resumeScanner);
+    flipBtn.addEventListener('click', flipCamera);
+    refreshConfigBtn.addEventListener('click', () => {
+      loadConfig().catch(() => undefined);
+    });
+    daySelect.addEventListener('change', () => {
+      state.selectedDay = daySelect.value;
+      if (state.currentResult) {
+        setStatus('PENDING', 'Day changed', 'Scan again for the new window');
+        clearPanels();
+      }
+    });
+
+    (async () => {
+      try {
+        await loadConfig();
+      } catch (_) {
+        // continue; staff can still attempt to scan once authenticated
+      }
+      initScanner();
+    })();
+  </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Event Check-In Scanner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      color-scheme: dark light;
+      --bg: #050914;
+      --panel: rgba(6, 13, 34, 0.85);
+      --muted: #6f7a99;
+      --green: #25d366;
+      --yellow: #f5c451;
+      --red: #ff4d4f;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Space Grotesk", system-ui, -apple-system, BlinkMacSystemFont;
+      color: #f4f6ff;
+      background: radial-gradient(circle at top, rgba(44, 86, 255, 0.4), transparent 60%),
+        radial-gradient(circle at bottom, rgba(0, 212, 140, 0.35), transparent 50%),
+        var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    main {
+      width: min(420px, 100%);
+      background: var(--panel);
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 4vw, 2rem);
+      letter-spacing: 1px;
+    }
+
+    p.subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    #qr-reader {
+      width: 100%;
+      border-radius: 20px;
+      overflow: hidden;
+      min-height: 320px;
+      background: #0c142f;
+    }
+
+    #qr-reader__scan_region video {
+      border-radius: 16px;
+    }
+
+    .status-card {
+      border-radius: 20px;
+      padding: 18px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: background 220ms ease, border-color 220ms ease, color 220ms ease;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .status-card span.label {
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .status-card strong {
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+    }
+
+    .status-card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .status-card.status-pending {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .status-card.status-valid {
+      background: rgba(37, 211, 102, 0.12);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .status-card.status-used {
+      background: rgba(245, 196, 81, 0.13);
+      border-color: var(--yellow);
+      color: var(--yellow);
+    }
+
+    .status-card.status-invalid {
+      background: rgba(255, 77, 79, 0.13);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      flex: 1;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 160ms ease;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #resume-btn {
+      background: #1c56ff;
+      color: #fff;
+    }
+
+    #flip-btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .status-card.status-valid p,
+    .status-card.status-used p,
+    .status-card.status-invalid p {
+      color: currentColor;
+    }
+
+    .meta {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.35);
+      text-align: center;
+    }
+  </style>
+  <script src="https://unpkg.com/html5-qrcode@2.3.9/html5-qrcode.min.js" integrity="sha384-lw9iEUeQFIscIzT81IBAU7kASfyBZix2yEKGQjGaK2CgyfIFpqZuhG5i5/GjLnxL" crossorigin="anonymous"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Gate Check-In</h1>
+      <p class="subtitle">One scan per guest · Live validation</p>
+    </header>
+
+    <div id="qr-reader" role="img" aria-label="QR scanner viewport"></div>
+
+    <section class="status-card status-pending" id="status-card">
+      <span class="label">Status</span>
+      <strong id="status-title">Waiting for scan</strong>
+      <p id="status-message">Align the QR within the frame</p>
+    </section>
+
+    <div class="actions">
+      <button id="resume-btn" type="button" disabled>Scan Next</button>
+      <button id="flip-btn" type="button">Flip Camera</button>
+    </div>
+
+    <p class="meta">Camera access stays on-device · Validation only via API</p>
+  </main>
+
+  <script>
+    // Centralized UI state so staff always see the latest server verdict.
+    const statusCard = document.getElementById("status-card");
+    const statusTitle = document.getElementById("status-title");
+    const statusMessage = document.getElementById("status-message");
+    const resumeBtn = document.getElementById("resume-btn");
+    const flipBtn = document.getElementById("flip-btn");
+
+    let scannerInstance;
+    let activeCameraId = null;
+    let isProcessing = false;
+
+    const STATUS_STYLES = {
+      PENDING: "status-pending",
+      VALID: "status-valid",
+      ALREADY_USED: "status-used",
+      INVALID: "status-invalid",
+      ERROR: "status-invalid"
+    };
+
+    function setStatus(state, title, message) {
+      statusCard.className = `status-card ${STATUS_STYLES[state] ?? STATUS_STYLES.PENDING}`;
+      statusTitle.textContent = title;
+      statusMessage.textContent = message;
+    }
+
+    function pauseScanner() {
+      if (!scannerInstance) return;
+      try {
+        scannerInstance.pause(true);
+      } catch (_) {
+        // html5-qrcode throws if already paused; ignore to keep UI responsive.
+      }
+      resumeBtn.disabled = false;
+    }
+
+    async function resumeScanner() {
+      if (!scannerInstance) return;
+      try {
+        await scannerInstance.resume();
+        setStatus("PENDING", "Ready", "Align the QR within the frame");
+        resumeBtn.disabled = true;
+        isProcessing = false;
+      } catch (error) {
+        setStatus("ERROR", "Camera unavailable", error.message || "Tap flip to retry");
+      }
+    }
+
+    async function sendToBackend(token) {
+      // All trust lives server-side. Frontend forwards opaque token only.
+      const res = await fetch("/api/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ token })
+      });
+
+      if (!res.ok) {
+        const detail = await res.json().catch(() => ({}));
+        throw new Error(detail.message || "Server rejected the request");
+      }
+
+      return res.json();
+    }
+
+    async function handleScan(token) {
+      if (isProcessing) return;
+      isProcessing = true;
+      pauseScanner();
+      setStatus("PENDING", "Validating", "Hold on...");
+
+      try {
+        const data = await sendToBackend(token);
+        const { status, name, message } = data;
+        switch (status) {
+          case "VALID":
+            setStatus("VALID", name || "Validated", message || "Proceed inside");
+            break;
+          case "ALREADY_USED":
+            setStatus("ALREADY_USED", name || "Already Checked In", message || "Do not re-admit");
+            break;
+          case "INVALID":
+          default:
+            setStatus("INVALID", "Not Recognized", message || "Escalate to coordinator");
+            break;
+        }
+      } catch (error) {
+        setStatus("ERROR", "Verification failed", error.message || "Network error");
+      }
+    }
+
+    async function initScanner() {
+      try {
+        const cameras = await Html5Qrcode.getCameras();
+        if (!cameras.length) throw new Error("No camera detected");
+        activeCameraId = cameras[0].id;
+        scannerInstance = new Html5Qrcode("qr-reader", { formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE] });
+        await scannerInstance.start(
+          { deviceId: { exact: activeCameraId } },
+          { fps: 10, qrbox: (viewfinderWidth, viewfinderHeight) => {
+              const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+              return { width: minEdge * 0.8, height: minEdge * 0.8 };
+            },
+            aspectRatio: 1.0,
+            rememberLastUsedCamera: true
+          },
+          decodedText => handleScan(decodedText),
+          error => {
+            // Noise is expected while scanning; surface only persistent camera errors.
+            if (String(error).includes("NotAllowedError")) {
+              setStatus("ERROR", "Camera blocked", "Allow camera access to scan");
+            }
+          }
+        );
+      } catch (error) {
+        setStatus("ERROR", "Scanner error", error.message || "Unable to start camera");
+      }
+    }
+
+    async function flipCamera() {
+      if (!scannerInstance) return;
+      try {
+        const cameras = await Html5Qrcode.getCameras();
+        if (cameras.length < 2) {
+          setStatus("ERROR", "Single camera", "No alternative camera found");
+          return;
+        }
+
+        const currentIndex = cameras.findIndex(cam => cam.id === activeCameraId);
+        const nextCamera = cameras[(currentIndex + 1) % cameras.length];
+        activeCameraId = nextCamera.id;
+
+        await scannerInstance.stop();
+        await scannerInstance.start(
+          { deviceId: { exact: activeCameraId } },
+          { fps: 10, qrbox: 240 }
+        );
+        setStatus("PENDING", "Ready", `Using ${nextCamera.label || "new camera"}`);
+        resumeBtn.disabled = true;
+        isProcessing = false;
+      } catch (error) {
+        setStatus("ERROR", "Flip failed", error.message || "Retry flip");
+      }
+    }
+
+    resumeBtn.addEventListener("click", resumeScanner);
+    flipBtn.addEventListener("click", flipCamera);
+
+    initScanner();
+
+    /*
+      Backend validation pseudocode (Node.js / Express)
+      -----------------------------------------------
+      const router = require("express").Router();
+      const db = require("../db");
+
+      router.post("/verify", async (req, res) => {
+        const { token } = req.body;
+        if (!token) return res.status(400).json({ status: "INVALID", message: "Token missing" });
+
+        // All validation remains server-side to avoid QR tampering.
+        await db.transaction(async trx => {
+          const registration = await trx("registrations")
+            .where({ registration_id: token })
+            .forUpdate() // pessimistic lock to prevent double check-in.
+            .first();
+
+          if (!registration) {
+            return res.status(404).json({ status: "INVALID", message: "Unknown registration" });
+          }
+
+          if (registration.checked_in_at && isToday(registration.checked_in_at)) {
+            return res.json({
+              status: "ALREADY_USED",
+              name: registration.full_name,
+              message: "Guest already checked in"
+            });
+          }
+
+          await trx("registrations")
+            .where({ id: registration.id })
+            .update({ checked_in_at: trx.fn.now() });
+
+          res.json({ status: "VALID", name: registration.full_name, message: "Welcome" });
+        });
+      });
+    */
+  </script>
+</body>
+</html>

@@ -580,6 +580,145 @@ export async function initializeDatabase() {
       );
     }
 
+    console.log('🔄 Rebuilding attendance_snapshot table...');
+    await connection.query('DROP TABLE IF EXISTS banner_launch_registrations').catch(() => {});
+    await connection.query('DROP TABLE IF EXISTS attendance_snapshot');
+    await connection.query(`
+      CREATE TABLE attendance_snapshot (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        registration_id VARCHAR(25) NOT NULL,
+        full_name VARCHAR(255) NOT NULL,
+        roll_number VARCHAR(100) NULL,
+        email VARCHAR(255) NOT NULL,
+        mobile VARCHAR(20) NOT NULL,
+        user_type ENUM('INTERNAL','EXTERNAL','ALUMNI') NOT NULL,
+        source_table ENUM('student_forms','butterfly_registrations','external_registrations','alumni_registrations') NOT NULL,
+        source_id INT NOT NULL,
+        day1 VARCHAR(20) NOT NULL DEFAULT 'unattended',
+        day2 VARCHAR(20) NOT NULL DEFAULT 'unattended',
+        day3 VARCHAR(20) NOT NULL DEFAULT 'unattended',
+        day4 VARCHAR(20) NOT NULL DEFAULT 'unattended',
+        day5 VARCHAR(20) NOT NULL DEFAULT 'unattended',
+        day6 VARCHAR(20) NOT NULL DEFAULT 'unattended',
+        day7 VARCHAR(20) NOT NULL DEFAULT 'unattended',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_registration_id (registration_id),
+        INDEX idx_user_type (user_type),
+        INDEX idx_source (source_table, source_id),
+        INDEX idx_registration_email_user (registration_id, email, user_type)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
+    await connection.query(`
+      INSERT INTO attendance_snapshot (
+        registration_id,
+        full_name,
+        roll_number,
+        email,
+        mobile,
+        user_type,
+        source_table,
+        source_id
+      )
+      SELECT
+        sf.registration_id,
+        sf.full_name,
+        sf.roll_number,
+        COALESCE(s.email, '') AS email,
+        sf.mobile,
+        'INTERNAL' AS user_type,
+        'student_forms' AS source_table,
+        sf.id AS source_id
+      FROM student_forms sf
+      LEFT JOIN students s ON s.id = sf.student_id
+      WHERE sf.payment_status = 'PAID'
+
+      UNION ALL
+
+      SELECT
+        br.registration_id,
+        br.student1_name,
+        br.student1_roll_number,
+        br.student1_email,
+        br.student1_mobile,
+        'INTERNAL' AS user_type,
+        'butterfly_registrations' AS source_table,
+        br.id AS source_id
+      FROM butterfly_registrations br
+      WHERE br.payment_status = 'PAID'
+
+      UNION ALL
+
+      SELECT
+        br.registration_id,
+        br.student2_name,
+        br.student2_roll_number,
+        br.student2_email,
+        br.student2_mobile,
+        'INTERNAL' AS user_type,
+        'butterfly_registrations' AS source_table,
+        br.id AS source_id
+      FROM butterfly_registrations br
+      WHERE br.payment_status = 'PAID'
+
+      UNION ALL
+
+      SELECT
+        br.registration_id,
+        br.student3_name,
+        br.student3_roll_number,
+        br.student3_email,
+        br.student3_mobile,
+        'INTERNAL' AS user_type,
+        'butterfly_registrations' AS source_table,
+        br.id AS source_id
+      FROM butterfly_registrations br
+      WHERE br.payment_status = 'PAID'
+
+      UNION ALL
+
+      SELECT
+        br.registration_id,
+        br.student4_name,
+        br.student4_roll_number,
+        br.student4_email,
+        br.student4_mobile,
+        'INTERNAL' AS user_type,
+        'butterfly_registrations' AS source_table,
+        br.id AS source_id
+      FROM butterfly_registrations br
+      WHERE br.payment_status = 'PAID'
+
+      UNION ALL
+
+      SELECT
+        er.registration_id,
+        er.full_name,
+        er.identity_number AS roll_number,
+        er.email,
+        er.mobile,
+        'EXTERNAL' AS user_type,
+        'external_registrations' AS source_table,
+        er.id AS source_id
+      FROM external_registrations er
+      WHERE er.payment_status = 'PAID'
+
+      UNION ALL
+
+      SELECT
+        ar.registration_id,
+        ar.full_name,
+        NULL AS roll_number,
+        ar.email,
+        ar.mobile,
+        'ALUMNI' AS user_type,
+        'alumni_registrations' AS source_table,
+        ar.id AS source_id
+      FROM alumni_registrations ar
+      WHERE ar.payment_status = 'PAID'
+    `);
+
     connection.release();
     await tempPool.end();
 
