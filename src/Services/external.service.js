@@ -11,10 +11,10 @@ export const EXTERNAL_ADD_ON_AMOUNT = 500;
 export const PRASASTI_SOLO_FEE = 150;
 export const PRASASTI_GROUP_FEE = 350;
 const MAX_SELECTED_EVENTS = 20; // Increased limit
+const MAX_ESPARTO_EVENTS = 2;
 const PRICING = {
   // Esparto pricing
-  ESPARTO_SOLO: 200,
-  ESPARTO_GROUP: 600,
+  ESPARTO_SOLO: 500,
   // Sahitya pricing (new solo/group structure)
   SAHITYA_SOLO: 150,
   SAHITYA_GROUP: 450,  // Group of 4
@@ -30,13 +30,13 @@ function generateExternalRegistrationId() {
   return `ELYSIANX${year}${random}`;
 }
 
-function sanitizeEventIds(selected = []) {
+function sanitizeEventIds(selected = [], limit = MAX_SELECTED_EVENTS) {
   if (!Array.isArray(selected)) {
     return [];
   }
   const trimmed = selected
     .filter(eventId => typeof eventId === 'string' && eventId.trim().length > 0)
-    .slice(0, MAX_SELECTED_EVENTS);
+    .slice(0, limit);
   return trimmed;
 }
 
@@ -57,8 +57,6 @@ export async function createExternalRegistration(payload) {
     // Esparto fields
     esparto_selected = false,
     esparto_mode = null,
-    esparto_participant_type = null,
-    esparto_team_members = null,
     esparto_events = [],
     // Sahitya fields (now with solo/group)
     sahitya_selected = false,
@@ -73,16 +71,15 @@ export async function createExternalRegistration(payload) {
     prasasti_team_members = null
   } = payload;
 
+  const normalizedEspartoType = esparto_selected ? 'solo' : null;
+  const sanitizedEspartoEvents = sanitizeEventIds(esparto_events, MAX_ESPARTO_EVENTS);
+
   // 1. Calculate Total Amount Server-side
   let totalAmount = 0;
   let addOnSelected = false; // Flag to legacy support
 
   if (esparto_selected) {
-    if (esparto_participant_type === 'group') {
-      totalAmount += PRICING.ESPARTO_GROUP;
-    } else {
-      totalAmount += PRICING.ESPARTO_SOLO;
-    }
+    totalAmount += PRICING.ESPARTO_SOLO;
   }
 
   if (sahitya_selected) {
@@ -109,9 +106,10 @@ export async function createExternalRegistration(payload) {
   }
 
   // 2. Format JSON fields
-  const espartoEventsJson = sanitizeEventIds(esparto_events).length > 0 ? JSON.stringify(sanitizeEventIds(esparto_events)) : null;
+  const espartoEventsJson = sanitizedEspartoEvents.length > 0 ? JSON.stringify(sanitizedEspartoEvents) : null;
   const sahityaEventsJson = sanitizeEventIds(sahitya_events).length > 0 ? JSON.stringify(sanitizeEventIds(sahitya_events)) : null;
   const prasastiEventsJson = sanitizeEventIds(prasasti_events).length > 0 ? JSON.stringify(sanitizeEventIds(prasasti_events)) : null;
+  const espartoTeamMembersJson = null;
 
   // 3. Check for existing registration
   const [existingRows] = await db.query(
@@ -168,8 +166,8 @@ export async function createExternalRegistration(payload) {
         esparto_selected,
         espartoEventsJson,
         esparto_mode,
-        esparto_participant_type,
-        esparto_team_members,
+        normalizedEspartoType,
+        espartoTeamMembersJson,
         sahitya_selected,
         sahitya_participant_type,
         sahitya_team_members,
@@ -238,8 +236,8 @@ export async function createExternalRegistration(payload) {
       esparto_selected,
       espartoEventsJson,
       esparto_mode,
-      esparto_participant_type,
-      esparto_team_members,
+      normalizedEspartoType,
+      espartoTeamMembersJson,
       sahitya_selected,
       sahitya_participant_type,
       sahitya_team_members,

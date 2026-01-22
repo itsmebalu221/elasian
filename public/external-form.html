@@ -1691,7 +1691,7 @@
           <p class="sidebar-addon-title">Esparto — 28-29 Jan 2026</p>
           <p class="sidebar-addon-desc">Technical competitions, hackathons, workshops, and innovative challenges.
             Showcase your problem-solving skills and technical expertise.</p>
-          <span class="sidebar-addon-price">₹200 - ₹600</span>
+          <span class="sidebar-addon-price">₹500 · Solo only</span>
         </div>
 
         <div class="sidebar-addon sidebar-info-sahitya">
@@ -1777,39 +1777,26 @@
                     <div class="category-title">Esparto — Technical Fest</div>
                     <div class="category-desc">Compete in technical events and hackathons</div>
                   </div>
-                  <div class="category-price" id="esparto-price">₹200</div>
+                    <div class="category-price" id="esparto-price">₹500</div>
                 </div>
                 <div class="category-content">
                   <!-- Participant Options (Solo/Group) -->
                   <div class="participant-options visible" id="esparto-participant-options">
-                    <div class="section-label" style="margin-bottom: 0.75rem;">Participation Type</div>
-                    <div class="participant-type-row">
-                      <div class="participant-type" data-type="solo" onclick="selectParticipantType('esparto', 'solo')">
-                        <div class="mode-radio"></div>
-                        <span class="mode-title">Solo</span>
-                        <span class="mode-price" style="margin-left: auto;">₹200</span>
+                      <div class="section-label" style="margin-bottom: 0.75rem;">Participation Type</div>
+                      <div class="participant-type-row" style="grid-template-columns: 1fr;">
+                        <div class="participant-type" data-type="solo"
+                          onclick="selectParticipantType('esparto', 'solo')">
+                          <div class="mode-radio"></div>
+                          <span class="mode-title">Solo</span>
+                          <span class="mode-price" style="margin-left: auto;">₹500</span>
+                        </div>
                       </div>
-                      <div class="participant-type" data-type="group"
-                        onclick="selectParticipantType('esparto', 'group')">
-                        <div class="mode-radio"></div>
-                        <span class="mode-title">Group</span>
-                        <span class="mode-price" style="margin-left: auto;">₹600</span>
-                      </div>
-                    </div>
 
-                    <!-- Team Members (for Group) -->
-                    <div class="team-members-section" id="esparto-team-section">
-                      <div class="team-members-header">
-                        <span class="team-members-title">Team Members</span>
-                        <span class="team-members-count">You + Others</span>
-                      </div>
-                      <div class="team-members-list" id="esparto-members-list"></div>
-                      <p class="team-hint">You are automatically the team lead. Add details for your other team members
-                        above.</p>
-                    </div>
-
-                    <p class="event-hint" style="margin-top: 1rem;">Select the technical events you want to participate
-                      in:</p>
+                      <p class="event-hint" id="esparto-event-hint" style="margin-top: 1rem;">
+                        Select up to two Esparto events to participate in.
+                        <span id="esparto-event-count" style="font-weight: 600;">0/2 selected</span>
+                        <span id="esparto-event-limit" style="margin-left: 0.5rem; color: #dc2626; display: none;">Limit reached</span>
+                      </p>
                     <div class="event-groups" id="esparto-events"></div>
                   </div>
                 </div>
@@ -1984,8 +1971,7 @@
     // ========== PRICING CONSTANTS ==========
     const PRICING = {
       // Esparto pricing
-      ESPARTO_SOLO: 200,
-      ESPARTO_GROUP: 600,
+      ESPARTO_SOLO: 500,
       // Sahitya pricing (now with solo/group)
       SAHITYA_SOLO: 150,
       SAHITYA_GROUP: 450,  // Group of 4
@@ -1994,6 +1980,8 @@
       PRASASTI_SOLO: 150,
       PRASASTI_GROUP: 350
     };
+
+    const MAX_ESPARTO_EVENTS = 2;
 
     // ========== EVENT DEFINITIONS ==========
     const SAHITYA_EVENTS = [
@@ -2023,11 +2011,7 @@
       let total = 0;
 
       if (state.esparto.selected) {
-        if (state.esparto.participantType === 'group') {
-          total += PRICING.ESPARTO_GROUP;
-        } else {
-          total += PRICING.ESPARTO_SOLO;
-        }
+        total += PRICING.ESPARTO_SOLO;
       }
 
       if (state.sahitya.selected) {
@@ -2065,9 +2049,7 @@
       let rows = '';
 
       if (state.esparto.selected) {
-        const label = state.esparto.participantType === 'group' ? 'Esparto (Group)' : 'Esparto (Solo)';
-        const amount = state.esparto.participantType === 'group' ? PRICING.ESPARTO_GROUP : PRICING.ESPARTO_SOLO;
-        rows += `<div class="pricing-row"><span>${label}</span><strong>₹${amount}</strong></div>`;
+        rows += `<div class="pricing-row"><span>Esparto (Solo)</span><strong>₹${PRICING.ESPARTO_SOLO}</strong></div>`;
       }
 
       if (state.sahitya.selected) {
@@ -2124,8 +2106,7 @@
 
       let price = 0;
       if (category === 'esparto') {
-        if (state.esparto.participantType === 'group') price = PRICING.ESPARTO_GROUP;
-        else price = PRICING.ESPARTO_SOLO;
+        price = PRICING.ESPARTO_SOLO;
       }
       if (category === 'sahitya') {
         if (state.sahitya.participantType === 'group') price = PRICING.SAHITYA_GROUP;
@@ -2208,6 +2189,10 @@
         updateModeUI(category);
       }
 
+      if (category === 'esparto') {
+        updateEspartoEventHint();
+      }
+
       updatePricing();
       updateSummary();
       clearEventsError();
@@ -2254,6 +2239,8 @@
 
     // ========== PARTICIPANT TYPE (Solo/Group) ==========
     function selectParticipantType(category, type) {
+      if (!state[category].selected) return;
+
       // For Esparto and Sahitya, ensure mode is always set to 'participant' since they're always participant mode
       if (category === 'esparto' || category === 'sahitya') {
         state[category].mode = 'participant';
@@ -2262,10 +2249,11 @@
         return;
       }
 
-      state[category].participantType = type;
+      const normalizedType = category === 'esparto' ? 'solo' : type;
+      state[category].participantType = normalizedType;
 
       // Reset team members if switching to solo
-      if (type === 'solo') {
+      if (normalizedType === 'solo') {
         state[category].teamMembers = '';
       }
 
@@ -2428,6 +2416,7 @@
         document.getElementById('esparto-events').innerHTML =
           '<p class="summary-empty">Events will be announced soon.</p>';
       }
+      updateEspartoEventHint();
     }
 
     function renderEspartoEvents() {
@@ -2504,13 +2493,37 @@
       }
 
       container.innerHTML = html;
+      updateEspartoEventHint();
+    }
+    function updateEspartoEventHint() {
+      const countEl = document.getElementById('esparto-event-count');
+      const limitEl = document.getElementById('esparto-event-limit');
+      const count = state.esparto.events.size;
+
+      if (countEl) {
+        countEl.textContent = `${count}/${MAX_ESPARTO_EVENTS} selected`;
+        countEl.style.color = count >= MAX_ESPARTO_EVENTS ? '#dc2626' : 'inherit';
+      }
+
+      if (limitEl) {
+        const showLimit = count >= MAX_ESPARTO_EVENTS;
+        limitEl.style.display = showLimit ? 'inline' : 'none';
+        limitEl.textContent = showLimit ? 'Limit reached' : '';
+      }
     }
 
     function toggleEspartoEvent(eventId) {
       if (state.esparto.events.has(eventId)) {
         state.esparto.events.delete(eventId);
+        clearEventsError();
       } else {
+        if (state.esparto.events.size >= MAX_ESPARTO_EVENTS) {
+          updateEspartoEventHint();
+          showEventsError(`Esparto: You can select up to ${MAX_ESPARTO_EVENTS} events.`);
+          return;
+        }
         state.esparto.events.add(eventId);
+        clearEventsError();
       }
       renderEspartoEvents();
       updateSummary();
@@ -2522,9 +2535,10 @@
 
       if (state.esparto.selected) {
         const eventCount = state.esparto.events.size;
+        const countLabel = `${eventCount}/${MAX_ESPARTO_EVENTS} events`;
         items.push({
           name: 'Esparto — Technical Fest',
-          meta: eventCount > 0 ? `${eventCount} event(s) selected` : 'No events selected yet'
+          meta: `Solo — ${eventCount > 0 ? countLabel : 'Select events'}`
         });
       }
 
@@ -2572,20 +2586,11 @@
 
       // Esparto validation
       if (state.esparto.selected) {
-        if (state.esparto.participantType === 'group') {
-          const members = collectTeamMembersData('esparto');
-          const validMembers = members.filter(m => m.name && m.mobile);
-          if (validMembers.length === 0) {
-            return { ok: false, reason: 'Please enter at least one team member with name and mobile for Esparto group participation.' };
-          }
-          // Validate mobile numbers
-          for (const member of validMembers) {
-            if (!/^[6-9]\d{9}$/.test(member.mobile)) {
-              return { ok: false, reason: `Invalid mobile number for "${member.name}" in Esparto team. Please enter a valid 10-digit number.` };
-            }
-          }
-          state.esparto.teamMembers = formatTeamMembersForStorage(validMembers);
+        if (state.esparto.events.size > MAX_ESPARTO_EVENTS) {
+          return { ok: false, reason: `Esparto: You can select up to ${MAX_ESPARTO_EVENTS} events.` };
         }
+        state.esparto.participantType = 'solo';
+        state.esparto.teamMembers = '';
       }
 
       // Sahitya validation
@@ -2701,6 +2706,8 @@
         return;
       }
 
+      const espartoEvents = Array.from(state.esparto.events).slice(0, MAX_ESPARTO_EVENTS);
+
       const payload = {
         full_name: formData.get('full_name').trim(),
         email: formData.get('email').trim(),
@@ -2712,9 +2719,9 @@
         // New category-based selections
         esparto_selected: state.esparto.selected,
         esparto_mode: state.esparto.mode,
-        esparto_participant_type: state.esparto.participantType,
-        esparto_events: Array.from(state.esparto.events),
-        esparto_team_members: state.esparto.teamMembers,
+        esparto_participant_type: state.esparto.selected ? 'solo' : null,
+        esparto_events: espartoEvents,
+        esparto_team_members: null,
         sahitya_selected: state.sahitya.selected,
         sahitya_participant_type: state.sahitya.participantType,
         sahitya_team_members: state.sahitya.teamMembers,
@@ -2863,18 +2870,12 @@
         if (!state.esparto.selected) toggleCategory('esparto');
 
         if (data.esparto_mode) selectMode('esparto', data.esparto_mode);
-        if (data.esparto_participant_type) selectParticipantType('esparto', data.esparto_participant_type);
-
-        // Populate Team Members
-        if (data.esparto_team_members) {
-          state.esparto.teamMembers = data.esparto_team_members;
-          // Re-trigger UI update to render cards with data
-          updateParticipantTypeUI('esparto');
-        }
+        selectParticipantType('esparto', 'solo');
 
         // Populate Events
         if (data.esparto_events && Array.isArray(data.esparto_events)) {
-          state.esparto.events = new Set(data.esparto_events);
+          const sanitized = data.esparto_events.slice(0, MAX_ESPARTO_EVENTS);
+          state.esparto.events = new Set(sanitized);
           renderEspartoEvents(); // Re-render to show ticks
         }
       }
@@ -2952,6 +2953,7 @@
 
       updatePricing();
       updateSummary();
+      updateEspartoEventHint();
 
       // Setup resume application listener
       setupIdentitySearch();

@@ -25,9 +25,12 @@ export const externalRegistrationSchema = z.object({
   // Events
   esparto_selected: z.boolean().optional(),
   esparto_mode: z.enum(['attendee', 'participant']).optional().nullable(),
-  esparto_participant_type: z.enum(['solo', 'group']).optional().nullable(),
+  esparto_participant_type: z.literal('solo').optional().nullable(),
   esparto_team_members: z.string().optional().nullable(),
-  esparto_events: z.array(z.string().min(1)).optional().default([]),
+  esparto_events: z.array(z.string().min(1))
+    .max(2, 'You can select up to two Esparto events.')
+    .optional()
+    .default([]),
 
   sahitya_selected: z.boolean().optional(),
   sahitya_events: z.array(z.string().min(1)).optional().default([]),

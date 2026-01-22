@@ -507,8 +507,7 @@
     // Pricing constants to match backend
     const PRICING = {
       // Esparto pricing
-      ESPARTO_SOLO: 200,
-      ESPARTO_GROUP: 600,
+      ESPARTO_SOLO: 500,
       // Sahitya pricing
       SAHITYA_SOLO: 150,
       SAHITYA_GROUP: 450,
@@ -617,10 +616,7 @@
 
       // Esparto
       if (data.esparto_selected) {
-        const isGroup = data.esparto_participant_type === 'group';
-        const label = isGroup ? 'Esparto (Group)' : 'Esparto (Solo)';
-        const amount = isGroup ? PRICING.ESPARTO_GROUP : PRICING.ESPARTO_SOLO;
-        html += `<div class="breakdown-row"><span>${label}</span><span>₹${amount}</span></div>`;
+        html += `<div class="breakdown-row"><span>Esparto (Solo)</span><span>₹${PRICING.ESPARTO_SOLO}</span></div>`;
       }
 
       // Sahitya
