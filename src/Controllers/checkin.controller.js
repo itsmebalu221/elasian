@@ -12,8 +12,9 @@ function isGateStaffEmail(email) {
   // Check explicit list
   if (GATE_STAFF_EMAILS.includes(normalized)) return true;
   
-  // Allow all @hitam.org emails as gate staff
+  // Allow all @hitam.org and @elysianhitam.com emails as gate staff
   if (normalized.endsWith('@hitam.org')) return true;
+  if (normalized.endsWith('@elysianhitam.com')) return true;
   
   return false;
 }
