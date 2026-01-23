@@ -14,6 +14,7 @@ import { eventRoutes } from './src/Routes/event.routes.js';
 import { butterflyRoutes } from './src/Routes/butterfly.routes.js';
 import { alumniRoutes } from './src/Routes/alumni.routes.js';
 import { checkinRoutes } from './src/Routes/checkin.routes.js';
+import { adminRoutes } from './src/Routes/admin.routes.js';
 import { initializeDatabase } from './src/db/mysql.js';
 import { verifyToken, getCookieName, getClearCookieOptions } from './src/utils/jwt.js';
 
@@ -37,8 +38,8 @@ app.use((req, res, next) => {
 
 // Simple rate limiting for API endpoints (in-memory, resets on restart)
 const rateLimitMap = new Map();
-const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 100; // 100 requests per minute per IP
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const RATE_LIMIT_MAX_REQUESTS = 100; // 100 requests per hour per IP
 
 function rateLimiter(req, res, next) {
   // Only rate limit API endpoints
@@ -129,6 +130,7 @@ eventRoutes(app);
 butterflyRoutes(app);
 alumniRoutes(app);
 checkinRoutes(app);
+adminRoutes(app);
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

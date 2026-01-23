@@ -13,7 +13,8 @@ const SOURCE_TO_TYPE = {
   butterfly_registrations: 'BUTTERFLY',
   external_registrations: 'EXTERNAL',
   student_forms: 'INTERNAL',
-  alumni_registrations: 'ALUMNI'
+  alumni_registrations: 'ALUMNI',
+  flash_registrations: 'FLASH'
 };
 
 const STATUS_LABELS = {
@@ -25,10 +26,9 @@ const STATUS_LABELS = {
 
 const PASS_LABELS = {
   BUTTERFLY: 'Butterfly Pass',
-  EXTERNAL: 'External Pass',
-  INTERNAL: 'Student Pass',
-  ALUMNI: 'Alumni Pass',
-  FIRST_PHASE: 'First Phase Registration'
+  EXTERNAL: 'External (HITAM Only)',
+  FIRST_PHASE: 'First Phase Registration',
+  FLASH: 'Flash Pass'
 };
 
 export class CheckinError extends Error {
@@ -198,48 +198,6 @@ function mapExternalParticipants(registration, snapshots, dayId) {
   return [hydrateParticipant(baseSlot, snapshot, dayId, 'Pass Holder')];
 }
 
-function mapInternalParticipants(registration, snapshots, dayId) {
-  // Internal student passes - 1 person per registration
-  if (!snapshots.length) {
-    return [];
-  }
-
-  const snapshot = snapshots[0];
-  const baseSlot = {
-    studentNumber: 1,
-    name: snapshot.full_name || registration.full_name,
-    branch: registration.branch,
-    rollNumber: registration.roll_number,
-    mobile: registration.mobile,
-    email: snapshot.email || null,
-    institution: null,
-    department: null
-  };
-
-  return [hydrateParticipant(baseSlot, snapshot, dayId, 'Pass Holder')];
-}
-
-function mapAlumniParticipants(registration, snapshots, dayId) {
-  // Alumni passes - 1 person per registration
-  if (!snapshots.length) {
-    return [];
-  }
-
-  const snapshot = snapshots[0];
-  const baseSlot = {
-    studentNumber: 1,
-    name: snapshot.full_name || registration.full_name,
-    branch: registration.branch,
-    rollNumber: null,
-    mobile: registration.mobile,
-    email: registration.email,
-    institution: null,
-    department: null
-  };
-
-  return [hydrateParticipant(baseSlot, snapshot, dayId, 'Pass Holder')];
-}
-
 function summarizeParticipants(participants) {
   const summary = {
     total: participants.length,
@@ -279,44 +237,14 @@ function buildMeta(passType, registration, summary) {
     };
   }
 
-  if (passType === 'EXTERNAL') {
-    return {
-      passLabel: PASS_LABELS.EXTERNAL,
-      ownerName: registration.full_name,
-      institution: registration.institution,
-      department: registration.department,
-      identityNumber: registration.identity_number,
-      paymentStatus: registration.payment_status,
-      totalAmount: Number(registration.total_amount),
-      counts: summary
-    };
-  }
-
-  if (passType === 'INTERNAL') {
-    return {
-      passLabel: PASS_LABELS.INTERNAL,
-      ownerName: registration.full_name,
-      branch: registration.branch,
-      rollNumber: registration.roll_number,
-      paymentStatus: registration.payment_status,
-      counts: summary
-    };
-  }
-
-  if (passType === 'ALUMNI') {
-    return {
-      passLabel: PASS_LABELS.ALUMNI,
-      ownerName: registration.full_name,
-      branch: registration.branch,
-      yearOfGraduation: registration.year_of_graduation,
-      paymentStatus: registration.payment_status,
-      counts: summary
-    };
-  }
-
   return {
-    passLabel: passType,
+    passLabel: PASS_LABELS.EXTERNAL,
     ownerName: registration.full_name,
+    institution: registration.institution,
+    department: registration.department,
+    identityNumber: registration.identity_number,
+    paymentStatus: registration.payment_status,
+    totalAmount: Number(registration.total_amount),
     counts: summary
   };
 }
@@ -340,6 +268,14 @@ async function fetchRegistration(table, id) {
 async function fetchFirstPhaseRegistration(registrationId) {
   const [rows] = await db.query(
     'SELECT * FROM first_phase_registrations WHERE registration_id = ? ORDER BY id',
+    [registrationId]
+  );
+  return rows;
+}
+
+async function fetchFlashRegistration(registrationId) {
+  const [rows] = await db.query(
+    'SELECT * FROM flash_registrations WHERE registration_id = ? ORDER BY id',
     [registrationId]
   );
   return rows;
@@ -377,6 +313,18 @@ function buildFirstPhaseMeta(registration, summary) {
   };
 }
 
+function buildFlashMeta(registration, summary) {
+  return {
+    passLabel: PASS_LABELS.FLASH,
+    ownerName: registration.full_name,
+    email: registration.email,
+    rollNumber: registration.roll_number,
+    paymentStatus: registration.payment_status,
+    totalAmount: Number(registration.amount || 0),
+    counts: summary
+  };
+}
+
 async function buildFirstPhasePayload(registrationId, dayId) {
   const day = resolveDay(dayId);
   const registrations = await fetchFirstPhaseRegistration(registrationId);
@@ -408,6 +356,56 @@ async function buildFirstPhasePayload(registrationId, dayId) {
   };
 }
 
+async function buildFlashPayload(registrationId, dayId) {
+  const day = resolveDay(dayId);
+  const registrations = await fetchFlashRegistration(registrationId);
+
+  if (!registrations.length) {
+    return null; // Not found in flash_registrations either
+  }
+
+  const participants = registrations.map((reg, index) => {
+    const status = normalizeStatus(reg[day.id]);
+    return {
+      attendanceId: reg.id,
+      slotLabel: registrations.length === 1 ? 'Pass Holder' : `Participant ${index + 1}`,
+      studentNumber: index + 1,
+      name: reg.full_name,
+      branch: reg.branch || null,
+      rollNumber: reg.roll_number || null,
+      email: reg.email || null,
+      mobile: reg.phone || null,
+      institution: null,
+      department: null,
+      status,
+      statusLabel: STATUS_LABELS[status] || status,
+      canAdmit: status === 'unattended',
+      history: buildHistory(reg)
+    };
+  });
+
+  const summary = summarizeParticipants(participants);
+  const meta = buildFlashMeta(registrations[0], summary);
+  const message = summary.pending
+    ? `${summary.pending} participant(s) ready to admit`
+    : summary.admitted === summary.total && summary.total > 0
+      ? 'All participants already admitted'
+      : 'No participants available to admit';
+
+  return {
+    status: summary.status,
+    passType: 'FLASH',
+    registrationId,
+    day: day.id,
+    dayLabel: day.label,
+    canAdmit: participants.some(p => p.canAdmit),
+    participants,
+    meta,
+    message,
+    scannedAt: new Date().toISOString()
+  };
+}
+
 async function buildPayload(registrationId, dayId) {
   const day = resolveDay(dayId);
   const snapshots = await fetchSnapshots(registrationId);
@@ -418,13 +416,17 @@ async function buildPayload(registrationId, dayId) {
     if (firstPhasePayload) {
       return firstPhasePayload;
     }
+    const flashPayload = await buildFlashPayload(registrationId, dayId);
+    if (flashPayload) {
+      return flashPayload;
+    }
     throw new CheckinError('Registration not found or not eligible for this gate', 404, 'NOT_FOUND');
   }
 
   const sourceTable = snapshots[0].source_table;
   const passType = SOURCE_TO_TYPE[sourceTable] || 'UNKNOWN';
 
-  if (!['BUTTERFLY', 'EXTERNAL', 'INTERNAL', 'ALUMNI'].includes(passType)) {
+  if (!['BUTTERFLY', 'EXTERNAL'].includes(passType)) {
     throw new CheckinError('Unsupported pass type for this validator', 400, 'UNSUPPORTED_PASS');
   }
 
@@ -440,16 +442,9 @@ async function buildPayload(registrationId, dayId) {
     }
   }
 
-  let participants;
-  if (passType === 'BUTTERFLY') {
-    participants = mapButterflyParticipants(registration, snapshots, day.id);
-  } else if (passType === 'EXTERNAL') {
-    participants = mapExternalParticipants(registration, snapshots, day.id);
-  } else if (passType === 'INTERNAL') {
-    participants = mapInternalParticipants(registration, snapshots, day.id);
-  } else if (passType === 'ALUMNI') {
-    participants = mapAlumniParticipants(registration, snapshots, day.id);
-  }
+  const participants = passType === 'BUTTERFLY'
+    ? mapButterflyParticipants(registration, snapshots, day.id)
+    : mapExternalParticipants(registration, snapshots, day.id);
 
   const summary = summarizeParticipants(participants);
   const meta = buildMeta(passType, registration, summary);
@@ -500,7 +495,11 @@ export async function admitSelection({ attendanceIds, dayId, operator, passType 
   const placeholders = uniqueIds.map(() => '?').join(',');
 
   // Determine which table to update based on passType
-  const tableName = passType === 'FIRST_PHASE' ? 'first_phase_registrations' : 'attendance_snapshot';
+  const tableName = passType === 'FIRST_PHASE'
+    ? 'first_phase_registrations'
+    : passType === 'FLASH'
+      ? 'flash_registrations'
+      : 'attendance_snapshot';
 
   try {
     await connection.beginTransaction();

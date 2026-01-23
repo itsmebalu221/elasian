@@ -24,6 +24,25 @@ function generateQRCodeUrl(registrationId, size = 200) {
   return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodedData}&bgcolor=ffffff&color=000000`;
 }
 
+function buildDetailsRows(details = []) {
+  return details
+    .filter(item => item && item.value)
+    .map(item => `
+                <tr>
+                  <td style="padding: 8px 0; color: #666; font-size: 14px; width: 40%;">${item.label}</td>
+                  <td style="padding: 8px 0; color: #1a1a2e; font-size: 14px; font-weight: 600;">${item.value}</td>
+                </tr>
+    `)
+    .join('');
+}
+
+function buildTextDetails(details = []) {
+  return details
+    .filter(item => item && item.value)
+    .map(item => `${item.label}: ${item.value}`)
+    .join('\n');
+}
+
 // Format events list for email
 async function formatEventsList(selectedEvents = []) {
   if (!selectedEvents || selectedEvents.length === 0) {
@@ -599,5 +618,321 @@ Need help? Contact us at elysian@hitam.org
     console.error('❌ Error sending butterfly confirmation emails:', error);
     return { success: false, error: error.message };
   }
+}
+
+export async function sendButterflyConfirmationEmailsByCode(registrationCode) {
+  try {
+    if (!registrationCode) {
+      return { success: false, reason: 'Registration ID is required' };
+    }
+
+    const [rows] = await db.query(
+      'SELECT id FROM butterfly_registrations WHERE registration_id = ? AND payment_status = ? LIMIT 1',
+      [registrationCode, 'PAID']
+    );
+
+    if (!rows.length) {
+      return { success: false, reason: 'Registration not found or not paid' };
+    }
+
+    return sendButterflyConfirmationEmails(rows[0].id);
+  } catch (error) {
+    console.error('❌ Error sending butterfly confirmation emails by code:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+async function sendGenericQrEmail({
+  transporter,
+  email,
+  name,
+  mobile,
+  registrationId,
+  passLabel,
+  details = [],
+  selectedEvents = [],
+  dryRun = false
+}) {
+  const qrCodeUrl = generateQRCodeUrl(registrationId);
+  const detailsRows = buildDetailsRows([
+    { label: 'Name', value: name },
+    { label: 'Email', value: email }
+  ]);
+
+  const textDetails = buildTextDetails([
+    { label: 'Name', value: name },
+    { label: 'Email', value: email }
+  ]);
+
+  const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elysian '26 - QR Pass</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f5f5f5;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f5f5f5; padding: 20px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <tr>
+            <td style="background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%); padding: 30px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 300; letter-spacing: 4px;">elysian'26</h1>
+              <p style="margin: 10px 0 0 0; color: #a8a9ad; font-size: 14px;">Your QR Pass</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #22c55e; padding: 15px; text-align: center;">
+              <p style="margin: 0; color: #ffffff; font-size: 16px; font-weight: 600;">✓ Registration Confirmed</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px; text-align: center; border-bottom: 1px solid #eee;">
+              <p style="margin: 0 0 15px 0; color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Your Pass QR Code</p>
+              <img src="${qrCodeUrl}" alt="QR Code" width="180" height="180" style="border: 4px solid #1a1a2e; border-radius: 8px;">
+              <p style="margin: 15px 0 0 0; font-size: 24px; font-weight: 700; color: #1a1a2e; letter-spacing: 2px;">${registrationId}</p>
+              <p style="margin: 5px 0 0 0; color: #666; font-size: 12px;">Registration ID</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px;">
+              <h2 style="margin: 0 0 20px 0; color: #1a1a2e; font-size: 18px; border-bottom: 2px solid #1a1a2e; padding-bottom: 10px;">Your Details</h2>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                ${detailsRows}
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 0 30px 30px 30px;">
+              <div style="background-color: #f0f9ff; padding: 16px; border-radius: 8px; border: 1px solid #bae6fd; text-align: center;">
+                <p style="margin: 0 0 8px 0; color: #0f172a; font-size: 14px; font-weight: 600;">Register for individual Esparto Event Registrations</p>
+                <p style="margin: 0 0 12px 0; color: #475569; font-size: 13px;">For flash passes and First phase (₹400 passes)</p>
+                <a href="https://forms.gle/eHzXDNjPXKXZwKjL9" style="display: inline-block; background-color: #0ea5e9; color: #ffffff; text-decoration: none; padding: 10px 18px; border-radius: 6px; font-size: 14px;">Open Google Form</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #1a1a2e; padding: 25px; text-align: center;">
+              <p style="margin: 0 0 10px 0; color: #a8a9ad; font-size: 14px;">Need help? Contact us at</p>
+              <a href="mailto:elysian@hitam.org" style="color: #4db03c; text-decoration: none; font-size: 14px;">elysian@hitam.org</a>
+              <p style="margin: 15px 0 0 0; color: #666; font-size: 12px;">© 2026 Elysian - HITAM Technical Fest</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+
+  const textContent = `
+ELYSIAN '26 - QR PASS
+===================
+
+REGISTRATION ID: ${registrationId}
+
+PASS DETAILS
+------------
+${textDetails}
+
+Show this QR code at the entrance for verification.
+
+Register for individual Esparto Event Registrations (for flash passes and First phase ₹400 passes):
+https://forms.gle/eHzXDNjPXKXZwKjL9
+
+---
+Need help? Contact us at elysian@hitam.org
+© 2026 Elysian - HITAM Technical Fest
+  `.trim();
+
+  if (dryRun) {
+    return { success: true, email, registrationId, dryRun: true };
+  }
+
+  const mailOptions = {
+    from: `"Elysian '26" <${process.env.SMTP_USER}>`,
+    to: email,
+    subject: `Elysian '26 - Your QR Pass (${passLabel})`,
+    text: textContent,
+    html: htmlContent
+  };
+
+  const info = await transporter.sendMail(mailOptions);
+  return { success: true, email, registrationId, messageId: info.messageId };
+}
+
+function parseJsonField(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return [];
+  }
+}
+
+export async function sendBulkRegistrationQrEmails({
+  tables = ['attendance_snapshot', 'flash_registrations', 'first_phase_registrations'],
+  onlyPaid = true,
+  limit = null,
+  dryRun = false,
+  testEmail = null
+} = {}) {
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn('⚠️ SMTP not configured. Skipping bulk QR emails.');
+    return { success: false, reason: 'SMTP not configured' };
+  }
+
+  const transporter = createTransporter();
+  const recipients = [];
+  const normalizedTables = Array.isArray(tables) ? tables : [tables];
+
+  if (normalizedTables.includes('attendance_snapshot')) {
+    const [rows] = await db.query(
+      `SELECT registration_id, full_name, roll_number, email, mobile, user_type, source_table
+       FROM attendance_snapshot
+       WHERE email IS NOT NULL AND email <> '' AND registration_id IS NOT NULL`
+    );
+
+    const passLabelMap = {
+      student_forms: 'Internal Student',
+      butterfly_registrations: 'Butterfly Group',
+      external_registrations: 'External Registration',
+      alumni_registrations: 'Alumni Registration'
+    };
+
+    for (const row of rows) {
+      recipients.push({
+        source: 'attendance_snapshot',
+        email: row.email,
+        name: row.full_name,
+        mobile: row.mobile,
+        registrationId: row.registration_id,
+        passLabel: passLabelMap[row.source_table] || row.user_type || 'Registration',
+        selectedEvents: [],
+        details: [
+          row.roll_number ? { label: 'Roll Number', value: row.roll_number } : null,
+          row.user_type ? { label: 'User Type', value: row.user_type } : null
+        ]
+      });
+    }
+  }
+
+  if (normalizedTables.includes('flash_registrations')) {
+    const [rows] = await db.query(
+      `SELECT registration_id, full_name, email, phone, payment_status, roll_number, branch
+       FROM flash_registrations
+       WHERE email IS NOT NULL AND registration_id IS NOT NULL
+       ${onlyPaid ? "AND payment_status = 'PAID'" : ''}`
+    );
+
+    for (const row of rows) {
+      recipients.push({
+        source: 'flash_registrations',
+        email: row.email,
+        name: row.full_name,
+        mobile: row.phone,
+        registrationId: row.registration_id,
+        passLabel: 'Flash Registration',
+        selectedEvents: [],
+        details: [
+          row.roll_number ? { label: 'Roll Number', value: row.roll_number } : null,
+          row.branch ? { label: 'Branch', value: row.branch } : null
+        ]
+      });
+    }
+  }
+
+  if (normalizedTables.includes('first_phase_registrations')) {
+    const [rows] = await db.query(
+      `SELECT registration_id, full_name, email, mobile, roll_number
+       FROM first_phase_registrations
+       WHERE email IS NOT NULL AND registration_id IS NOT NULL`
+    );
+
+    for (const row of rows) {
+      recipients.push({
+        source: 'first_phase_registrations',
+        email: row.email,
+        name: row.full_name,
+        mobile: row.mobile,
+        registrationId: row.registration_id,
+        passLabel: 'First Phase Registration',
+        selectedEvents: [],
+        details: [
+          row.roll_number ? { label: 'Roll Number', value: row.roll_number } : null
+        ]
+      });
+    }
+  }
+
+  const uniqueMap = new Map();
+  for (const recipient of recipients) {
+    if (!recipient.email || !recipient.registrationId) continue;
+    const key = `${recipient.email.toLowerCase()}|${recipient.registrationId}`;
+    if (!uniqueMap.has(key)) {
+      uniqueMap.set(key, recipient);
+    }
+  }
+
+  let list = Array.from(uniqueMap.values());
+  if (typeof limit === 'number' && limit > 0) {
+    list = list.slice(0, limit);
+  }
+
+  if (testEmail) {
+    const first = list[0];
+    if (!first) {
+      return { success: false, reason: 'No recipients found for test email' };
+    }
+
+    list = [
+      {
+        ...first,
+        email: testEmail
+      }
+    ];
+  }
+
+  const results = [];
+  for (const [index, recipient] of list.entries()) {
+    try {
+      console.log(`📨 Sending QR email ${index + 1}/${list.length} -> ${recipient.email} (${recipient.registrationId})`);
+      const info = await sendGenericQrEmail({
+        transporter,
+        email: recipient.email,
+        name: recipient.name,
+        mobile: recipient.mobile,
+        registrationId: recipient.registrationId,
+        passLabel: recipient.passLabel,
+        details: recipient.details,
+        selectedEvents: recipient.selectedEvents,
+        dryRun
+      });
+      results.push({ ...info, source: recipient.source });
+      console.log(`✅ Sent: ${recipient.email} (${recipient.registrationId})`);
+    } catch (error) {
+      results.push({
+        success: false,
+        email: recipient.email,
+        registrationId: recipient.registrationId,
+        source: recipient.source,
+        error: error.message
+      });
+      console.log(`❌ Failed: ${recipient.email} (${recipient.registrationId}) - ${error.message}`);
+    }
+  }
+
+  const successCount = results.filter(r => r.success).length;
+  console.log(`📊 Bulk QR emails complete: ${successCount}/${results.length} sent.`);
+  return {
+    success: successCount > 0,
+    sentCount: successCount,
+    totalCount: results.length,
+    results
+  };
 }
 

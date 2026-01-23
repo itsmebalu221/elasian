@@ -52,8 +52,7 @@ export async function firebaseLoginHandler(req, res) {
     const normalizedDbType =
       dbUser.user_type === 'INTERNAL' ? 'HITAMONLY' : dbUser.user_type;
 
-    // HITAMONLY registrations are closed - treat as EXTERNAL unless they already have a form
-    let resolvedUserType = isAlumniLogin
+    const resolvedUserType = isAlumniLogin
       ? 'ALUMNI'
       : (normalizedDbType || detectedUserType);
 
@@ -62,13 +61,7 @@ export async function firebaseLoginHandler(req, res) {
         if (resolvedUserType === 'ALUMNI') {
           existingForm = await getAlumniRegistrationByEmail(email);
         } else if (resolvedUserType === 'HITAMONLY') {
-          // Check if they have an existing HITAM student form
           existingForm = await getStudentForm(dbUser.id);
-          // If no existing form, treat as EXTERNAL since HITAMONLY registrations are closed
-          if (!existingForm) {
-            resolvedUserType = 'EXTERNAL';
-            existingForm = await getExternalRegistrationByEmail(email);
-          }
         } else {
           existingForm = await getExternalRegistrationByEmail(email);
         }
@@ -175,14 +168,6 @@ export async function checkAuthStatus(req, res) {
           } else if (authUser.userType === 'HITAMONLY') {
             // HITAM students - check student_forms table
             existingForm = await getStudentForm(authUser.id);
-            // If no existing form, treat as EXTERNAL since HITAMONLY registrations are closed
-            if (!existingForm) {
-              authUser = {
-                ...authUser,
-                userType: 'EXTERNAL'
-              };
-              existingForm = await getExternalRegistrationByEmail(authUser.email);
-            }
           } else {
             // External users - check external_registrations table by email
             existingForm = await getExternalRegistrationByEmail(authUser.email);
