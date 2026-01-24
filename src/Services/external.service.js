@@ -45,6 +45,28 @@ function normalizeSelectedEvents(selected = []) {
   return trimmed.length > 0 ? JSON.stringify(trimmed) : null;
 }
 
+function normalizeJsonValue(value) {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    try {
+      const parsed = JSON.parse(trimmed);
+      return JSON.stringify(parsed);
+    } catch {
+      return JSON.stringify(trimmed);
+    }
+  }
+
+  return JSON.stringify(value);
+}
+
 export async function createExternalRegistration(payload) {
   const {
     full_name,
@@ -110,6 +132,8 @@ export async function createExternalRegistration(payload) {
   const sahityaEventsJson = sanitizeEventIds(sahitya_events).length > 0 ? JSON.stringify(sanitizeEventIds(sahitya_events)) : null;
   const prasastiEventsJson = sanitizeEventIds(prasasti_events).length > 0 ? JSON.stringify(sanitizeEventIds(prasasti_events)) : null;
   const espartoTeamMembersJson = null;
+  const sahityaTeamMembersJson = normalizeJsonValue(sahitya_team_members);
+  const prasastiTeamMembersJson = normalizeJsonValue(prasasti_team_members);
 
   // 3. Check for existing registration
   const [existingRows] = await db.query(
@@ -170,13 +194,13 @@ export async function createExternalRegistration(payload) {
         espartoTeamMembersJson,
         sahitya_selected,
         sahitya_participant_type,
-        sahitya_team_members,
+        sahityaTeamMembersJson,
         sahityaEventsJson,
         prasasti_selected,
         prasastiEventsJson,
         prasasti_mode,
         prasasti_participant_type,
-        prasasti_team_members,
+        prasastiTeamMembersJson,
         existing.id
       ]
     );
@@ -214,7 +238,7 @@ export async function createExternalRegistration(payload) {
       esparto_team_members,
       sahitya_selected,
       sahitya_participant_type,
-      sahitya_team_members,
+      sahityaTeamMembersJson,
       sahitya_events,
       prasasti_selected,
       prasasti_events,
@@ -246,7 +270,7 @@ export async function createExternalRegistration(payload) {
       prasastiEventsJson,
       prasasti_mode,
       prasasti_participant_type,
-      prasasti_team_members
+      prasastiTeamMembersJson
     ]
   );
 
