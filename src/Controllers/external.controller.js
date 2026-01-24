@@ -53,6 +53,7 @@ export async function registerExternalParticipant(req, res) {
     return res.json({
       success: true,
       registration: responseData,
+      registrationId: result.record.id,
       isExisting: result.isExisting,
       isPaid: result.isPaid
     });
@@ -380,6 +381,149 @@ export async function getRegistrationByElysianId(req, res) {
     return res.status(500).json({
       success: false,
       error: 'Failed to fetch registration details'
+    });
+  }
+}
+
+// Public endpoint to get registration by numeric ID (for payment flow)
+export async function getRegistrationById(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Registration ID is required'
+      });
+    }
+
+    const numericId = Number(id);
+    if (Number.isNaN(numericId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid registration ID'
+      });
+    }
+
+    const registration = await externalService.getExternalRegistrationById(numericId);
+
+    if (!registration) {
+      return res.status(404).json({
+        success: false,
+        error: 'Registration not found'
+      });
+    }
+
+    const responseData = parseRegistrationEvents(registration);
+    const jsonFields = [
+      'esparto_team_members', 'sahitya_team_members', 'prasasti_team_members',
+      'esparto_events', 'sahitya_events', 'prasasti_events'
+    ];
+
+    jsonFields.forEach(field => {
+      if (responseData[field] && typeof responseData[field] === 'string') {
+        try {
+          responseData[field] = JSON.parse(responseData[field]);
+        } catch (e) {
+          console.warn(`Failed to parse ${field}:`, e);
+          responseData[field] = [];
+        }
+      }
+    });
+
+    // Hide registration_id if not paid
+    if (registration.payment_status !== 'PAID') {
+      delete responseData.registration_id;
+    }
+
+    return res.json({
+      success: true,
+      registration: responseData,
+      isPaid: registration.payment_status === 'PAID'
+    });
+  } catch (error) {
+    console.error('Get registration by ID error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch registration'
+    });
+  }
+}
+
+// Public payment order creation (uses registration ID from body)
+export async function createExternalOrderPublic(req, res) {
+  try {
+    const { registrationId } = req.body;
+
+    if (!registrationId) {
+      return res.status(400).json({ error: 'Registration ID is required' });
+    }
+
+    const registration = await externalService.getExternalRegistrationById(registrationId);
+
+    if (!registration) {
+      return res.status(404).json({ error: 'Registration not found' });
+    }
+
+    if (registration.payment_status === 'PAID') {
+      return res.status(400).json({ error: 'Payment already completed for this registration' });
+    }
+
+    const existingPayment = await paymentService.getPaymentByExternalRegistrationId(registration.id);
+    if (existingPayment && existingPayment.status === 'PENDING' && existingPayment.payment_session_id) {
+      const createdAt = new Date(existingPayment.created_at);
+      const now = new Date();
+      const diffMinutes = (now - createdAt) / (1000 * 60);
+
+      if (diffMinutes < REUSE_WINDOW_MINUTES) {
+        return res.json({
+          success: true,
+          orderId: existingPayment.order_id,
+          paymentSessionId: existingPayment.payment_session_id,
+          orderAmount: existingPayment.amount,
+          mode: paymentService.getCashfreeMode(),
+          message: 'Using existing payment session'
+        });
+      }
+    }
+
+    const result = await paymentService.createPaymentOrder({
+      externalRegistrationId: registration.id,
+      customerName: registration.full_name,
+      customerEmail: registration.email,
+      customerPhone: registration.mobile,
+      amount: registration.total_amount,
+      returnUrlPath: '/payment-status.html?type=external&order_id={order_id}',
+      orderNote: `Elysian 2026 External Pass - Registration ID: ${registration.registration_id}`
+    });
+
+    return res.json(result);
+  } catch (error) {
+    console.error('External order error:', error);
+
+    let errorDetails = {
+      message: error.message,
+      code: error.code || 'UNKNOWN',
+      name: error.name
+    };
+
+    if (error.response?.data) {
+      errorDetails.cashfreeError = error.response.data;
+    }
+
+    if (error.response) {
+      errorDetails.statusCode = error.response.status;
+      errorDetails.statusText = error.response.statusText;
+    }
+
+    if (error.stack) {
+      errorDetails.stack = error.stack.substring(0, 500);
+    }
+
+    return res.status(500).json({
+      error: 'Failed to create payment order',
+      message: error.message,
+      details: errorDetails
     });
   }
 }

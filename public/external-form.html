@@ -2755,6 +2755,10 @@
           return;
         }
 
+        // Store registration ID for payment page
+        if (result.registrationId) {
+          localStorage.setItem('external_registration_id', result.registrationId);
+        }
         window.location.href = '/external-payment.html';
       } catch (error) {
         console.error('External registration error:', error);

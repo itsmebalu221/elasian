@@ -35,6 +35,10 @@ function requireExternalAuth(req, res, next) {
 export function externalRoutes(app) {
   // Registration is public
   app.post('/api/external/register', externalController.registerExternalParticipant);
+  // Public payment endpoints (for users who registered without logging in)
+  app.get('/api/external/registration/id/:id', externalController.getRegistrationById);
+  app.post('/api/external/payment/create-order-public', externalController.createExternalOrderPublic);
+  // Authenticated payment endpoints
   app.post('/api/external/payment/create-order', requireExternalAuth, externalController.createExternalOrder);
   app.get('/api/external/payment/status', requireExternalAuth, externalController.getExternalPaymentStatus);
   app.get('/api/external/registration/by-email', requireExternalAuth, externalController.getExternalRegistrationByEmail);

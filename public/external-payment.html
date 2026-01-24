@@ -520,40 +520,50 @@
     // Check authentication and get registration data
     async function init() {
       try {
+        // First check if we have a registration ID from localStorage (public flow)
+        const storedRegId = localStorage.getItem('external_registration_id');
+        
         // Check auth status
         const authRes = await fetch('/api/auth/status', {
           credentials: 'include'
         });
         const authData = await authRes.json();
 
-        if (!authData.isAuthenticated) {
-          window.location.href = '/login.html';
-          return;
-        }
+        const isAuthenticated = authData.isAuthenticated;
 
         // HITAM internal users should use payment.html
-        if (authData.user.userType === 'HITAMONLY') {
+        if (isAuthenticated && authData.user.userType === 'HITAMONLY') {
           window.location.href = '/payment.html';
           return;
         }
 
-        // Get external registration by authenticated user (server uses auth email)
-        const regRes = await fetch('/api/external/registration/by-email', {
-          credentials: 'include'
-        });
+        let regResult = null;
 
-        if (!regRes.ok) {
-          showError('No registration found. Please complete the registration form first.');
-          setTimeout(() => {
-            window.location.href = '/external-form.html';
-          }, 2000);
-          return;
+        // Try to get registration - prefer authenticated flow, fallback to public flow
+        if (isAuthenticated) {
+          // Get external registration by authenticated user (server uses auth email)
+          const regRes = await fetch('/api/external/registration/by-email', {
+            credentials: 'include'
+          });
+
+          if (regRes.ok) {
+            regResult = await regRes.json();
+          }
         }
 
-        const regResult = await regRes.json();
+        // Fallback: use stored registration ID (public flow)
+        if ((!regResult || !regResult.success) && storedRegId) {
+          const regRes = await fetch(`/api/external/registration/id/${storedRegId}`, {
+            credentials: 'include'
+          });
 
-        if (!regResult.success || !regResult.registration) {
-          showError('Please complete your registration form first');
+          if (regRes.ok) {
+            regResult = await regRes.json();
+          }
+        }
+
+        if (!regResult || !regResult.success || !regResult.registration) {
+          showError('No registration found. Please complete the registration form first.');
           setTimeout(() => {
             window.location.href = '/external-form.html';
           }, 2000);
@@ -564,6 +574,7 @@
 
         // Check if already paid
         if (registrationData.payment_status === 'PAID') {
+          localStorage.removeItem('external_registration_id');
           showInfo('Payment already completed! Redirecting to dashboard...');
           setTimeout(() => {
             window.location.href = '/dashboard.html';
@@ -693,8 +704,18 @@
 
         console.log('Creating payment order for registration:', registrationData.id);
 
+        // Check if user is authenticated
+        const authRes = await fetch('/api/auth/status', { credentials: 'include' });
+        const authData = await authRes.json();
+        const isAuthenticated = authData.isAuthenticated;
+
+        // Use public endpoint if not authenticated, otherwise use authenticated endpoint
+        const paymentEndpoint = isAuthenticated 
+          ? '/api/external/payment/create-order' 
+          : '/api/external/payment/create-order-public';
+
         // Create order
-        const response = await fetch('/api/external/payment/create-order', {
+        const response = await fetch(paymentEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
