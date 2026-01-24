@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-const DEFAULT_EXPIRY = '24h';
+const DEFAULT_EXPIRY = '7d';
 const COOKIE_NAME = 'elysian_token';
 
 function getSecret() {
@@ -33,7 +33,7 @@ export function getCookieOptions() {
     secure: isProduction,
     sameSite: 'lax',  // Use 'lax' to allow cookies on redirect from payment gateway
     path: '/',
-    maxAge: 24 * 60 * 60 * 1000 // milliseconds (24 hours)
+    maxAge: 7 * 24 * 60 * 60 * 1000 // milliseconds (7 days)
   };
 }
 

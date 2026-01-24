@@ -572,6 +572,18 @@
     let isScanning = false;
     let libLoaded = false;
     let currentUser = null;
+    let loginInProgress = false;
+    let loginFailCount = 0;
+    let loginCooldownUntil = 0;
+    let loginCooldownTimer = null;
+    let lookupInProgress = false;
+    let admitInProgress = false;
+    let lastLookupValue = null;
+    let lastLookupAt = 0;
+    let scannerInitInProgress = false;
+
+    const LOOKUP_COOLDOWN_MS = 1500;
+    const ADMIT_COOLDOWN_MS = 1500;
 
     // ===== ELEMENTS =====
     const loginScreen = document.getElementById('loginScreen');
@@ -595,6 +607,36 @@
     const startCamBtn = document.getElementById('startCamBtn');
     const manualIdInput = document.getElementById('manualIdInput');
 
+    function setLoginButtonState(disabled, text) {
+      loginBtn.disabled = disabled;
+      loginBtn.textContent = text;
+    }
+
+    function startLoginCooldown(durationMs) {
+      loginCooldownUntil = Date.now() + durationMs;
+      if (loginCooldownTimer) {
+        clearInterval(loginCooldownTimer);
+      }
+
+      const update = () => {
+        const remainingMs = Math.max(0, loginCooldownUntil - Date.now());
+        const remainingSeconds = Math.ceil(remainingMs / 1000);
+
+        if (remainingMs <= 0) {
+          clearInterval(loginCooldownTimer);
+          loginCooldownTimer = null;
+          loginFailCount = 0;
+          setLoginButtonState(false, 'Sign In');
+          return;
+        }
+
+        setLoginButtonState(true, `Try again in ${remainingSeconds}s`);
+      };
+
+      update();
+      loginCooldownTimer = setInterval(update, 1000);
+    }
+
     // ===== AUTH =====
     async function checkSession() {
       try {
@@ -615,6 +657,16 @@
     // Email/Password login via Firebase
     async function handleEmailLogin(e) {
       e.preventDefault();
+
+      if (loginInProgress) {
+        return;
+      }
+
+      if (Date.now() < loginCooldownUntil) {
+        const waitSeconds = Math.ceil((loginCooldownUntil - Date.now()) / 1000);
+        showLoginError(`Please wait ${waitSeconds}s before trying again.`);
+        return;
+      }
       
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
@@ -624,8 +676,8 @@
         return;
       }
 
-      loginBtn.disabled = true;
-      loginBtn.textContent = 'Signing in...';
+      loginInProgress = true;
+      setLoginButtonState(true, 'Signing in...');
       hideLoginError();
 
       try {
@@ -635,6 +687,7 @@
 
         // Send to backend
         await authenticateWithBackend(firebaseUser);
+        loginFailCount = 0;
 
       } catch (err) {
         console.error('Login error:', err);
@@ -645,17 +698,35 @@
         else if (err.code === 'auth/too-many-requests') msg = 'Too many attempts. Try again later.';
         else if (err.message) msg = err.message;
         showLoginError(msg);
+
+        loginFailCount += 1;
+        if (err.code === 'auth/too-many-requests' || loginFailCount >= 3) {
+          startLoginCooldown(30000);
+        }
       } finally {
-        loginBtn.disabled = false;
-        loginBtn.textContent = 'Sign In';
+        loginInProgress = false;
+        if (Date.now() >= loginCooldownUntil) {
+          setLoginButtonState(false, 'Sign In');
+        }
       }
     }
 
     // Google login via Firebase
     async function handleGoogleLogin() {
+      if (loginInProgress) {
+        return;
+      }
+
+      if (Date.now() < loginCooldownUntil) {
+        const waitSeconds = Math.ceil((loginCooldownUntil - Date.now()) / 1000);
+        showLoginError(`Please wait ${waitSeconds}s before trying again.`);
+        return;
+      }
+
       hideLoginError();
 
       try {
+        loginInProgress = true;
         const provider = new firebase.auth.GoogleAuthProvider();
         provider.addScope('email');
         provider.addScope('profile');
@@ -664,12 +735,15 @@
         const firebaseUser = result.user;
 
         await authenticateWithBackend(firebaseUser);
+        loginFailCount = 0;
 
       } catch (err) {
         console.error('Google login error:', err);
         if (err.code !== 'auth/popup-closed-by-user') {
           showLoginError(err.message || 'Google login failed');
         }
+      } finally {
+        loginInProgress = false;
       }
     }
 
@@ -803,6 +877,8 @@
     }
 
     async function initScanner() {
+      if (scannerInitInProgress) return;
+      scannerInitInProgress = true;
       overlayText.textContent = 'Starting camera...';
       startCamBtn.style.display = 'none';
       scannerOverlay.classList.remove('hidden');
@@ -841,6 +917,8 @@
         overlayText.textContent = err.message || 'Camera error';
         startCamBtn.style.display = 'block';
         showError('Camera: ' + err.message);
+      } finally {
+        scannerInitInProgress = false;
       }
     }
 
@@ -851,7 +929,7 @@
     }
 
     async function onScanSuccess(decodedText) {
-      if (!isScanning) return;
+      if (!isScanning || lookupInProgress) return;
       await stopScanner();
       await doLookup(decodedText, false);
     }
@@ -863,6 +941,7 @@
         showError('Enter a registration ID');
         return;
       }
+      if (lookupInProgress) return;
       await stopScanner();
       scannerOverlay.classList.remove('hidden');
       overlayText.textContent = 'Looking up...';
@@ -870,6 +949,16 @@
     }
 
     async function doLookup(value, isDirect) {
+      if (lookupInProgress) return;
+      const now = Date.now();
+      const normalizedValue = value?.toString().trim().toUpperCase();
+      if (normalizedValue && lastLookupValue === normalizedValue && (now - lastLookupAt) < LOOKUP_COOLDOWN_MS) {
+        return;
+      }
+
+      lookupInProgress = true;
+      lastLookupValue = normalizedValue;
+      lastLookupAt = now;
       setStatus('loading', '', 'Verifying...', value.toUpperCase());
       hideError();
 
@@ -891,6 +980,8 @@
         setStatus('invalid', '❌', 'Not Found', err.message);
         passInfo.classList.add('hidden');
         admitBtn.disabled = true;
+      } finally {
+        lookupInProgress = false;
       }
     }
 
@@ -959,6 +1050,13 @@
     // ===== ADMIT =====
     async function admitSelected() {
       if (selectedIds.size === 0) return;
+      if (admitInProgress) return;
+      const now = Date.now();
+      if (now - lastLookupAt < ADMIT_COOLDOWN_MS) {
+        return;
+      }
+
+      admitInProgress = true;
 
       admitBtn.disabled = true;
       admitBtn.textContent = 'Admitting...';
@@ -981,6 +1079,8 @@
       } catch (err) {
         showError('Admit failed: ' + err.message);
         updateAdmitButton();
+      } finally {
+        admitInProgress = false;
       }
     }
 
