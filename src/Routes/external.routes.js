@@ -33,11 +33,11 @@ function requireExternalAuth(req, res, next) {
 }
 
 export function externalRoutes(app) {
-  // All external routes require authentication
-  app.post('/api/external/register', requireExternalAuth, externalController.registerExternalParticipant);
+  // Registration is public
+  app.post('/api/external/register', externalController.registerExternalParticipant);
   app.post('/api/external/payment/create-order', requireExternalAuth, externalController.createExternalOrder);
   app.get('/api/external/payment/status', requireExternalAuth, externalController.getExternalPaymentStatus);
   app.get('/api/external/registration/by-email', requireExternalAuth, externalController.getExternalRegistrationByEmail);
-  app.get('/api/external/registration/:identityNumber', requireExternalAuth, externalController.getRegistrationByIdentity);
-  app.get('/api/external/registration/code/:elysianId', requireExternalAuth, externalController.getRegistrationByElysianId);
+  app.get('/api/external/registration/:identityNumber', externalController.getRegistrationByIdentity);
+  app.get('/api/external/registration/code/:elysianId', externalController.getRegistrationByElysianId);
 }

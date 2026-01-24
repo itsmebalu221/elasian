@@ -23,19 +23,22 @@ function parseRegistrationEvents(registration) {
 
 export async function registerExternalParticipant(req, res) {
   try {
-    // Use authenticated user's email
+    // Use authenticated email when available, otherwise accept payload email
     const userEmail = req.user?.email;
-    if (!userEmail) {
-      return res.status(401).json({
+    const fallbackEmail = req.body?.email;
+    const resolvedEmail = (userEmail || fallbackEmail || '').toString().toLowerCase().trim();
+
+    if (!resolvedEmail) {
+      return res.status(400).json({
         success: false,
-        error: 'Authentication required'
+        error: 'Email is required'
       });
     }
 
-    // Override email with authenticated user's email for security
+    // Override email with authenticated user's email for security when present
     const payload = {
       ...req.body,
-      email: userEmail.toLowerCase().trim()
+      email: resolvedEmail
     };
 
     const validated = externalRegistrationSchema.parse(payload);
