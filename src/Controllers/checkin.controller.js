@@ -4,6 +4,11 @@ import { findOrCreateUser } from '../config/firebase.js';
 
 // Allowed gate staff emails (can also be set via env)
 const GATE_STAFF_EMAILS = (process.env.GATE_STAFF_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+const BASIC_LOGIN_EMAILS = (process.env.GATE_STAFF_BASIC_EMAILS || process.env.GATE_STAFF_BASIC_EMAIL || '')
+  .split(',')
+  .map(e => e.trim().toLowerCase())
+  .filter(Boolean);
+const BASIC_LOGIN_PASSWORD = (process.env.GATE_STAFF_BASIC_PASSWORD || process.env.GATE_STAFF_BASIC_PASS || '').toString();
 
 function isGateStaffEmail(email) {
   if (!email) return false;
@@ -134,6 +139,59 @@ export async function gateStaffLogin(req, res) {
 
   } catch (error) {
     console.error('Gate staff login error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Login failed'
+    });
+  }
+}
+
+export async function gateStaffLoginBasic(req, res) {
+  try {
+    const { email, password } = req.body || {};
+
+    if (!BASIC_LOGIN_EMAILS.length || !BASIC_LOGIN_PASSWORD) {
+      return res.status(500).json({
+        success: false,
+        error: 'Basic gate login is not configured'
+      });
+    }
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email and password are required'
+      });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    if (!BASIC_LOGIN_EMAILS.includes(normalizedEmail) || password !== BASIC_LOGIN_PASSWORD) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials'
+      });
+    }
+
+    const token = signToken({
+      id: `basic_${Date.now()}`,
+      email: normalizedEmail,
+      name: normalizedEmail.split('@')[0],
+      picture: null,
+      userType: 'GATESTAFF'
+    });
+
+    res.cookie(getCookieName(), token, getCookieOptions());
+
+    return res.json({
+      success: true,
+      user: {
+        email: normalizedEmail,
+        name: normalizedEmail.split('@')[0],
+        userType: 'GATESTAFF'
+      }
+    });
+  } catch (error) {
+    console.error('Gate staff basic login error:', error);
     return res.status(500).json({
       success: false,
       error: 'Login failed'

@@ -541,29 +541,7 @@
     </div>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-
   <script>
-    // ===== FIREBASE CONFIG =====
-    const firebaseConfig = {
-      apiKey: "AIzaSyBb8jN0YSs2C_Khzx9AHRqc5olB6vR41DY",
-      authDomain: "elysian-1f0e0.firebaseapp.com",
-      projectId: "elysian-1f0e0",
-      storageBucket: "elysian-1f0e0.firebasestorage.app",
-      messagingSenderId: "418734607706",
-      appId: "1:418734607706:web:34925d2deb1cba466f7763"
-    };
-
-    try {
-      firebase.initializeApp(firebaseConfig);
-    } catch (e) {
-      if (!/already exists/.test(e.message)) {
-        console.error('Firebase init error:', e);
-      }
-    }
-
     // ===== STATE =====
     let scanner = null;
     let currentDay = 'day1';
@@ -654,7 +632,7 @@
       return false;
     }
 
-    // Email/Password login via Firebase
+    // Email/Password login via env credentials
     async function handleEmailLogin(e) {
       e.preventDefault();
 
@@ -681,26 +659,30 @@
       hideLoginError();
 
       try {
-        // Firebase email/password sign in
-        const result = await firebase.auth().signInWithEmailAndPassword(email, password);
-        const firebaseUser = result.user;
+        const res = await fetch('/api/checkin/login-basic', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
 
-        // Send to backend
-        await authenticateWithBackend(firebaseUser);
-        loginFailCount = 0;
+        const data = await res.json();
+        if (data.success && data.user) {
+          currentUser = data.user;
+          showApp();
+          loginFailCount = 0;
+        } else {
+          throw new Error(data.error || 'Login failed');
+        }
 
       } catch (err) {
         console.error('Login error:', err);
         let msg = 'Login failed';
-        if (err.code === 'auth/user-not-found') msg = 'No account found with this email';
-        else if (err.code === 'auth/wrong-password') msg = 'Invalid password';
-        else if (err.code === 'auth/invalid-email') msg = 'Invalid email format';
-        else if (err.code === 'auth/too-many-requests') msg = 'Too many attempts. Try again later.';
-        else if (err.message) msg = err.message;
+        if (err.message) msg = err.message;
         showLoginError(msg);
 
         loginFailCount += 1;
-        if (err.code === 'auth/too-many-requests' || loginFailCount >= 3) {
+        if (loginFailCount >= 3) {
           startLoginCooldown(30000);
         }
       } finally {
@@ -711,73 +693,8 @@
       }
     }
 
-    // Google login via Firebase
-    async function handleGoogleLogin() {
-      if (loginInProgress) {
-        return;
-      }
-
-      if (Date.now() < loginCooldownUntil) {
-        const waitSeconds = Math.ceil((loginCooldownUntil - Date.now()) / 1000);
-        showLoginError(`Please wait ${waitSeconds}s before trying again.`);
-        return;
-      }
-
-      hideLoginError();
-
-      try {
-        loginInProgress = true;
-        const provider = new firebase.auth.GoogleAuthProvider();
-        provider.addScope('email');
-        provider.addScope('profile');
-
-        const result = await firebase.auth().signInWithPopup(provider);
-        const firebaseUser = result.user;
-
-        await authenticateWithBackend(firebaseUser);
-        loginFailCount = 0;
-
-      } catch (err) {
-        console.error('Google login error:', err);
-        if (err.code !== 'auth/popup-closed-by-user') {
-          showLoginError(err.message || 'Google login failed');
-        }
-      } finally {
-        loginInProgress = false;
-      }
-    }
-
-    // Send Firebase user to backend
-    async function authenticateWithBackend(firebaseUser) {
-      const res = await fetch('/api/checkin/login', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user: {
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            displayName: firebaseUser.displayName,
-            photoURL: firebaseUser.photoURL
-          }
-        })
-      });
-
-      const data = await res.json();
-
-      if (data.success && data.user) {
-        currentUser = data.user;
-        showApp();
-      } else {
-        // Sign out from Firebase if backend rejects
-        await firebase.auth().signOut();
-        throw new Error(data.error || 'Access denied');
-      }
-    }
-
     async function handleLogout() {
       try {
-        await firebase.auth().signOut();
         await fetch('/api/checkin/logout', { method: 'POST', credentials: 'include' });
       } catch (e) {}
       
