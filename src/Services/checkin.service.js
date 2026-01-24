@@ -28,7 +28,9 @@ const PASS_LABELS = {
   BUTTERFLY: 'Butterfly Pass',
   EXTERNAL: 'External (HITAM Only)',
   FIRST_PHASE: 'First Phase Registration',
-  FLASH: 'Flash Pass'
+  FLASH: 'Flash Pass',
+  INTERNAL: 'Student Pass',
+  ALUMNI: 'Alumni Pass'
 };
 
 export class CheckinError extends Error {
@@ -198,6 +200,16 @@ function mapExternalParticipants(registration, snapshots, dayId) {
   return [hydrateParticipant(baseSlot, snapshot, dayId, 'Pass Holder')];
 }
 
+function mapSingleParticipant(registration, snapshots, dayId, baseSlotBuilder) {
+  if (!snapshots.length) {
+    return [];
+  }
+
+  const snapshot = snapshots[0];
+  const baseSlot = baseSlotBuilder(registration, snapshot);
+  return [hydrateParticipant(baseSlot, snapshot, dayId, 'Pass Holder')];
+}
+
 function summarizeParticipants(participants) {
   const summary = {
     total: participants.length,
@@ -233,6 +245,26 @@ function buildMeta(passType, registration, summary) {
       primaryEmail: registration.primary_email,
       paymentStatus: registration.payment_status,
       totalAmount: Number(registration.total_amount),
+      counts: summary
+    };
+  }
+
+  if (passType === 'INTERNAL') {
+    return {
+      passLabel: PASS_LABELS.INTERNAL,
+      ownerName: registration.full_name,
+      branch: registration.branch,
+      rollNumber: registration.roll_number,
+      counts: summary
+    };
+  }
+
+  if (passType === 'ALUMNI') {
+    return {
+      passLabel: PASS_LABELS.ALUMNI,
+      ownerName: registration.full_name,
+      branch: registration.branch,
+      yearOfGraduation: registration.year_of_graduation,
       counts: summary
     };
   }
@@ -426,7 +458,7 @@ async function buildPayload(registrationId, dayId) {
   const sourceTable = snapshots[0].source_table;
   const passType = SOURCE_TO_TYPE[sourceTable] || 'UNKNOWN';
 
-  if (!['BUTTERFLY', 'EXTERNAL'].includes(passType)) {
+  if (!['BUTTERFLY', 'EXTERNAL', 'INTERNAL', 'ALUMNI'].includes(passType)) {
     throw new CheckinError('Unsupported pass type for this validator', 400, 'UNSUPPORTED_PASS');
   }
 
@@ -442,9 +474,34 @@ async function buildPayload(registrationId, dayId) {
     }
   }
 
-  const participants = passType === 'BUTTERFLY'
-    ? mapButterflyParticipants(registration, snapshots, day.id)
-    : mapExternalParticipants(registration, snapshots, day.id);
+  let participants = [];
+  if (passType === 'BUTTERFLY') {
+    participants = mapButterflyParticipants(registration, snapshots, day.id);
+  } else if (passType === 'EXTERNAL') {
+    participants = mapExternalParticipants(registration, snapshots, day.id);
+  } else if (passType === 'INTERNAL') {
+    participants = mapSingleParticipant(registration, snapshots, day.id, (reg, snapshot) => ({
+      studentNumber: 1,
+      name: reg.full_name,
+      branch: reg.branch || null,
+      rollNumber: reg.roll_number || null,
+      mobile: reg.mobile || snapshot.mobile || null,
+      email: snapshot.email || null,
+      institution: null,
+      department: null
+    }));
+  } else if (passType === 'ALUMNI') {
+    participants = mapSingleParticipant(registration, snapshots, day.id, (reg, snapshot) => ({
+      studentNumber: 1,
+      name: reg.full_name,
+      branch: reg.branch || null,
+      rollNumber: null,
+      mobile: reg.mobile || snapshot.mobile || null,
+      email: reg.email || snapshot.email || null,
+      institution: null,
+      department: null
+    }));
+  }
 
   const summary = summarizeParticipants(participants);
   const meta = buildMeta(passType, registration, summary);
