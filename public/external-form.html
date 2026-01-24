@@ -2809,7 +2809,9 @@
     async function fetchRegistrationByEmail() {
       try {
         setLoading(true, 'Checking existing application...');
-        const response = await fetch('/api/external/registration/by-email');
+        const response = await fetch('/api/external/registration/by-email', {
+          credentials: 'include'
+        });
         const result = await response.json();
 
         if (response.ok && result.success && result.registration) {
@@ -2827,7 +2829,9 @@
     async function fetchRegistrationByIdentity(identityNumber) {
       try {
         setLoading(true, 'Checking existing registration...');
-        const response = await fetch(`/api/external/registration/${encodeURIComponent(identityNumber)}`);
+        const response = await fetch(`/api/external/registration/${encodeURIComponent(identityNumber)}`, {
+          credentials: 'include'
+        });
         const result = await response.json();
 
         if (response.ok && result.success && result.registration) {

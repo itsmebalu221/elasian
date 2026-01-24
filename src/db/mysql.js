@@ -31,6 +31,40 @@ function createPool() {
   return pool;
 }
 
+async function ensureExternalRegistrationColumns(connection) {
+  const columns = [
+    { name: 'esparto_selected', type: 'BOOLEAN DEFAULT FALSE' },
+    { name: 'esparto_mode', type: "ENUM('attendee', 'participant') NULL" },
+    { name: 'esparto_participant_type', type: "ENUM('solo', 'group') NULL" },
+    { name: 'esparto_team_members', type: 'TEXT NULL' },
+    { name: 'sahitya_selected', type: 'BOOLEAN DEFAULT FALSE' },
+    { name: 'sahitya_events', type: 'JSON NULL' },
+    { name: 'sahitya_participant_type', type: "ENUM('solo', 'group') NULL" },
+    { name: 'sahitya_team_members', type: 'TEXT NULL' },
+    { name: 'prasasti_selected', type: 'BOOLEAN DEFAULT FALSE' },
+    { name: 'prasasti_events', type: 'JSON NULL' },
+    { name: 'prasasti_mode', type: "ENUM('attendee', 'participant') NULL" },
+    { name: 'prasasti_participant_type', type: "ENUM('solo', 'group') NULL" },
+    { name: 'prasasti_team_members', type: 'TEXT NULL' }
+  ];
+
+  for (const column of columns) {
+    const [rows] = await connection.query(
+      `SELECT COUNT(*) AS count FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = 'external_registrations'
+         AND COLUMN_NAME = ?`,
+      [column.name]
+    );
+
+    if (rows?.[0]?.count === 0) {
+      await connection.query(
+        `ALTER TABLE external_registrations ADD COLUMN ${column.name} ${column.type}`
+      );
+    }
+  }
+}
+
 // Initialize database and create tables
 export async function initializeDatabase() {
   let connection = null;
@@ -157,11 +191,19 @@ export async function initializeDatabase() {
         add_on_selected BOOLEAN DEFAULT FALSE,
         total_amount DECIMAL(10, 2) NOT NULL,
         selected_events JSON NULL,
+        esparto_selected BOOLEAN DEFAULT FALSE,
         esparto_events JSON NULL,
+        esparto_mode ENUM('attendee', 'participant') NULL,
+        esparto_participant_type ENUM('solo', 'group') NULL,
+        esparto_team_members TEXT NULL,
+        sahitya_selected BOOLEAN DEFAULT FALSE,
         sahitya_events JSON NULL,
         sahitya_mode ENUM('attendee', 'participant') NULL,
+        sahitya_participant_type ENUM('solo', 'group') NULL,
         sahitya_team_members TEXT NULL,
+        prasasti_selected BOOLEAN DEFAULT FALSE,
         prasasti_mode ENUM('attendee', 'participant') NULL,
+        prasasti_participant_type ENUM('solo', 'group') NULL,
         prasasti_team_members TEXT NULL,
         prasasti_events JSON NULL,
         prasasti_event VARCHAR(50) NULL,
@@ -176,6 +218,9 @@ export async function initializeDatabase() {
         INDEX idx_external_payment_status (payment_status)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
+
+    // Ensure new external registration columns exist (for older databases)
+    await ensureExternalRegistrationColumns(connection);
 
     // Step 7b: Create butterfly registrations table (4-student group offer)
     console.log('🔄 Creating butterfly_registrations table...');
@@ -719,34 +764,8 @@ export async function initializeDatabase() {
       WHERE ar.payment_status = 'PAID'
     `);
 
-    // Copy existing data from first_phase_registrations if table exists
-    console.log('🔄 Checking for first_phase_registrations data...');
-    try {
-      const [tableExists] = await connection.query(`
-        SELECT COUNT(*) as count FROM information_schema.tables 
-        WHERE table_schema = ? AND table_name = 'first_phase_registrations'
-      `, [DB_NAME]);
-      
-      if (tableExists[0].count > 0) {
-        const [inserted] = await connection.query(`
-          INSERT INTO attendance_snapshot (
-            registration_id, full_name, roll_number, email, mobile,
-            user_type, source_table, source_id,
-            day1, day2, day3, day4, day5, day6, day7
-          )
-          SELECT 
-            registration_id, full_name, roll_number, email, mobile,
-            user_type, source_table, source_id,
-            day1, day2, day3, day4, day5, day6, day7
-          FROM first_phase_registrations
-        `);
-        console.log(`   ✅ Imported ${inserted.affectedRows} records from first_phase_registrations`);
-      } else {
-        console.log('   ℹ️ No first_phase_registrations table found, skipping...');
-      }
-    } catch (fpErr) {
-      console.warn('   ⚠️ Could not import first_phase_registrations:', fpErr.message);
-    }
+    // first_phase_registrations is handled separately at check-in lookup (not part of attendance_snapshot)
+    console.log('ℹ️ Skipping first_phase_registrations import (handled separately at check-in).');
 
     connection.release();
     await tempPool.end();
