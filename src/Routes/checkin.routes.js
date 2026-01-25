@@ -1,4 +1,4 @@
-import { fetchConfig, lookupRegistration, admitGuests, gateStaffLogin, gateStaffLoginBasic, gateStaffLogout, getGateStaffSession } from '../Controllers/checkin.controller.js';
+import { fetchConfig, lookupRegistration, admitGuests, gateStaffLoginBasic, gateStaffLogout, getGateStaffSession } from '../Controllers/checkin.controller.js';
 
 function requireCheckinAuth(req, res, next) {
   // Check if user is authenticated as GATESTAFF or HITAMONLY
@@ -20,9 +20,9 @@ function requireCheckinAuth(req, res, next) {
 }
 
 export function checkinRoutes(app) {
-  // Auth endpoints (no auth required)
-  app.post('/api/checkin/login', gateStaffLogin);
-  app.post('/api/checkin/login-basic', gateStaffLoginBasic);
+  // Auth endpoints (no auth required) - simple email/password login with 24h session
+  app.post('/api/checkin/login', gateStaffLoginBasic);  // Main login endpoint
+  app.post('/api/checkin/login-basic', gateStaffLoginBasic);  // Alias
   app.post('/api/checkin/logout', gateStaffLogout);
   app.get('/api/checkin/session', getGateStaffSession);
   

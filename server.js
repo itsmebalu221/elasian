@@ -39,11 +39,16 @@ app.use((req, res, next) => {
 // Simple rate limiting for API endpoints (in-memory, resets on restart)
 const rateLimitMap = new Map();
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
-const RATE_LIMIT_MAX_REQUESTS = 100; // 100 requests per hour per IP
+const RATE_LIMIT_MAX_REQUESTS = 10000; // 10000 requests per hour per IP
 
 function rateLimiter(req, res, next) {
   // Only rate limit API endpoints
   if (!req.path.startsWith('/api/')) {
+    return next();
+  }
+
+  // Skip rate limiting for checkin endpoints (they have auth protection)
+  if (req.path.startsWith('/api/checkin/')) {
     return next();
   }
 

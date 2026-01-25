@@ -1,6 +1,5 @@
 import { admitSelection, getCheckinConfig, lookupPass, CheckinError } from '../Services/checkin.service.js';
-import { signToken, getCookieName, getCookieOptions, getClearCookieOptions } from '../utils/jwt.js';
-import { findOrCreateUser } from '../config/firebase.js';
+import { signGateStaffToken, getCookieName, getGateStaffCookieOptions, getClearCookieOptions } from '../utils/jwt.js';
 
 // Allowed gate staff emails (can also be set via env)
 const GATE_STAFF_EMAILS = (process.env.GATE_STAFF_EMAILS || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
@@ -77,75 +76,7 @@ export async function admitGuests(req, res) {
   }
 }
 
-export async function gateStaffLogin(req, res) {
-  try {
-    const { user } = req.body || {};
-
-    if (!user || !user.email) {
-      return res.status(400).json({
-        success: false,
-        error: 'Firebase user data is required'
-      });
-    }
-
-    const email = user.email.toLowerCase().trim();
-    
-    // Check if user is allowed as gate staff
-    if (!isGateStaffEmail(email)) {
-      return res.status(403).json({
-        success: false,
-        error: 'Access denied. Only authorized staff can access gate check-in.'
-      });
-    }
-
-    // Find or create user in database
-    let dbUser;
-    try {
-      dbUser = await findOrCreateUser({
-        uid: user.uid || `firebase_${Date.now()}`,
-        email,
-        displayName: user.displayName || email.split('@')[0],
-        photoURL: user.photoURL || null
-      });
-    } catch (dbError) {
-      console.error('Database error during gate login:', dbError);
-      dbUser = {
-        id: `session_${Date.now()}`,
-        email,
-        name: user.displayName || email.split('@')[0],
-        is_temporary: true
-      };
-    }
-
-    const token = signToken({
-      id: dbUser.id,
-      email,
-      name: user.displayName || dbUser.name || email.split('@')[0],
-      picture: user.photoURL || dbUser.profile_picture || null,
-      userType: 'GATESTAFF'
-    });
-
-    res.cookie(getCookieName(), token, getCookieOptions());
-    
-    return res.json({
-      success: true,
-      user: {
-        email,
-        name: user.displayName || dbUser.name,
-        picture: user.photoURL || null,
-        userType: 'GATESTAFF'
-      }
-    });
-
-  } catch (error) {
-    console.error('Gate staff login error:', error);
-    return res.status(500).json({
-      success: false,
-      error: 'Login failed'
-    });
-  }
-}
-
+// Simple email/password login for gate staff (24-hour session)
 export async function gateStaffLoginBasic(req, res) {
   try {
     const { email, password } = req.body || {};
@@ -172,7 +103,7 @@ export async function gateStaffLoginBasic(req, res) {
       });
     }
 
-    const token = signToken({
+    const token = signGateStaffToken({
       id: `basic_${Date.now()}`,
       email: normalizedEmail,
       name: normalizedEmail.split('@')[0],
@@ -180,7 +111,7 @@ export async function gateStaffLoginBasic(req, res) {
       userType: 'GATESTAFF'
     });
 
-    res.cookie(getCookieName(), token, getCookieOptions());
+    res.cookie(getCookieName(), token, getGateStaffCookieOptions());
 
     return res.json({
       success: true,

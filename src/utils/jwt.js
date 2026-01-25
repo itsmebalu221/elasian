@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 const DEFAULT_EXPIRY = '7d';
+const GATE_STAFF_EXPIRY = '24h';
 const COOKIE_NAME = 'elysian_token';
 
 function getSecret() {
@@ -14,6 +15,13 @@ function getSecret() {
 export function signToken(payload, options = {}) {
   return jwt.sign(payload, getSecret(), {
     expiresIn: DEFAULT_EXPIRY,
+    ...options
+  });
+}
+
+export function signGateStaffToken(payload, options = {}) {
+  return jwt.sign(payload, getSecret(), {
+    expiresIn: GATE_STAFF_EXPIRY,
     ...options
   });
 }
@@ -34,6 +42,17 @@ export function getCookieOptions() {
     sameSite: 'lax',  // Use 'lax' to allow cookies on redirect from payment gateway
     path: '/',
     maxAge: 7 * 24 * 60 * 60 * 1000 // milliseconds (7 days)
+  };
+}
+
+export function getGateStaffCookieOptions() {
+  const isProduction = process.env.NODE_ENV === 'production' || !!process.env.VERCEL;
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 24 * 60 * 60 * 1000 // milliseconds (24 hours)
   };
 }
 
