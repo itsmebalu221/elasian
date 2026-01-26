@@ -626,6 +626,19 @@ export async function initializeDatabase() {
     }
 
     console.log('🔄 Rebuilding attendance_snapshot table...');
+    
+    // First, backup existing attendance data (day1-day7 values)
+    let existingAttendance = [];
+    try {
+      const [rows] = await connection.query(
+        'SELECT registration_id, email, day1, day2, day3, day4, day5, day6, day7 FROM attendance_snapshot'
+      );
+      existingAttendance = rows || [];
+      console.log(`📦 Backed up ${existingAttendance.length} attendance records`);
+    } catch (e) {
+      console.log('ℹ️ No existing attendance_snapshot table to backup');
+    }
+
     await connection.query('DROP TABLE IF EXISTS banner_launch_registrations').catch(() => {});
     await connection.query('DROP TABLE IF EXISTS attendance_snapshot');
     await connection.query(`
@@ -763,6 +776,42 @@ export async function initializeDatabase() {
       FROM alumni_registrations ar
       WHERE ar.payment_status = 'PAID'
     `);
+
+    // Restore attendance data from backup
+    if (existingAttendance.length > 0) {
+      console.log('🔄 Restoring attendance data...');
+      let restoredCount = 0;
+      for (const record of existingAttendance) {
+        // Only update if there's actual attendance data (not all unattended)
+        const hasAttendance = ['day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7'].some(
+          day => record[day] && record[day] !== 'unattended'
+        );
+        if (hasAttendance) {
+          try {
+            await connection.query(
+              `UPDATE attendance_snapshot 
+               SET day1 = ?, day2 = ?, day3 = ?, day4 = ?, day5 = ?, day6 = ?, day7 = ?
+               WHERE registration_id = ? AND email = ?`,
+              [
+                record.day1 || 'unattended',
+                record.day2 || 'unattended',
+                record.day3 || 'unattended',
+                record.day4 || 'unattended',
+                record.day5 || 'unattended',
+                record.day6 || 'unattended',
+                record.day7 || 'unattended',
+                record.registration_id,
+                record.email
+              ]
+            );
+            restoredCount++;
+          } catch (e) {
+            // Silently skip if record doesn't exist
+          }
+        }
+      }
+      console.log(`✅ Restored attendance for ${restoredCount} records`);
+    }
 
     // first_phase_registrations is handled separately at check-in lookup (not part of attendance_snapshot)
     console.log('ℹ️ Skipping first_phase_registrations import (handled separately at check-in).');
